@@ -7,7 +7,7 @@ class Employee {
   final String lastName;
   final String badgeNumber;
   final bool isSupervisor;
-  Division? division; // Employees can only be assigned to one division
+  final Division? division; // Employees can only be assigned to one division
 
   Employee({
     required this.id,

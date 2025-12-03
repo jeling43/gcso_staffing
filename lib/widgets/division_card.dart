@@ -85,7 +85,7 @@ class DivisionCard extends StatelessWidget {
                               children: [
                                 CircleAvatar(
                                   radius: 16,
-                                  backgroundColor: _getDivisionColor(division).withAlpha(51),
+                                  backgroundColor: _getDivisionColor(division).withOpacity(0.2),
                                   child: Text(
                                     entry.employee.firstName[0] + entry.employee.lastName[0],
                                     style: TextStyle(

@@ -168,7 +168,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                color: _getDivisionColor(division).withAlpha(51),
+                color: _getDivisionColor(division).withOpacity(0.2),
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
               ),
               child: Row(
