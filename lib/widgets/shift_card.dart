@@ -47,7 +47,8 @@ class ShiftCard extends StatelessWidget {
         return Icons.wb_sunny;
       case Shift.night:
         return Icons.nightlight;
-      case Shift.split:
+      case Shift.split1200:
+      case Shift.split1400:
         return Icons.schedule;
       default:
         return Icons.access_time;
@@ -60,7 +61,8 @@ class ShiftCard extends StatelessWidget {
         return Colors.amber;
       case Shift.night:
         return Colors.indigo;
-      case Shift.split:
+      case Shift.split1200:
+      case Shift.split1400:
         return Colors.teal;
       default:
         return Colors.grey;
