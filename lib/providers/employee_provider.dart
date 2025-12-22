@@ -15,8 +15,8 @@ class EmployeeProvider extends ChangeNotifier {
   }
 
   void _initializeSampleData() {
-    // Sample employees for Patrol division - 11 total
-    // 5 Day shift, 5 Night shift, 1 Split shift
+    // Sample employees for Patrol division - 12 total
+    // 5 Day shift, 5 Night shift, 2 Split shift
     _employees.addAll([
       // Day Shift - 5 employees
       Employee(
@@ -110,13 +110,22 @@ class EmployeeProvider extends ChangeNotifier {
         isSupervisor: false,
         division: Division.patrol,
       ),
-      // Split Shift - 1 employee
+      // Split Shift - 2 employees
       Employee(
         id: '11',
         firstName: 'Robert',
         lastName: 'Garcia',
         badgeNumber: 'P011',
         rank: Rank.sergeantFirstClass,
+        isSupervisor: false,
+        division: Division.patrol,
+      ),
+      Employee(
+        id: '12',
+        firstName: 'Maria',
+        lastName: 'Rodriguez',
+        badgeNumber: 'P012',
+        rank: Rank.corporal,
         isSupervisor: false,
         division: Division.patrol,
       ),

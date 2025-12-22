@@ -135,24 +135,10 @@ class DivisionCard extends StatelessWidget {
   }
 
   IconData _getDivisionIcon(Division division) {
-    switch (division) {
-      case Division.jail:
-        return Icons.security;
-      case Division.patrol:
-        return Icons.directions_car;
-      case Division.courthouse:
-        return Icons.account_balance;
-    }
+    return Icons.directions_car;
   }
 
   Color _getDivisionColor(Division division) {
-    switch (division) {
-      case Division.jail:
-        return Colors.orange;
-      case Division.patrol:
-        return Colors.blue;
-      case Division.courthouse:
-        return Colors.purple;
-    }
+    return Colors.blue;
   }
 }

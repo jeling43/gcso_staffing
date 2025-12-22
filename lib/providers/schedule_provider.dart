@@ -17,7 +17,7 @@ class ScheduleProvider extends ChangeNotifier {
     // Assign specific shifts to employees based on ID
     // IDs 1-5: Day shift
     // IDs 6-10: Night shift
-    // ID 11: Split shift
+    // IDs 11-12: Split shift (2 employees)
     for (final employee in employees) {
       if (employee.division != null) {
         String shift;

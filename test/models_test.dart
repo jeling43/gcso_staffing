@@ -169,10 +169,10 @@ void main() {
   });
 
   group('EmployeeProvider', () {
-    test('initializes with 11 patrol employees', () {
+    test('initializes with 12 patrol employees', () {
       final provider = EmployeeProvider();
       
-      expect(provider.employees.length, equals(11));
+      expect(provider.employees.length, equals(12));
       expect(provider.currentUser, isNotNull);
     });
     
@@ -198,7 +198,7 @@ void main() {
       
       final patrolEmployees = provider.getEmployeesByDivision(Division.patrol);
       
-      expect(patrolEmployees.length, equals(11));
+      expect(patrolEmployees.length, equals(12));
       for (final employee in patrolEmployees) {
         expect(employee.division, equals(Division.patrol));
       }

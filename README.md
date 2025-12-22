@@ -14,9 +14,11 @@ A modern Flutter web application for the Sheriff's Office Patrol Division that t
 The application tracks staffing across three shifts in the Patrol Division:
 - **Day Shift** - Officers working daytime hours (5 employees)
 - **Night Shift** - Officers working nighttime hours (5 employees)
-- **Split Shift** - Officers working split hours (1 employee)
+- **Split Shift** - Officers working split hours (2 employees)
+  - Split 1: 1200-2400 (12:00 PM - 12:00 AM)
+  - Split 2: 1400-2400 (2:00 PM - 12:00 AM)
 
-Total: 11 Patrol Division employees
+Total: 12 Patrol Division employees
 
 ## User Roles
 
