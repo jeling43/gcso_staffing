@@ -27,7 +27,10 @@ class DashboardScreen extends StatelessWidget {
   /// Get the current shift group (A or B) - simplified for demo
   String _getCurrentShiftGroup() {
     // In a real app, this would track actual rotation schedule
-    // For demo purposes, alternate based on day of year
+    // For demo purposes, alternate based on day of year:
+    // - Week 0, 2, 4, ... = A shift
+    // - Week 1, 3, 5, ... = B shift
+    // Each week starts on day 0 (Jan 1st) and increments by 7 days
     final dayOfYear = DateTime.now().difference(DateTime(DateTime.now().year, 1, 1)).inDays;
     return (dayOfYear ~/ 7) % 2 == 0 ? 'A' : 'B';
   }
