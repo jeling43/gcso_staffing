@@ -19,7 +19,7 @@ class ScheduleProvider extends ChangeNotifier {
     
     // Assign shifts based on employee ID and shift group
     // Blue Shift: IDs 1-3 (Day), IDs 4-6 (Night)
-    // Gold Shift: IDs 7-8 (Day), IDs 9-10 (Night), IDs 11-12 (Split)
+    // Gold Shift: IDs 7-8 (Day), IDs 9-10 (Night), ID 11 (Split-1200), ID 12 (Split-1400)
     for (final employee in employees) {
       if (employee.division != null && employee.shiftGroup != null) {
         String shift;
@@ -34,8 +34,10 @@ class ScheduleProvider extends ChangeNotifier {
           shift = Shift.day;
         } else if (id >= 9 && id <= 10) {
           shift = Shift.night;
+        } else if (id == 11) {
+          shift = Shift.split1200;
         } else {
-          shift = Shift.split;
+          shift = Shift.split1400;
         }
         
         // Only add schedule entry if this employee's shift group is working today
@@ -133,5 +135,27 @@ class ScheduleProvider extends ChangeNotifier {
       _scheduleEntries[index] = entry.copyWith(isOnDuty: !entry.isOnDuty);
       notifyListeners();
     }
+  }
+
+  /// Check if a person can be added to a split shift
+  /// Split shifts (Split-1200 and Split-1400) have a maximum capacity of 1 person
+  bool canAddToSplit(String shift, DateTime date, Division division) {
+    // No restriction for non-split shifts
+    if (shift != Shift.split1200 && shift != Shift.split1400) {
+      return true;
+    }
+    
+    // For split shifts, check if there's already one person assigned
+    final existingCount = _scheduleEntries
+        .where((entry) =>
+            entry.shift == shift &&
+            entry.division == division &&
+            entry.isOnDuty &&
+            entry.date.year == date.year &&
+            entry.date.month == date.month &&
+            entry.date.day == date.day)
+        .length;
+    
+    return existingCount < 1;
   }
 }
