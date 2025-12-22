@@ -4,9 +4,10 @@ import 'division.dart';
 class Rank {
   static const String lieutenant = 'LT';
   static const String sergeantFirstClass = 'SFC';
+  static const String corporal = 'CPL';
   static const String deputy = 'DEP';
   
-  static const List<String> validRanks = [lieutenant, sergeantFirstClass, deputy];
+  static const List<String> validRanks = [lieutenant, sergeantFirstClass, corporal, deputy];
 }
 
 /// Valid shift names
