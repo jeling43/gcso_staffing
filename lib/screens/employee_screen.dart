@@ -87,13 +87,17 @@ class EmployeeScreen extends StatelessWidget {
                   leading: CircleAvatar(
                     backgroundColor: _getDivisionColor(division),
                     child: Text(
-                      employee.firstName[0] + employee.lastName[0],
-                      style: const TextStyle(color: Colors.white),
+                      employee.rank,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                  title: Text(employee.fullName),
+                  title: Text('${employee.rank} ${employee.lastName} #${employee.badgeNumber}'),
                   subtitle: Text(
-                    'Badge: ${employee.badgeNumber}${employee.isSupervisor ? " • Supervisor" : ""}',
+                    '${employee.firstName} ${employee.lastName}${employee.isSupervisor ? " • Supervisor" : ""}',
                   ),
                   trailing: isSupervisor
                       ? PopupMenuButton<String>(
@@ -152,6 +156,7 @@ class EmployeeScreen extends StatelessWidget {
     final badgeController = TextEditingController();
     bool isSupervisor = false;
     Division? selectedDivision;
+    String selectedRank = Rank.deputy;
     
     showDialog(
       context: context,
@@ -176,6 +181,20 @@ class EmployeeScreen extends StatelessWidget {
                 TextField(
                   controller: badgeController,
                   decoration: const InputDecoration(labelText: 'Badge Number'),
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: selectedRank,
+                  decoration: const InputDecoration(labelText: 'Rank'),
+                  items: const [
+                    DropdownMenuItem(value: Rank.lieutenant, child: Text('Lieutenant (LT)')),
+                    DropdownMenuItem(value: Rank.sergeantFirstClass, child: Text('Sergeant First Class (SFC)')),
+                    DropdownMenuItem(value: Rank.corporal, child: Text('Corporal (CPL)')),
+                    DropdownMenuItem(value: Rank.deputy, child: Text('Deputy (DEP)')),
+                  ],
+                  onChanged: (value) {
+                    setState(() => selectedRank = value ?? Rank.deputy);
+                  },
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<Division>(
@@ -217,6 +236,7 @@ class EmployeeScreen extends StatelessWidget {
                     firstName: firstNameController.text,
                     lastName: lastNameController.text,
                     badgeNumber: badgeController.text,
+                    rank: selectedRank,
                     isSupervisor: isSupervisor,
                     division: selectedDivision,
                   ));
@@ -238,6 +258,7 @@ class EmployeeScreen extends StatelessWidget {
     final lastNameController = TextEditingController(text: employee.lastName);
     final badgeController = TextEditingController(text: employee.badgeNumber);
     bool isSupervisor = employee.isSupervisor;
+    String selectedRank = employee.rank;
     
     showDialog(
       context: context,
@@ -264,6 +285,20 @@ class EmployeeScreen extends StatelessWidget {
                   decoration: const InputDecoration(labelText: 'Badge Number'),
                 ),
                 const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: selectedRank,
+                  decoration: const InputDecoration(labelText: 'Rank'),
+                  items: const [
+                    DropdownMenuItem(value: Rank.lieutenant, child: Text('Lieutenant (LT)')),
+                    DropdownMenuItem(value: Rank.sergeantFirstClass, child: Text('Sergeant First Class (SFC)')),
+                    DropdownMenuItem(value: Rank.corporal, child: Text('Corporal (CPL)')),
+                    DropdownMenuItem(value: Rank.deputy, child: Text('Deputy (DEP)')),
+                  ],
+                  onChanged: (value) {
+                    setState(() => selectedRank = value ?? Rank.deputy);
+                  },
+                ),
+                const SizedBox(height: 16),
                 CheckboxListTile(
                   title: const Text('Supervisor'),
                   value: isSupervisor,
@@ -288,6 +323,7 @@ class EmployeeScreen extends StatelessWidget {
                     firstName: firstNameController.text,
                     lastName: lastNameController.text,
                     badgeNumber: badgeController.text,
+                    rank: selectedRank,
                     isSupervisor: isSupervisor,
                   ));
                   Navigator.pop(context);

@@ -7,7 +7,7 @@ class ScheduleEntry {
   final Employee employee;
   final Division division;
   final DateTime date;
-  final String shift; // e.g., "Day", "Night", "Swing"
+  final String shift; // "A-Days", "A-Split", "A-Night", "B-Days", "B-Split", "B-Night"
   final bool isOnDuty;
 
   ScheduleEntry({

@@ -11,10 +11,9 @@ class DivisionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<ScheduleProvider, OnCallProvider>(
-      builder: (context, scheduleProvider, onCallProvider, _) {
+    return Consumer<ScheduleProvider>(
+      builder: (context, scheduleProvider, _) {
         final onDutyStaff = scheduleProvider.getCurrentlyOnDuty(division);
-        final onCallAssignment = onCallProvider.getOnCallForDivision(division);
 
         return Card(
           elevation: 4,
@@ -87,10 +86,11 @@ class DivisionCard extends StatelessWidget {
                                   radius: 16,
                                   backgroundColor: _getDivisionColor(division).withOpacity(0.2),
                                   child: Text(
-                                    entry.employee.firstName[0] + entry.employee.lastName[0],
+                                    entry.employee.rank,
                                     style: TextStyle(
                                       color: _getDivisionColor(division),
-                                      fontSize: 12,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
@@ -100,7 +100,7 @@ class DivisionCard extends StatelessWidget {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        entry.employee.fullName,
+                                        '${entry.employee.rank} ${entry.employee.lastName} #${entry.employee.badgeNumber}',
                                         style: const TextStyle(fontWeight: FontWeight.w500),
                                       ),
                                       Text(
@@ -123,33 +123,6 @@ class DivisionCard extends StatelessWidget {
                           '+ ${onDutyStaff.length - 5} more',
                           style: TextStyle(color: Colors.grey[600]),
                         ),
-                      ),
-                    const Divider(height: 24),
-                    const Text(
-                      'On-Call',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    if (onCallAssignment != null)
-                      Row(
-                        children: [
-                          const Icon(Icons.phone, color: Colors.green, size: 20),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              onCallAssignment.employee.fullName,
-                              style: const TextStyle(fontWeight: FontWeight.w500),
-                            ),
-                          ),
-                        ],
-                      )
-                    else
-                      const Text(
-                        'No on-call assignment',
-                        style: TextStyle(color: Colors.grey),
                       ),
                   ],
                 ),

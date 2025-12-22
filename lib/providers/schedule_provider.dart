@@ -13,7 +13,7 @@ class ScheduleProvider extends ChangeNotifier {
 
   void _initializeSampleSchedule(List<Employee> employees) {
     final today = DateTime.now();
-    final shifts = ['Day', 'Night', 'Swing'];
+    final shifts = Shift.validShifts;
     
     for (final employee in employees) {
       if (employee.division != null) {

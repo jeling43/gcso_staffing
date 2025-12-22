@@ -18,12 +18,14 @@ void main() {
         firstName: 'John',
         lastName: 'Doe',
         badgeNumber: 'B001',
+        rank: Rank.deputy,
       );
 
       expect(employee.id, equals('1'));
       expect(employee.firstName, equals('John'));
       expect(employee.lastName, equals('Doe'));
       expect(employee.badgeNumber, equals('B001'));
+      expect(employee.rank, equals(Rank.deputy));
       expect(employee.isSupervisor, isFalse);
       expect(employee.division, isNull);
     });
@@ -34,9 +36,38 @@ void main() {
         firstName: 'John',
         lastName: 'Doe',
         badgeNumber: 'B001',
+        rank: Rank.deputy,
       );
 
       expect(employee.fullName, equals('John Doe'));
+    });
+
+    test('supports different rank values', () {
+      final lt = Employee(
+        id: '1',
+        firstName: 'John',
+        lastName: 'Doe',
+        badgeNumber: 'B001',
+        rank: Rank.lieutenant,
+      );
+      final sfc = Employee(
+        id: '2',
+        firstName: 'Jane',
+        lastName: 'Smith',
+        badgeNumber: 'B002',
+        rank: Rank.sergeantFirstClass,
+      );
+      final dep = Employee(
+        id: '3',
+        firstName: 'Bob',
+        lastName: 'Johnson',
+        badgeNumber: 'B003',
+        rank: Rank.deputy,
+      );
+
+      expect(lt.rank, equals(Rank.lieutenant));
+      expect(sfc.rank, equals(Rank.sergeantFirstClass));
+      expect(dep.rank, equals(Rank.deputy));
     });
 
     test('employees can only be assigned to one division', () {
@@ -45,6 +76,7 @@ void main() {
         firstName: 'John',
         lastName: 'Doe',
         badgeNumber: 'B001',
+        rank: Rank.deputy,
         division: Division.jail,
       );
 
@@ -62,17 +94,20 @@ void main() {
         firstName: 'John',
         lastName: 'Doe',
         badgeNumber: 'B001',
+        rank: Rank.deputy,
         division: Division.jail,
       );
 
       final updated = employee.copyWith(
         firstName: 'Jane',
+        rank: Rank.lieutenant,
         isSupervisor: true,
       );
 
       expect(updated.id, equals('1'));
       expect(updated.firstName, equals('Jane'));
       expect(updated.lastName, equals('Doe'));
+      expect(updated.rank, equals(Rank.lieutenant));
       expect(updated.isSupervisor, isTrue);
     });
   });
@@ -84,6 +119,7 @@ void main() {
         firstName: 'John',
         lastName: 'Doe',
         badgeNumber: 'B001',
+        rank: Rank.deputy,
         division: Division.jail,
       );
 
@@ -92,59 +128,38 @@ void main() {
         employee: employee,
         division: Division.jail,
         date: DateTime(2024, 1, 15),
-        shift: 'Day',
+        shift: Shift.aDays,
       );
 
       expect(entry.id, equals('sched1'));
       expect(entry.employee, equals(employee));
       expect(entry.division, equals(Division.jail));
-      expect(entry.shift, equals('Day'));
+      expect(entry.shift, equals(Shift.aDays));
       expect(entry.isOnDuty, isTrue);
     });
-  });
 
-  group('OnCallAssignment', () {
-    test('isActiveOn returns true for dates within range', () {
+    test('supports new shift naming convention', () {
       final employee = Employee(
         id: '1',
         firstName: 'John',
         lastName: 'Doe',
         badgeNumber: 'B001',
+        rank: Rank.deputy,
         division: Division.patrol,
       );
 
-      final assignment = OnCallAssignment(
-        id: 'oncall1',
-        employee: employee,
-        division: Division.patrol,
-        startDate: DateTime(2024, 1, 1),
-        endDate: DateTime(2024, 1, 7),
-      );
-
-      expect(assignment.isActiveOn(DateTime(2024, 1, 3)), isTrue);
-      expect(assignment.isActiveOn(DateTime(2024, 1, 1)), isTrue);
-      expect(assignment.isActiveOn(DateTime(2024, 1, 7)), isTrue);
-    });
-
-    test('isActiveOn returns false for dates outside range', () {
-      final employee = Employee(
-        id: '1',
-        firstName: 'John',
-        lastName: 'Doe',
-        badgeNumber: 'B001',
-        division: Division.patrol,
-      );
-
-      final assignment = OnCallAssignment(
-        id: 'oncall1',
-        employee: employee,
-        division: Division.patrol,
-        startDate: DateTime(2024, 1, 1),
-        endDate: DateTime(2024, 1, 7),
-      );
-
-      expect(assignment.isActiveOn(DateTime(2023, 12, 31)), isFalse);
-      expect(assignment.isActiveOn(DateTime(2024, 1, 9)), isFalse);
+      final shifts = Shift.validShifts;
+      
+      for (final shift in shifts) {
+        final entry = ScheduleEntry(
+          id: 'sched_$shift',
+          employee: employee,
+          division: Division.patrol,
+          date: DateTime(2024, 1, 15),
+          shift: shift,
+        );
+        expect(entry.shift, equals(shift));
+      }
     });
   });
 
@@ -154,6 +169,15 @@ void main() {
       
       expect(provider.employees.isNotEmpty, isTrue);
       expect(provider.currentUser, isNotNull);
+    });
+
+    test('all sample employees have ranks', () {
+      final provider = EmployeeProvider();
+      
+      for (final employee in provider.employees) {
+        expect(employee.rank, isNotEmpty);
+        expect(Rank.validRanks.contains(employee.rank), isTrue);
+      }
     });
 
     test('can filter employees by division', () {
