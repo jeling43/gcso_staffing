@@ -5,9 +5,12 @@ import 'package:gcso_staffing/providers/providers.dart';
 void main() {
   group('Division', () {
     test('has correct display names', () {
-      expect(Division.jail.displayName, equals('Jail'));
       expect(Division.patrol.displayName, equals('Patrol'));
-      expect(Division.courthouse.displayName, equals('Courthouse'));
+    });
+    
+    test('only has patrol division', () {
+      expect(Division.values.length, equals(1));
+      expect(Division.values.first, equals(Division.patrol));
     });
   });
 
@@ -70,22 +73,18 @@ void main() {
       expect(dep.rank, equals(Rank.deputy));
     });
 
-    test('employees can only be assigned to one division', () {
+    test('employees are assigned to patrol division', () {
       final employee = Employee(
         id: '1',
         firstName: 'John',
         lastName: 'Doe',
         badgeNumber: 'B001',
         rank: Rank.deputy,
-        division: Division.jail,
+        division: Division.patrol,
       );
 
-      // Employee is assigned to jail
-      expect(employee.division, equals(Division.jail));
-
-      // When reassigned to patrol, they are no longer in jail
-      final reassignedEmployee = employee.copyWith(division: Division.patrol);
-      expect(reassignedEmployee.division, equals(Division.patrol));
+      // Employee is assigned to patrol
+      expect(employee.division, equals(Division.patrol));
     });
 
     test('copyWith creates new employee with updated fields', () {
@@ -95,7 +94,7 @@ void main() {
         lastName: 'Doe',
         badgeNumber: 'B001',
         rank: Rank.deputy,
-        division: Division.jail,
+        division: Division.patrol,
       );
 
       final updated = employee.copyWith(
@@ -120,21 +119,21 @@ void main() {
         lastName: 'Doe',
         badgeNumber: 'B001',
         rank: Rank.deputy,
-        division: Division.jail,
+        division: Division.patrol,
       );
 
       final entry = ScheduleEntry(
         id: 'sched1',
         employee: employee,
-        division: Division.jail,
+        division: Division.patrol,
         date: DateTime(2024, 1, 15),
-        shift: Shift.aDays,
+        shift: Shift.day,
       );
 
       expect(entry.id, equals('sched1'));
       expect(entry.employee, equals(employee));
-      expect(entry.division, equals(Division.jail));
-      expect(entry.shift, equals(Shift.aDays));
+      expect(entry.division, equals(Division.patrol));
+      expect(entry.shift, equals(Shift.day));
       expect(entry.isOnDuty, isTrue);
     });
 
@@ -150,6 +149,12 @@ void main() {
 
       final shifts = Shift.validShifts;
       
+      // Should have Day, Night, Split shifts
+      expect(shifts.length, equals(3));
+      expect(shifts.contains(Shift.day), isTrue);
+      expect(shifts.contains(Shift.night), isTrue);
+      expect(shifts.contains(Shift.split), isTrue);
+      
       for (final shift in shifts) {
         final entry = ScheduleEntry(
           id: 'sched_$shift',
@@ -164,11 +169,19 @@ void main() {
   });
 
   group('EmployeeProvider', () {
-    test('initializes with sample employees', () {
+    test('initializes with 11 patrol employees', () {
       final provider = EmployeeProvider();
       
-      expect(provider.employees.isNotEmpty, isTrue);
+      expect(provider.employees.length, equals(11));
       expect(provider.currentUser, isNotNull);
+    });
+    
+    test('all sample employees are in patrol division', () {
+      final provider = EmployeeProvider();
+      
+      for (final employee in provider.employees) {
+        expect(employee.division, equals(Division.patrol));
+      }
     });
 
     test('all sample employees have ranks', () {
@@ -183,10 +196,11 @@ void main() {
     test('can filter employees by division', () {
       final provider = EmployeeProvider();
       
-      final jailEmployees = provider.getEmployeesByDivision(Division.jail);
+      final patrolEmployees = provider.getEmployeesByDivision(Division.patrol);
       
-      for (final employee in jailEmployees) {
-        expect(employee.division, equals(Division.jail));
+      expect(patrolEmployees.length, equals(11));
+      for (final employee in patrolEmployees) {
+        expect(employee.division, equals(Division.patrol));
       }
     });
 
@@ -194,33 +208,13 @@ void main() {
       final provider = EmployeeProvider();
       final employee = provider.employees.first;
       
-      provider.assignToDivision(employee.id, Division.courthouse);
+      // Already in patrol, just verify
+      expect(employee.division, equals(Division.patrol));
+      
+      provider.assignToDivision(employee.id, Division.patrol);
       
       final updatedEmployee = provider.employees.firstWhere((e) => e.id == employee.id);
-      expect(updatedEmployee.division, equals(Division.courthouse));
-    });
-
-    test('employee can only belong to one division at a time', () {
-      final provider = EmployeeProvider();
-      final employee = provider.employees.first;
-      
-      // Assign to jail
-      provider.assignToDivision(employee.id, Division.jail);
-      var updatedEmployee = provider.employees.firstWhere((e) => e.id == employee.id);
-      expect(updatedEmployee.division, equals(Division.jail));
-      
-      // Reassign to patrol - should no longer be in jail
-      provider.assignToDivision(employee.id, Division.patrol);
-      updatedEmployee = provider.employees.firstWhere((e) => e.id == employee.id);
       expect(updatedEmployee.division, equals(Division.patrol));
-      
-      // Verify not in jail anymore
-      final jailEmployees = provider.getEmployeesByDivision(Division.jail);
-      expect(jailEmployees.any((e) => e.id == employee.id), isFalse);
-      
-      // Verify in patrol
-      final patrolEmployees = provider.getEmployeesByDivision(Division.patrol);
-      expect(patrolEmployees.any((e) => e.id == employee.id), isTrue);
     });
   });
 }
