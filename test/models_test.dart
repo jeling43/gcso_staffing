@@ -145,7 +145,7 @@ void main() {
         badgeNumber: 'B001',
         rank: Rank.deputy,
         division: Division.patrol,
-        shiftGroup: ShiftGroup.blue,
+        shiftGroup: ShiftGroup.b,
       );
 
       final shifts = Shift.validShifts;
@@ -208,35 +208,35 @@ void main() {
     });
     
     test('swing schedule calculates correctly', () {
-      // Blue shift starts Jan 2, 2026
-      final blueStart = DateTime(2026, 1, 2);
+      // B shift starts Jan 2, 2026
+      final bStart = DateTime(2026, 1, 2);
       
-      // Day 0 (Jan 2) - Blue working
-      expect(ShiftGroup.getWorkingShiftGroup(blueStart), equals(ShiftGroup.blue));
+      // Day 0 (Jan 2) - B working
+      expect(ShiftGroup.getWorkingShiftGroup(bStart), equals(ShiftGroup.b));
       
-      // Day 1 (Jan 3) - Blue working
-      expect(ShiftGroup.getWorkingShiftGroup(blueStart.add(const Duration(days: 1))), equals(ShiftGroup.blue));
+      // Day 1 (Jan 3) - B working
+      expect(ShiftGroup.getWorkingShiftGroup(bStart.add(const Duration(days: 1))), equals(ShiftGroup.b));
       
-      // Day 2 (Jan 4) - Blue working
-      expect(ShiftGroup.getWorkingShiftGroup(blueStart.add(const Duration(days: 2))), equals(ShiftGroup.blue));
+      // Day 2 (Jan 4) - B working
+      expect(ShiftGroup.getWorkingShiftGroup(bStart.add(const Duration(days: 2))), equals(ShiftGroup.b));
       
-      // Day 3 (Jan 5) - Gold working
-      expect(ShiftGroup.getWorkingShiftGroup(blueStart.add(const Duration(days: 3))), equals(ShiftGroup.gold));
+      // Day 3 (Jan 5) - A working
+      expect(ShiftGroup.getWorkingShiftGroup(bStart.add(const Duration(days: 3))), equals(ShiftGroup.a));
       
-      // Day 4 (Jan 6) - Gold working
-      expect(ShiftGroup.getWorkingShiftGroup(blueStart.add(const Duration(days: 4))), equals(ShiftGroup.gold));
+      // Day 4 (Jan 6) - A working
+      expect(ShiftGroup.getWorkingShiftGroup(bStart.add(const Duration(days: 4))), equals(ShiftGroup.a));
       
-      // Day 5 (Jan 7) - Blue working
-      expect(ShiftGroup.getWorkingShiftGroup(blueStart.add(const Duration(days: 5))), equals(ShiftGroup.blue));
+      // Day 5 (Jan 7) - B working
+      expect(ShiftGroup.getWorkingShiftGroup(bStart.add(const Duration(days: 5))), equals(ShiftGroup.b));
       
-      // Day 6 (Jan 8) - Blue working
-      expect(ShiftGroup.getWorkingShiftGroup(blueStart.add(const Duration(days: 6))), equals(ShiftGroup.blue));
+      // Day 6 (Jan 8) - B working
+      expect(ShiftGroup.getWorkingShiftGroup(bStart.add(const Duration(days: 6))), equals(ShiftGroup.b));
       
-      // Day 7 (Jan 9) - Gold working
-      expect(ShiftGroup.getWorkingShiftGroup(blueStart.add(const Duration(days: 7))), equals(ShiftGroup.gold));
+      // Day 7 (Jan 9) - A working
+      expect(ShiftGroup.getWorkingShiftGroup(bStart.add(const Duration(days: 7))), equals(ShiftGroup.a));
       
-      // Day 10 (Jan 12) - Blue working (start of new cycle)
-      expect(ShiftGroup.getWorkingShiftGroup(blueStart.add(const Duration(days: 10))), equals(ShiftGroup.blue));
+      // Day 10 (Jan 12) - B working (start of new cycle)
+      expect(ShiftGroup.getWorkingShiftGroup(bStart.add(const Duration(days: 10))), equals(ShiftGroup.b));
     });
   });
 
@@ -268,11 +268,11 @@ void main() {
     test('shift groups are balanced', () {
       final provider = EmployeeProvider();
       
-      final blueEmployees = provider.employees.where((e) => e.shiftGroup == ShiftGroup.blue).toList();
-      final goldEmployees = provider.employees.where((e) => e.shiftGroup == ShiftGroup.gold).toList();
+      final bEmployees = provider.employees.where((e) => e.shiftGroup == ShiftGroup.b).toList();
+      final aEmployees = provider.employees.where((e) => e.shiftGroup == ShiftGroup.a).toList();
       
-      expect(blueEmployees.length, equals(6));
-      expect(goldEmployees.length, equals(6));
+      expect(bEmployees.length, equals(6));
+      expect(aEmployees.length, equals(6));
     });
 
     test('all sample employees have ranks', () {

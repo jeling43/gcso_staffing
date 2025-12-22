@@ -18,8 +18,8 @@ class ScheduleProvider extends ChangeNotifier {
     final workingShiftGroup = ShiftGroup.getWorkingShiftGroup(today);
     
     // Assign shifts based on employee ID and shift group
-    // Blue Shift: IDs 1-3 (Day), IDs 4-6 (Night)
-    // Gold Shift: IDs 7-8 (Day), IDs 9-10 (Night), ID 11 (Split-1200), ID 12 (Split-1400)
+    // B Shift: IDs 1-3 (Day), IDs 4-6 (Night)
+    // A Shift: IDs 7-8 (Day), IDs 9-10 (Night), ID 11 (Split-1200), ID 12 (Split-1400)
     for (final employee in employees) {
       if (employee.division != null && employee.shiftGroup != null) {
         String shift;

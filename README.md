@@ -21,13 +21,13 @@ The application tracks staffing across three shifts in the Patrol Division with 
   - Split 2: 1400-2400 (2:00 PM - 12:00 AM)
 
 ### Shift Groups (Swing Schedule)
-- **Blue Shift**: 6 employees (3 Day, 3 Night)
-- **Gold Shift**: 6 employees (2 Day, 2 Night, 2 Split)
+- **A Shift**: 6 employees (2 Day, 2 Night, 2 Split)
+- **B Shift**: 6 employees (3 Day, 3 Night)
 
 ### Swing Schedule Rotation
 **Pattern**: 3 days on, 2 days off, 2 days on, 3 days off (10-day cycle)
-- Blue Shift starts: January 2, 2026
-- When Blue is working, Gold is off, and vice versa
+- B Shift starts: January 2, 2026
+- When B is working, A is off, and vice versa
 
 Total: 12 Patrol Division employees
 
