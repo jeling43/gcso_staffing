@@ -1,5 +1,26 @@
 import 'division.dart';
 
+/// Valid rank values for employees
+class Rank {
+  static const String lieutenant = 'LT';
+  static const String sergeantFirstClass = 'SFC';
+  static const String deputy = 'DEP';
+  
+  static const List<String> validRanks = [lieutenant, sergeantFirstClass, deputy];
+}
+
+/// Valid shift names
+class Shift {
+  static const String aDays = 'A-Days';
+  static const String aSplit = 'A-Split';
+  static const String aNight = 'A-Night';
+  static const String bDays = 'B-Days';
+  static const String bSplit = 'B-Split';
+  static const String bNight = 'B-Night';
+  
+  static const List<String> validShifts = [aDays, aSplit, aNight, bDays, bSplit, bNight];
+}
+
 /// Represents an employee in the Sheriff's Office
 class Employee {
   final String id;
@@ -18,7 +39,7 @@ class Employee {
     required this.rank,
     this.isSupervisor = false,
     this.division,
-  });
+  }) : assert(Rank.validRanks.contains(rank), 'Invalid rank: $rank');
 
   String get fullName => '$firstName $lastName';
 

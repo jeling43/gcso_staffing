@@ -18,14 +18,14 @@ void main() {
         firstName: 'John',
         lastName: 'Doe',
         badgeNumber: 'B001',
-        rank: 'DEP',
+        rank: Rank.deputy,
       );
 
       expect(employee.id, equals('1'));
       expect(employee.firstName, equals('John'));
       expect(employee.lastName, equals('Doe'));
       expect(employee.badgeNumber, equals('B001'));
-      expect(employee.rank, equals('DEP'));
+      expect(employee.rank, equals(Rank.deputy));
       expect(employee.isSupervisor, isFalse);
       expect(employee.division, isNull);
     });
@@ -36,7 +36,7 @@ void main() {
         firstName: 'John',
         lastName: 'Doe',
         badgeNumber: 'B001',
-        rank: 'DEP',
+        rank: Rank.deputy,
       );
 
       expect(employee.fullName, equals('John Doe'));
@@ -48,26 +48,26 @@ void main() {
         firstName: 'John',
         lastName: 'Doe',
         badgeNumber: 'B001',
-        rank: 'LT',
+        rank: Rank.lieutenant,
       );
       final sfc = Employee(
         id: '2',
         firstName: 'Jane',
         lastName: 'Smith',
         badgeNumber: 'B002',
-        rank: 'SFC',
+        rank: Rank.sergeantFirstClass,
       );
       final dep = Employee(
         id: '3',
         firstName: 'Bob',
         lastName: 'Johnson',
         badgeNumber: 'B003',
-        rank: 'DEP',
+        rank: Rank.deputy,
       );
 
-      expect(lt.rank, equals('LT'));
-      expect(sfc.rank, equals('SFC'));
-      expect(dep.rank, equals('DEP'));
+      expect(lt.rank, equals(Rank.lieutenant));
+      expect(sfc.rank, equals(Rank.sergeantFirstClass));
+      expect(dep.rank, equals(Rank.deputy));
     });
 
     test('employees can only be assigned to one division', () {
@@ -76,7 +76,7 @@ void main() {
         firstName: 'John',
         lastName: 'Doe',
         badgeNumber: 'B001',
-        rank: 'DEP',
+        rank: Rank.deputy,
         division: Division.jail,
       );
 
@@ -94,20 +94,20 @@ void main() {
         firstName: 'John',
         lastName: 'Doe',
         badgeNumber: 'B001',
-        rank: 'DEP',
+        rank: Rank.deputy,
         division: Division.jail,
       );
 
       final updated = employee.copyWith(
         firstName: 'Jane',
-        rank: 'LT',
+        rank: Rank.lieutenant,
         isSupervisor: true,
       );
 
       expect(updated.id, equals('1'));
       expect(updated.firstName, equals('Jane'));
       expect(updated.lastName, equals('Doe'));
-      expect(updated.rank, equals('LT'));
+      expect(updated.rank, equals(Rank.lieutenant));
       expect(updated.isSupervisor, isTrue);
     });
   });
@@ -119,7 +119,7 @@ void main() {
         firstName: 'John',
         lastName: 'Doe',
         badgeNumber: 'B001',
-        rank: 'DEP',
+        rank: Rank.deputy,
         division: Division.jail,
       );
 
@@ -128,13 +128,13 @@ void main() {
         employee: employee,
         division: Division.jail,
         date: DateTime(2024, 1, 15),
-        shift: 'A-Days',
+        shift: Shift.aDays,
       );
 
       expect(entry.id, equals('sched1'));
       expect(entry.employee, equals(employee));
       expect(entry.division, equals(Division.jail));
-      expect(entry.shift, equals('A-Days'));
+      expect(entry.shift, equals(Shift.aDays));
       expect(entry.isOnDuty, isTrue);
     });
 
@@ -144,11 +144,11 @@ void main() {
         firstName: 'John',
         lastName: 'Doe',
         badgeNumber: 'B001',
-        rank: 'DEP',
+        rank: Rank.deputy,
         division: Division.patrol,
       );
 
-      final shifts = ['A-Days', 'A-Split', 'A-Night', 'B-Days', 'B-Split', 'B-Night'];
+      final shifts = Shift.validShifts;
       
       for (final shift in shifts) {
         final entry = ScheduleEntry(
@@ -176,7 +176,7 @@ void main() {
       
       for (final employee in provider.employees) {
         expect(employee.rank, isNotEmpty);
-        expect(['LT', 'SFC', 'DEP'].contains(employee.rank), isTrue);
+        expect(Rank.validRanks.contains(employee.rank), isTrue);
       }
     });
 

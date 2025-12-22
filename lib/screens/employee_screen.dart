@@ -156,7 +156,7 @@ class EmployeeScreen extends StatelessWidget {
     final badgeController = TextEditingController();
     bool isSupervisor = false;
     Division? selectedDivision;
-    String selectedRank = 'DEP';
+    String selectedRank = Rank.deputy;
     
     showDialog(
       context: context,
@@ -187,12 +187,12 @@ class EmployeeScreen extends StatelessWidget {
                   value: selectedRank,
                   decoration: const InputDecoration(labelText: 'Rank'),
                   items: const [
-                    DropdownMenuItem(value: 'LT', child: Text('Lieutenant (LT)')),
-                    DropdownMenuItem(value: 'SFC', child: Text('Sergeant First Class (SFC)')),
-                    DropdownMenuItem(value: 'DEP', child: Text('Deputy (DEP)')),
+                    DropdownMenuItem(value: Rank.lieutenant, child: Text('Lieutenant (LT)')),
+                    DropdownMenuItem(value: Rank.sergeantFirstClass, child: Text('Sergeant First Class (SFC)')),
+                    DropdownMenuItem(value: Rank.deputy, child: Text('Deputy (DEP)')),
                   ],
                   onChanged: (value) {
-                    setState(() => selectedRank = value ?? 'DEP');
+                    setState(() => selectedRank = value ?? Rank.deputy);
                   },
                 ),
                 const SizedBox(height: 16),
@@ -288,12 +288,12 @@ class EmployeeScreen extends StatelessWidget {
                   value: selectedRank,
                   decoration: const InputDecoration(labelText: 'Rank'),
                   items: const [
-                    DropdownMenuItem(value: 'LT', child: Text('Lieutenant (LT)')),
-                    DropdownMenuItem(value: 'SFC', child: Text('Sergeant First Class (SFC)')),
-                    DropdownMenuItem(value: 'DEP', child: Text('Deputy (DEP)')),
+                    DropdownMenuItem(value: Rank.lieutenant, child: Text('Lieutenant (LT)')),
+                    DropdownMenuItem(value: Rank.sergeantFirstClass, child: Text('Sergeant First Class (SFC)')),
+                    DropdownMenuItem(value: Rank.deputy, child: Text('Deputy (DEP)')),
                   ],
                   onChanged: (value) {
-                    setState(() => selectedRank = value ?? 'DEP');
+                    setState(() => selectedRank = value ?? Rank.deputy);
                   },
                 ),
                 const SizedBox(height: 16),
