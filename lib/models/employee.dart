@@ -35,16 +35,16 @@ class ShiftGroup {
     final daysSinceStart = date.difference(blueShiftStartDate).inDays;
     final cycleDay = daysSinceStart % 10;
     
-    // Blue shift works: days 0-2, 5-6 (3 on, 2 off, 2 on, 3 off)
-    // Gold shift works: days 3-4, 7-9 (opposite of Blue)
+    // Blue shift works: cycle days 0-2, 5-6 (3 on, 2 off, 2 on, 3 off)
+    // Gold shift works: cycle days 3-4, 7-9 (opposite of Blue)
     if (cycleDay >= 0 && cycleDay <= 2) {
-      return blue; // Days 1-3 of cycle
+      return blue; // Cycle days 0-2 (first 3 days on)
     } else if (cycleDay >= 3 && cycleDay <= 4) {
-      return gold; // Days 4-5 of cycle
+      return gold; // Cycle days 3-4 (2 days off for Blue)
     } else if (cycleDay >= 5 && cycleDay <= 6) {
-      return blue; // Days 6-7 of cycle
+      return blue; // Cycle days 5-6 (2 days on)
     } else {
-      return gold; // Days 8-10 of cycle
+      return gold; // Cycle days 7-9 (3 days off for Blue)
     }
   }
   
