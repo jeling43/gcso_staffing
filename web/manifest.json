@@ -5,7 +5,7 @@
     "display": "standalone",
     "background_color": "#3949AB",
     "theme_color": "#3949AB",
-    "description": "Sheriff's Office Staffing Tracker - Track staffing across Jail, Patrol, and Courthouse divisions.",
+    "description": "Sheriff's Office Staffing Tracker - Track staffing by shift in the Patrol Division.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
