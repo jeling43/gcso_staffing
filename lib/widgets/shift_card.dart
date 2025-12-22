@@ -129,11 +129,11 @@ class ShiftCard extends StatelessWidget {
 
   IconData _getShiftIcon(String shift) {
     switch (shift) {
-      case 'Day':
+      case Shift.day:
         return Icons.wb_sunny;
-      case 'Night':
+      case Shift.night:
         return Icons.nightlight;
-      case 'Split':
+      case Shift.split:
         return Icons.schedule;
       default:
         return Icons.access_time;
@@ -142,11 +142,11 @@ class ShiftCard extends StatelessWidget {
 
   Color _getShiftColor(String shift) {
     switch (shift) {
-      case 'Day':
+      case Shift.day:
         return Colors.amber;
-      case 'Night':
+      case Shift.night:
         return Colors.indigo;
-      case 'Split':
+      case Shift.split:
         return Colors.teal;
       default:
         return Colors.grey;
