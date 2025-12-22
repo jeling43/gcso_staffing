@@ -10,6 +10,9 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final today = DateTime.now();
+    final workingShiftGroup = ShiftGroup.getWorkingShiftGroup(today);
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('GCSO Staffing Dashboard'),
@@ -42,9 +45,27 @@ class DashboardScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today,
+                      size: 16,
+                      color: Colors.grey[600],
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Working Today: $workingShiftGroup Shift',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
                 Text(
-                  'Real-time view of Patrol staff by shift assignment',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  'Swing Schedule: 3 on, 2 off, 2 on, 3 off',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Colors.grey[600],
                       ),
                 ),

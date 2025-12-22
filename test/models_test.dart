@@ -145,6 +145,7 @@ void main() {
         badgeNumber: 'B001',
         rank: Rank.deputy,
         division: Division.patrol,
+        shiftGroup: ShiftGroup.blue,
       );
 
       final shifts = Shift.validShifts;
@@ -166,6 +167,38 @@ void main() {
         expect(entry.shift, equals(shift));
       }
     });
+    
+    test('swing schedule calculates correctly', () {
+      // Blue shift starts Jan 2, 2026
+      final blueStart = DateTime(2026, 1, 2);
+      
+      // Day 0 (Jan 2) - Blue working
+      expect(ShiftGroup.getWorkingShiftGroup(blueStart), equals(ShiftGroup.blue));
+      
+      // Day 1 (Jan 3) - Blue working
+      expect(ShiftGroup.getWorkingShiftGroup(blueStart.add(const Duration(days: 1))), equals(ShiftGroup.blue));
+      
+      // Day 2 (Jan 4) - Blue working
+      expect(ShiftGroup.getWorkingShiftGroup(blueStart.add(const Duration(days: 2))), equals(ShiftGroup.blue));
+      
+      // Day 3 (Jan 5) - Gold working
+      expect(ShiftGroup.getWorkingShiftGroup(blueStart.add(const Duration(days: 3))), equals(ShiftGroup.gold));
+      
+      // Day 4 (Jan 6) - Gold working
+      expect(ShiftGroup.getWorkingShiftGroup(blueStart.add(const Duration(days: 4))), equals(ShiftGroup.gold));
+      
+      // Day 5 (Jan 7) - Blue working
+      expect(ShiftGroup.getWorkingShiftGroup(blueStart.add(const Duration(days: 5))), equals(ShiftGroup.blue));
+      
+      // Day 6 (Jan 8) - Blue working
+      expect(ShiftGroup.getWorkingShiftGroup(blueStart.add(const Duration(days: 6))), equals(ShiftGroup.blue));
+      
+      // Day 7 (Jan 9) - Gold working
+      expect(ShiftGroup.getWorkingShiftGroup(blueStart.add(const Duration(days: 7))), equals(ShiftGroup.gold));
+      
+      // Day 10 (Jan 12) - Blue working (start of new cycle)
+      expect(ShiftGroup.getWorkingShiftGroup(blueStart.add(const Duration(days: 10))), equals(ShiftGroup.blue));
+    });
   });
 
   group('EmployeeProvider', () {
@@ -182,6 +215,25 @@ void main() {
       for (final employee in provider.employees) {
         expect(employee.division, equals(Division.patrol));
       }
+    });
+    
+    test('all sample employees have shift groups', () {
+      final provider = EmployeeProvider();
+      
+      for (final employee in provider.employees) {
+        expect(employee.shiftGroup, isNotNull);
+        expect(ShiftGroup.validGroups.contains(employee.shiftGroup), isTrue);
+      }
+    });
+    
+    test('shift groups are balanced', () {
+      final provider = EmployeeProvider();
+      
+      final blueEmployees = provider.employees.where((e) => e.shiftGroup == ShiftGroup.blue).toList();
+      final goldEmployees = provider.employees.where((e) => e.shiftGroup == ShiftGroup.gold).toList();
+      
+      expect(blueEmployees.length, equals(6));
+      expect(goldEmployees.length, equals(6));
     });
 
     test('all sample employees have ranks', () {

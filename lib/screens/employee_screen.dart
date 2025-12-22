@@ -76,6 +76,7 @@ class EmployeeScreen extends StatelessWidget {
                                 .where((e) => e.employee.id == employee.id)
                                 .toList();
                             final shift = schedule.isNotEmpty ? schedule.first.shift : 'Unassigned';
+                            final shiftGroup = employee.shiftGroup ?? 'Unassigned';
                             
                             return ListTile(
                               leading: CircleAvatar(
@@ -91,7 +92,7 @@ class EmployeeScreen extends StatelessWidget {
                               ),
                               title: Text('${employee.rank} ${employee.lastName} #${employee.badgeNumber}'),
                               subtitle: Text(
-                                '${employee.firstName} ${employee.lastName}${employee.isSupervisor ? " • Supervisor" : ""} • $shift Shift',
+                                '${employee.firstName} ${employee.lastName}${employee.isSupervisor ? " • Supervisor" : ""} • $shift Shift • $shiftGroup Group',
                               ),
                               trailing: employeeProvider.isCurrentUserSupervisor
                                   ? IconButton(

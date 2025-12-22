@@ -16,9 +16,11 @@ class EmployeeProvider extends ChangeNotifier {
 
   void _initializeSampleData() {
     // Sample employees for Patrol division - 12 total
-    // 5 Day shift, 5 Night shift, 2 Split shift
+    // Blue Shift: 6 employees (3 Day, 3 Night)
+    // Gold Shift: 6 employees (2 Day, 2 Night, 2 Split)
+    // Swing schedule: 3 on, 2 off, 2 on, 3 off
     _employees.addAll([
-      // Day Shift - 5 employees
+      // Blue Shift - Day - 3 employees
       Employee(
         id: '1',
         firstName: 'Sarah',
@@ -27,6 +29,7 @@ class EmployeeProvider extends ChangeNotifier {
         rank: Rank.lieutenant,
         isSupervisor: true,
         division: Division.patrol,
+        shiftGroup: ShiftGroup.blue,
       ),
       Employee(
         id: '2',
@@ -36,6 +39,7 @@ class EmployeeProvider extends ChangeNotifier {
         rank: Rank.sergeantFirstClass,
         isSupervisor: false,
         division: Division.patrol,
+        shiftGroup: ShiftGroup.blue,
       ),
       Employee(
         id: '3',
@@ -45,61 +49,70 @@ class EmployeeProvider extends ChangeNotifier {
         rank: Rank.corporal,
         isSupervisor: false,
         division: Division.patrol,
+        shiftGroup: ShiftGroup.blue,
       ),
+      // Blue Shift - Night - 3 employees
       Employee(
         id: '4',
         firstName: 'David',
         lastName: 'Davis',
         badgeNumber: 'P004',
-        rank: Rank.deputy,
-        isSupervisor: false,
+        rank: Rank.lieutenant,
+        isSupervisor: true,
         division: Division.patrol,
+        shiftGroup: ShiftGroup.blue,
       ),
       Employee(
         id: '5',
         firstName: 'Jessica',
         lastName: 'Miller',
         badgeNumber: 'P005',
-        rank: Rank.deputy,
+        rank: Rank.sergeantFirstClass,
         isSupervisor: false,
         division: Division.patrol,
+        shiftGroup: ShiftGroup.blue,
       ),
-      // Night Shift - 5 employees
       Employee(
         id: '6',
         firstName: 'Christopher',
         lastName: 'Wilson',
         badgeNumber: 'P006',
-        rank: Rank.lieutenant,
-        isSupervisor: true,
+        rank: Rank.corporal,
+        isSupervisor: false,
         division: Division.patrol,
+        shiftGroup: ShiftGroup.blue,
       ),
+      // Gold Shift - Day - 2 employees
       Employee(
         id: '7',
         firstName: 'Amanda',
         lastName: 'Taylor',
         badgeNumber: 'P007',
-        rank: Rank.sergeantFirstClass,
-        isSupervisor: false,
+        rank: Rank.lieutenant,
+        isSupervisor: true,
         division: Division.patrol,
+        shiftGroup: ShiftGroup.gold,
       ),
       Employee(
         id: '8',
         firstName: 'Daniel',
         lastName: 'Anderson',
         badgeNumber: 'P008',
-        rank: Rank.corporal,
+        rank: Rank.sergeantFirstClass,
         isSupervisor: false,
         division: Division.patrol,
+        shiftGroup: ShiftGroup.gold,
       ),
+      // Gold Shift - Night - 2 employees
       Employee(
         id: '9',
         firstName: 'Ashley',
         lastName: 'Thomas',
         badgeNumber: 'P009',
-        rank: Rank.deputy,
+        rank: Rank.corporal,
         isSupervisor: false,
         division: Division.patrol,
+        shiftGroup: ShiftGroup.gold,
       ),
       Employee(
         id: '10',
@@ -109,25 +122,28 @@ class EmployeeProvider extends ChangeNotifier {
         rank: Rank.deputy,
         isSupervisor: false,
         division: Division.patrol,
+        shiftGroup: ShiftGroup.gold,
       ),
-      // Split Shift - 2 employees
+      // Gold Shift - Split - 2 employees
       Employee(
         id: '11',
         firstName: 'Robert',
         lastName: 'Garcia',
         badgeNumber: 'P011',
-        rank: Rank.sergeantFirstClass,
+        rank: Rank.deputy,
         isSupervisor: false,
         division: Division.patrol,
+        shiftGroup: ShiftGroup.gold,
       ),
       Employee(
         id: '12',
         firstName: 'Maria',
         lastName: 'Rodriguez',
         badgeNumber: 'P012',
-        rank: Rank.corporal,
+        rank: Rank.deputy,
         isSupervisor: false,
         division: Division.patrol,
+        shiftGroup: ShiftGroup.gold,
       ),
     ]);
     

@@ -14,21 +14,32 @@ class ScheduleProvider extends ChangeNotifier {
   void _initializeSampleSchedule(List<Employee> employees) {
     final today = DateTime.now();
     
-    // Assign specific shifts to employees based on ID
-    // IDs 1-5: Day shift
-    // IDs 6-10: Night shift
-    // IDs 11-12: Split shift (2 employees)
+    // Determine which shift group is working today based on swing schedule
+    final workingShiftGroup = ShiftGroup.getWorkingShiftGroup(today);
+    
+    // Assign shifts based on employee ID and shift group
+    // Blue Shift: IDs 1-3 (Day), IDs 4-6 (Night)
+    // Gold Shift: IDs 7-8 (Day), IDs 9-10 (Night), IDs 11-12 (Split)
     for (final employee in employees) {
-      if (employee.division != null) {
+      if (employee.division != null && employee.shiftGroup != null) {
         String shift;
         final id = int.parse(employee.id);
-        if (id >= 1 && id <= 5) {
+        
+        // Determine shift type based on employee ID
+        if (id >= 1 && id <= 3) {
           shift = Shift.day;
-        } else if (id >= 6 && id <= 10) {
+        } else if (id >= 4 && id <= 6) {
+          shift = Shift.night;
+        } else if (id >= 7 && id <= 8) {
+          shift = Shift.day;
+        } else if (id >= 9 && id <= 10) {
           shift = Shift.night;
         } else {
           shift = Shift.split;
         }
+        
+        // Only add schedule entry if this employee's shift group is working today
+        final isWorking = employee.shiftGroup == workingShiftGroup;
         
         _scheduleEntries.add(ScheduleEntry(
           id: 'sched_${employee.id}_${today.toIso8601String()}',
@@ -36,7 +47,7 @@ class ScheduleProvider extends ChangeNotifier {
           division: employee.division!,
           date: today,
           shift: shift,
-          isOnDuty: true,
+          isOnDuty: isWorking,
         ));
       }
     }

@@ -11,12 +11,23 @@ A modern Flutter web application for the Sheriff's Office Patrol Division that t
 
 ## Shifts
 
-The application tracks staffing across three shifts in the Patrol Division:
-- **Day Shift** - Officers working daytime hours (5 employees)
-- **Night Shift** - Officers working nighttime hours (5 employees)
-- **Split Shift** - Officers working split hours (2 employees)
+The application tracks staffing across three shifts in the Patrol Division with a **swing schedule rotation**:
+
+### Shift Types
+- **Day Shift** - Officers working daytime hours (5 employees total)
+- **Night Shift** - Officers working nighttime hours (5 employees total)
+- **Split Shift** - Officers working split hours (2 employees total)
   - Split 1: 1200-2400 (12:00 PM - 12:00 AM)
   - Split 2: 1400-2400 (2:00 PM - 12:00 AM)
+
+### Shift Groups (Swing Schedule)
+- **Blue Shift**: 6 employees (3 Day, 3 Night)
+- **Gold Shift**: 6 employees (2 Day, 2 Night, 2 Split)
+
+### Swing Schedule Rotation
+**Pattern**: 3 days on, 2 days off, 2 days on, 3 days off (10-day cycle)
+- Blue Shift starts: January 2, 2026
+- When Blue is working, Gold is off, and vice versa
 
 Total: 12 Patrol Division employees
 
