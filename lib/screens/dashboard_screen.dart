@@ -12,13 +12,14 @@ class DashboardScreen extends StatelessWidget {
     final now = DateTime.now();
     final hour = now.hour;
     
-    // Days: 6:00 AM - 2:00 PM (6-13)
-    // Split: 2:00 PM - 10:00 PM (14-21)
-    // Night: 10:00 PM - 6:00 AM (22-23, 0-5)
-    if (hour >= 6 && hour < 14) {
-      return 'Days';
-    } else if (hour >= 14 && hour < 22) {
+    // Days: 6:00 AM - 6:00 PM (6-17)
+    // Split: 12:00 PM - 12:00 AM (12-23) - overlaps with Days and Night, only one person
+    // Night: 6:00 PM - 6:00 AM (18-23, 0-5)
+    // Priority: Split > Days/Night for overlapping times
+    if (hour >= 12 && hour < 24) {
       return 'Split';
+    } else if (hour >= 6 && hour < 18) {
+      return 'Days';
     } else {
       return 'Night';
     }
