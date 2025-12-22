@@ -6,6 +6,7 @@ class Employee {
   final String firstName;
   final String lastName;
   final String badgeNumber;
+  final String rank; // "LT", "SFC", "DEP"
   final bool isSupervisor;
   final Division? division; // Employees can only be assigned to one division
 
@@ -14,6 +15,7 @@ class Employee {
     required this.firstName,
     required this.lastName,
     required this.badgeNumber,
+    required this.rank,
     this.isSupervisor = false,
     this.division,
   });
@@ -25,6 +27,7 @@ class Employee {
     String? firstName,
     String? lastName,
     String? badgeNumber,
+    String? rank,
     bool? isSupervisor,
     Division? division,
   }) {
@@ -33,6 +36,7 @@ class Employee {
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       badgeNumber: badgeNumber ?? this.badgeNumber,
+      rank: rank ?? this.rank,
       isSupervisor: isSupervisor ?? this.isSupervisor,
       division: division ?? this.division,
     );

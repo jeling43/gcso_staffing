@@ -23,12 +23,6 @@ class GCSOStaffingApp extends StatelessWidget {
           update: (context, employeeProvider, previous) =>
               previous ?? ScheduleProvider(employeeProvider.employees),
         ),
-        ChangeNotifierProxyProvider<EmployeeProvider, OnCallProvider>(
-          create: (context) =>
-              OnCallProvider(context.read<EmployeeProvider>().employees),
-          update: (context, employeeProvider, previous) =>
-              previous ?? OnCallProvider(employeeProvider.employees),
-        ),
       ],
       child: MaterialApp(
         title: 'GCSO Staffing Tracker',
@@ -62,7 +56,6 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
 
   static const List<Widget> _screens = [
     DashboardScreen(),
-    OnCallScreen(),
     EmployeeScreen(),
     ScheduleScreen(),
   ];
@@ -87,11 +80,6 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                       icon: Icon(Icons.dashboard_outlined),
                       selectedIcon: Icon(Icons.dashboard),
                       label: Text('Dashboard'),
-                    ),
-                    NavigationRailDestination(
-                      icon: Icon(Icons.phone_outlined),
-                      selectedIcon: Icon(Icons.phone),
-                      label: Text('On-Call'),
                     ),
                     NavigationRailDestination(
                       icon: Icon(Icons.people_outlined),
@@ -125,11 +113,6 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                 icon: Icon(Icons.dashboard_outlined),
                 selectedIcon: Icon(Icons.dashboard),
                 label: 'Dashboard',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.phone_outlined),
-                selectedIcon: Icon(Icons.phone),
-                label: 'On-Call',
               ),
               NavigationDestination(
                 icon: Icon(Icons.people_outlined),
