@@ -69,16 +69,7 @@ class EmployeeScreen extends StatelessWidget {
                           title: Text('No employees assigned'),
                         )
                       else
-                        ...employees.map((employee) => Consumer<ScheduleProvider>(
-                          builder: (context, scheduleProvider, _) {
-                            // Find employee's shift from schedule
-                            final schedule = scheduleProvider.scheduleEntries
-                                .where((e) => e.employee.id == employee.id)
-                                .toList();
-                            final shift = schedule.isNotEmpty ? schedule.first.shift : 'Unassigned';
-                            final shiftGroup = employee.shiftGroup ?? 'Unassigned';
-                            
-                            return ListTile(
+                        ...employees.map((employee) => ListTile(
                               leading: CircleAvatar(
                                 backgroundColor: Colors.blue,
                                 child: Text(
@@ -92,7 +83,7 @@ class EmployeeScreen extends StatelessWidget {
                               ),
                               title: Text('${employee.rank} ${employee.lastName} #${employee.badgeNumber}'),
                               subtitle: Text(
-                                '${employee.firstName} ${employee.lastName}${employee.isSupervisor ? " • Supervisor" : ""} • $shift Shift • $shiftGroup Group',
+                                '${employee.firstName} ${employee.lastName}${employee.isSupervisor ? " • Supervisor" : ""}\n${employee.shiftAssignment}',
                               ),
                               trailing: employeeProvider.isCurrentUserSupervisor
                                   ? IconButton(
@@ -100,9 +91,7 @@ class EmployeeScreen extends StatelessWidget {
                                       onPressed: () => _showEditEmployeeDialog(context, employee),
                                     )
                                   : null,
-                            );
-                          },
-                        )),
+                            )),
                     ],
                   ),
                 ),
@@ -134,6 +123,8 @@ class EmployeeScreen extends StatelessWidget {
     final badgeController = TextEditingController();
     bool isSupervisor = false;
     String selectedRank = Rank.deputy;
+    String? selectedShiftGroup;
+    String? selectedShiftType;
     
     showDialog(
       context: context,
@@ -142,53 +133,81 @@ class EmployeeScreen extends StatelessWidget {
           title: const Text('Add New Employee'),
           content: SizedBox(
             width: 400,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: firstNameController,
-                  decoration: const InputDecoration(labelText: 'First Name'),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: lastNameController,
-                  decoration: const InputDecoration(labelText: 'Last Name'),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: badgeController,
-                  decoration: const InputDecoration(labelText: 'Badge Number'),
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: selectedRank,
-                  decoration: const InputDecoration(labelText: 'Rank'),
-                  items: const [
-                    DropdownMenuItem(value: Rank.lieutenant, child: Text('Lieutenant (LT)')),
-                    DropdownMenuItem(value: Rank.sergeantFirstClass, child: Text('Sergeant First Class (SFC)')),
-                    DropdownMenuItem(value: Rank.corporal, child: Text('Corporal (CPL)')),
-                    DropdownMenuItem(value: Rank.deputy, child: Text('Deputy (DEP)')),
-                  ],
-                  onChanged: (value) {
-                    setState(() => selectedRank = value ?? Rank.deputy);
-                  },
-                ),
-                const SizedBox(height: 16),
-                const ListTile(
-                  leading: Icon(Icons.directions_car),
-                  title: Text('Division: Patrol'),
-                  subtitle: Text('All employees are assigned to Patrol division'),
-                  dense: true,
-                ),
-                const SizedBox(height: 8),
-                CheckboxListTile(
-                  title: const Text('Supervisor'),
-                  value: isSupervisor,
-                  onChanged: (value) {
-                    setState(() => isSupervisor = value ?? false);
-                  },
-                ),
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: firstNameController,
+                    decoration: const InputDecoration(labelText: 'First Name'),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: lastNameController,
+                    decoration: const InputDecoration(labelText: 'Last Name'),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: badgeController,
+                    decoration: const InputDecoration(labelText: 'Badge Number'),
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: selectedRank,
+                    decoration: const InputDecoration(labelText: 'Rank'),
+                    items: const [
+                      DropdownMenuItem(value: Rank.lieutenant, child: Text('Lieutenant (LT)')),
+                      DropdownMenuItem(value: Rank.sergeantFirstClass, child: Text('Sergeant First Class (SFC)')),
+                      DropdownMenuItem(value: Rank.corporal, child: Text('Corporal (CPL)')),
+                      DropdownMenuItem(value: Rank.deputy, child: Text('Deputy (DEP)')),
+                    ],
+                    onChanged: (value) {
+                      setState(() => selectedRank = value ?? Rank.deputy);
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: selectedShiftGroup,
+                    decoration: const InputDecoration(labelText: 'Shift Group'),
+                    items: const [
+                      DropdownMenuItem(value: ShiftGroup.a, child: Text('A Shift')),
+                      DropdownMenuItem(value: ShiftGroup.b, child: Text('B Shift')),
+                    ],
+                    onChanged: (value) {
+                      setState(() => selectedShiftGroup = value);
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: selectedShiftType,
+                    decoration: const InputDecoration(labelText: 'Shift Time'),
+                    items: const [
+                      DropdownMenuItem(value: Shift.day, child: Text('Days')),
+                      DropdownMenuItem(value: Shift.night, child: Text('Nights')),
+                      DropdownMenuItem(value: Shift.split1200, child: Text('Split 1200')),
+                      DropdownMenuItem(value: Shift.split1400, child: Text('Split 1400')),
+                    ],
+                    onChanged: (value) {
+                      setState(() => selectedShiftType = value);
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  const ListTile(
+                    leading: Icon(Icons.directions_car),
+                    title: Text('Division: Patrol'),
+                    subtitle: Text('All employees are assigned to Patrol division'),
+                    dense: true,
+                  ),
+                  const SizedBox(height: 8),
+                  CheckboxListTile(
+                    title: const Text('Supervisor'),
+                    value: isSupervisor,
+                    onChanged: (value) {
+                      setState(() => isSupervisor = value ?? false);
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
           actions: [
@@ -209,6 +228,8 @@ class EmployeeScreen extends StatelessWidget {
                     rank: selectedRank,
                     isSupervisor: isSupervisor,
                     division: Division.patrol,
+                    shiftGroup: selectedShiftGroup,
+                    shiftType: selectedShiftType,
                   ));
                   Navigator.pop(context);
                 }
@@ -229,6 +250,8 @@ class EmployeeScreen extends StatelessWidget {
     final badgeController = TextEditingController(text: employee.badgeNumber);
     bool isSupervisor = employee.isSupervisor;
     String selectedRank = employee.rank;
+    String? selectedShiftGroup = employee.shiftGroup;
+    String? selectedShiftType = employee.shiftType;
     
     showDialog(
       context: context,
@@ -237,46 +260,74 @@ class EmployeeScreen extends StatelessWidget {
           title: const Text('Edit Employee'),
           content: SizedBox(
             width: 400,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: firstNameController,
-                  decoration: const InputDecoration(labelText: 'First Name'),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: lastNameController,
-                  decoration: const InputDecoration(labelText: 'Last Name'),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: badgeController,
-                  decoration: const InputDecoration(labelText: 'Badge Number'),
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: selectedRank,
-                  decoration: const InputDecoration(labelText: 'Rank'),
-                  items: const [
-                    DropdownMenuItem(value: Rank.lieutenant, child: Text('Lieutenant (LT)')),
-                    DropdownMenuItem(value: Rank.sergeantFirstClass, child: Text('Sergeant First Class (SFC)')),
-                    DropdownMenuItem(value: Rank.corporal, child: Text('Corporal (CPL)')),
-                    DropdownMenuItem(value: Rank.deputy, child: Text('Deputy (DEP)')),
-                  ],
-                  onChanged: (value) {
-                    setState(() => selectedRank = value ?? Rank.deputy);
-                  },
-                ),
-                const SizedBox(height: 16),
-                CheckboxListTile(
-                  title: const Text('Supervisor'),
-                  value: isSupervisor,
-                  onChanged: (value) {
-                    setState(() => isSupervisor = value ?? false);
-                  },
-                ),
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: firstNameController,
+                    decoration: const InputDecoration(labelText: 'First Name'),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: lastNameController,
+                    decoration: const InputDecoration(labelText: 'Last Name'),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: badgeController,
+                    decoration: const InputDecoration(labelText: 'Badge Number'),
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: selectedRank,
+                    decoration: const InputDecoration(labelText: 'Rank'),
+                    items: const [
+                      DropdownMenuItem(value: Rank.lieutenant, child: Text('Lieutenant (LT)')),
+                      DropdownMenuItem(value: Rank.sergeantFirstClass, child: Text('Sergeant First Class (SFC)')),
+                      DropdownMenuItem(value: Rank.corporal, child: Text('Corporal (CPL)')),
+                      DropdownMenuItem(value: Rank.deputy, child: Text('Deputy (DEP)')),
+                    ],
+                    onChanged: (value) {
+                      setState(() => selectedRank = value ?? Rank.deputy);
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: selectedShiftGroup,
+                    decoration: const InputDecoration(labelText: 'Shift Group'),
+                    items: const [
+                      DropdownMenuItem(value: ShiftGroup.a, child: Text('A Shift')),
+                      DropdownMenuItem(value: ShiftGroup.b, child: Text('B Shift')),
+                    ],
+                    onChanged: (value) {
+                      setState(() => selectedShiftGroup = value);
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: selectedShiftType,
+                    decoration: const InputDecoration(labelText: 'Shift Time'),
+                    items: const [
+                      DropdownMenuItem(value: Shift.day, child: Text('Days')),
+                      DropdownMenuItem(value: Shift.night, child: Text('Nights')),
+                      DropdownMenuItem(value: Shift.split1200, child: Text('Split 1200')),
+                      DropdownMenuItem(value: Shift.split1400, child: Text('Split 1400')),
+                    ],
+                    onChanged: (value) {
+                      setState(() => selectedShiftType = value);
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  CheckboxListTile(
+                    title: const Text('Supervisor'),
+                    value: isSupervisor,
+                    onChanged: (value) {
+                      setState(() => isSupervisor = value ?? false);
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
           actions: [
@@ -295,6 +346,8 @@ class EmployeeScreen extends StatelessWidget {
                     badgeNumber: badgeController.text,
                     rank: selectedRank,
                     isSupervisor: isSupervisor,
+                    shiftGroup: selectedShiftGroup,
+                    shiftType: selectedShiftType,
                   ));
                   Navigator.pop(context);
                 }

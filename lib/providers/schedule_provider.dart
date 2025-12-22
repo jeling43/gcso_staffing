@@ -17,29 +17,9 @@ class ScheduleProvider extends ChangeNotifier {
     // Determine which shift group is working today based on swing schedule
     final workingShiftGroup = ShiftGroup.getWorkingShiftGroup(today);
     
-    // Assign shifts based on employee ID and shift group
-    // B Shift: IDs 1-3 (Day), IDs 4-6 (Night)
-    // A Shift: IDs 7-8 (Day), IDs 9-10 (Night), ID 11 (Split-1200), ID 12 (Split-1400)
+    // Assign shifts based on employee's shiftType and shiftGroup
     for (final employee in employees) {
-      if (employee.division != null && employee.shiftGroup != null) {
-        String shift;
-        final id = int.parse(employee.id);
-        
-        // Determine shift type based on employee ID
-        if (id >= 1 && id <= 3) {
-          shift = Shift.day;
-        } else if (id >= 4 && id <= 6) {
-          shift = Shift.night;
-        } else if (id >= 7 && id <= 8) {
-          shift = Shift.day;
-        } else if (id >= 9 && id <= 10) {
-          shift = Shift.night;
-        } else if (id == 11) {
-          shift = Shift.split1200;
-        } else {
-          shift = Shift.split1400;
-        }
-        
+      if (employee.division != null && employee.shiftGroup != null && employee.shiftType != null) {
         // Only add schedule entry if this employee's shift group is working today
         final isWorking = employee.shiftGroup == workingShiftGroup;
         
@@ -48,7 +28,7 @@ class ScheduleProvider extends ChangeNotifier {
           employee: employee,
           division: employee.division!,
           date: today,
-          shift: shift,
+          shift: employee.shiftType!,
           isOnDuty: isWorking,
         ));
       }

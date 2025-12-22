@@ -113,6 +113,7 @@ class Employee {
   final bool isSupervisor;
   final Division? division; // Employees can only be assigned to one division
   final String? shiftGroup; // "A" or "B" for swing schedule rotation
+  final String? shiftType; // "Day", "Night", "Split-1200", "Split-1400"
 
   Employee({
     required this.id,
@@ -123,9 +124,18 @@ class Employee {
     this.isSupervisor = false,
     this.division,
     this.shiftGroup,
+    this.shiftType,
   }) : assert(Rank.validRanks.contains(rank), 'Invalid rank: $rank');
 
   String get fullName => '$firstName $lastName';
+  
+  /// Get the full shift assignment (e.g., "B Shift - Nights")
+  String get shiftAssignment {
+    if (shiftGroup == null || shiftType == null) {
+      return 'Unassigned';
+    }
+    return '$shiftGroup Shift - $shiftType';
+  }
 
   Employee copyWith({
     String? id,
@@ -136,6 +146,7 @@ class Employee {
     bool? isSupervisor,
     Division? division,
     String? shiftGroup,
+    String? shiftType,
   }) {
     return Employee(
       id: id ?? this.id,
@@ -146,6 +157,7 @@ class Employee {
       isSupervisor: isSupervisor ?? this.isSupervisor,
       division: division ?? this.division,
       shiftGroup: shiftGroup ?? this.shiftGroup,
+      shiftType: shiftType ?? this.shiftType,
     );
   }
 

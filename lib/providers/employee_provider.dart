@@ -30,6 +30,7 @@ class EmployeeProvider extends ChangeNotifier {
         isSupervisor: true,
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
+        shiftType: Shift.day,
       ),
       Employee(
         id: '2',
@@ -40,6 +41,7 @@ class EmployeeProvider extends ChangeNotifier {
         isSupervisor: false,
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
+        shiftType: Shift.day,
       ),
       Employee(
         id: '3',
@@ -50,6 +52,7 @@ class EmployeeProvider extends ChangeNotifier {
         isSupervisor: false,
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
+        shiftType: Shift.day,
       ),
       // B Shift - Night - 3 employees
       Employee(
@@ -61,6 +64,7 @@ class EmployeeProvider extends ChangeNotifier {
         isSupervisor: true,
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
+        shiftType: Shift.night,
       ),
       Employee(
         id: '5',
@@ -71,6 +75,7 @@ class EmployeeProvider extends ChangeNotifier {
         isSupervisor: false,
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
+        shiftType: Shift.night,
       ),
       Employee(
         id: '6',
@@ -81,6 +86,7 @@ class EmployeeProvider extends ChangeNotifier {
         isSupervisor: false,
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
+        shiftType: Shift.night,
       ),
       // A Shift - Day - 2 employees
       Employee(
@@ -92,6 +98,7 @@ class EmployeeProvider extends ChangeNotifier {
         isSupervisor: true,
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
+        shiftType: Shift.day,
       ),
       Employee(
         id: '8',
@@ -102,6 +109,7 @@ class EmployeeProvider extends ChangeNotifier {
         isSupervisor: false,
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
+        shiftType: Shift.day,
       ),
       // A Shift - Night - 2 employees
       Employee(
@@ -113,6 +121,7 @@ class EmployeeProvider extends ChangeNotifier {
         isSupervisor: false,
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
+        shiftType: Shift.night,
       ),
       Employee(
         id: '10',
@@ -123,6 +132,7 @@ class EmployeeProvider extends ChangeNotifier {
         isSupervisor: false,
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
+        shiftType: Shift.night,
       ),
       // A Shift - Split - 2 employees
       Employee(
@@ -134,6 +144,7 @@ class EmployeeProvider extends ChangeNotifier {
         isSupervisor: false,
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
+        shiftType: Shift.split1200,
       ),
       Employee(
         id: '12',
@@ -144,6 +155,7 @@ class EmployeeProvider extends ChangeNotifier {
         isSupervisor: false,
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
+        shiftType: Shift.split1400,
       ),
     ]);
     
