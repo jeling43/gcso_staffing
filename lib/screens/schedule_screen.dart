@@ -14,7 +14,6 @@ class ScheduleScreen extends StatefulWidget {
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
   DateTime _selectedDate = DateTime.now();
-  Division? _selectedDivision;
 
   @override
   Widget build(BuildContext context) {
@@ -90,28 +89,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Wrap(
-                  spacing: 8.0,
-                  children: [
-                    FilterChip(
-                      label: const Text('All Divisions'),
-                      selected: _selectedDivision == null,
-                      onSelected: (selected) {
-                        setState(() => _selectedDivision = null);
-                      },
-                    ),
-                    ...Division.values.map((division) => FilterChip(
-                          label: Text(division.displayName),
-                          selected: _selectedDivision == division,
-                          onSelected: (selected) {
-                            setState(() {
-                              _selectedDivision = selected ? division : null;
-                            });
-                          },
-                        )),
-                  ],
-                ),
-                const SizedBox(height: 24),
                 if (!isSupervisor)
                   Container(
                     padding: const EdgeInsets.all(16.0),
@@ -150,17 +127,14 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     ScheduleProvider scheduleProvider,
     bool isSupervisor,
   ) {
-    final divisions = _selectedDivision != null
-        ? [_selectedDivision!]
-        : Division.values;
+    // Only show Patrol division entries
+    final entries = scheduleProvider.getScheduleByDivision(
+      Division.patrol,
+      date: _selectedDate,
+    );
 
-    return divisions.map((division) {
-      final entries = scheduleProvider.getScheduleByDivision(
-        division,
-        date: _selectedDate,
-      );
-
-      return Card(
+    return [
+      Card(
         margin: const EdgeInsets.only(bottom: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,18 +142,18 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                color: _getDivisionColor(division).withOpacity(0.2),
+                color: Colors.blue.withOpacity(0.2),
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
               ),
               child: Row(
                 children: [
-                  Icon(
-                    _getDivisionIcon(division),
-                    color: _getDivisionColor(division),
+                  const Icon(
+                    Icons.directions_car,
+                    color: Colors.blue,
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    division.displayName,
+                    'Patrol Division',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const Spacer(),
@@ -204,8 +178,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   )),
           ],
         ),
-      );
-    }).toList();
+      ),
+    ];
   }
 
   Widget _buildScheduleEntryTile(
@@ -281,14 +255,13 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     final scheduleProvider = context.read<ScheduleProvider>();
     
     Employee? selectedEmployee;
-    Division selectedDivision = _selectedDivision ?? Division.jail;
-    String selectedShift = Shift.aDays;
+    String selectedShift = Shift.day;
     
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
-          final availableEmployees = employeeProvider.getEmployeesByDivision(selectedDivision);
+          final availableEmployees = employeeProvider.getEmployeesByDivision(Division.patrol);
           
           return AlertDialog(
             title: const Text('Add Schedule Entry'),
@@ -297,25 +270,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  DropdownButtonFormField<Division>(
-                    value: selectedDivision,
-                    decoration: const InputDecoration(labelText: 'Division'),
-                    items: Division.values
-                        .map((d) => DropdownMenuItem(
-                              value: d,
-                              child: Text(d.displayName),
-                            ))
-                        .toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() {
-                          selectedDivision = value;
-                          selectedEmployee = null;
-                        });
-                      }
-                    },
+                  const ListTile(
+                    leading: Icon(Icons.directions_car),
+                    title: Text('Division: Patrol'),
+                    dense: true,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
                   DropdownButtonFormField<Employee>(
                     value: selectedEmployee,
                     decoration: const InputDecoration(labelText: 'Employee'),
@@ -360,7 +320,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                         scheduleProvider.addScheduleEntry(ScheduleEntry(
                           id: 'sched_${DateTime.now().millisecondsSinceEpoch}',
                           employee: selectedEmployee!,
-                          division: selectedDivision,
+                          division: Division.patrol,
                           date: _selectedDate,
                           shift: selectedShift,
                           isOnDuty: true,
@@ -431,27 +391,5 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         ),
       ),
     );
-  }
-
-  IconData _getDivisionIcon(Division division) {
-    switch (division) {
-      case Division.jail:
-        return Icons.security;
-      case Division.patrol:
-        return Icons.directions_car;
-      case Division.courthouse:
-        return Icons.account_balance;
-    }
-  }
-
-  Color _getDivisionColor(Division division) {
-    switch (division) {
-      case Division.jail:
-        return Colors.orange;
-      case Division.patrol:
-        return Colors.blue;
-      case Division.courthouse:
-        return Colors.purple;
-    }
   }
 }

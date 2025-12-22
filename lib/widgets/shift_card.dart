@@ -3,17 +3,17 @@ import 'package:provider/provider.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
 
-/// Card widget displaying division staffing information
-class DivisionCard extends StatelessWidget {
-  final Division division;
+/// Card widget displaying shift staffing information
+class ShiftCard extends StatelessWidget {
+  final String shift;
 
-  const DivisionCard({super.key, required this.division});
+  const ShiftCard({super.key, required this.shift});
 
   @override
   Widget build(BuildContext context) {
     return Consumer<ScheduleProvider>(
       builder: (context, scheduleProvider, _) {
-        final onDutyStaff = scheduleProvider.getCurrentlyOnDuty(division);
+        final onDutyStaff = scheduleProvider.getCurrentlyOnDutyByShift(shift);
 
         return Card(
           elevation: 4,
@@ -23,13 +23,13 @@ class DivisionCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
-                  color: _getDivisionColor(division),
+                  color: _getShiftColor(shift),
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                 ),
                 child: Row(
                   children: [
                     Icon(
-                      _getDivisionIcon(division),
+                      _getShiftIcon(shift),
                       color: Colors.white,
                       size: 32,
                     ),
@@ -39,7 +39,7 @@ class DivisionCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            division.displayName,
+                            '$shift Shift',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 20,
@@ -78,17 +78,17 @@ class DivisionCard extends StatelessWidget {
                         style: TextStyle(color: Colors.grey),
                       )
                     else
-                      ...onDutyStaff.take(5).map((entry) => Padding(
+                      ...onDutyStaff.map((entry) => Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4.0),
                             child: Row(
                               children: [
                                 CircleAvatar(
                                   radius: 16,
-                                  backgroundColor: _getDivisionColor(division).withOpacity(0.2),
+                                  backgroundColor: _getShiftColor(shift).withOpacity(0.2),
                                   child: Text(
                                     entry.employee.rank,
                                     style: TextStyle(
-                                      color: _getDivisionColor(division),
+                                      color: _getShiftColor(shift),
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -103,27 +103,20 @@ class DivisionCard extends StatelessWidget {
                                         '${entry.employee.rank} ${entry.employee.lastName} #${entry.employee.badgeNumber}',
                                         style: const TextStyle(fontWeight: FontWeight.w500),
                                       ),
-                                      Text(
-                                        '${entry.shift} Shift',
-                                        style: TextStyle(
-                                          color: Colors.grey[600],
-                                          fontSize: 12,
+                                      if (entry.employee.isSupervisor)
+                                        Text(
+                                          'Supervisor',
+                                          style: TextStyle(
+                                            color: Colors.grey[600],
+                                            fontSize: 12,
+                                          ),
                                         ),
-                                      ),
                                     ],
                                   ),
                                 ),
                               ],
                             ),
                           )),
-                    if (onDutyStaff.length > 5)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          '+ ${onDutyStaff.length - 5} more',
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
-                      ),
                   ],
                 ),
               ),
@@ -134,11 +127,29 @@ class DivisionCard extends StatelessWidget {
     );
   }
 
-  IconData _getDivisionIcon(Division division) {
-    return Icons.directions_car;
+  IconData _getShiftIcon(String shift) {
+    switch (shift) {
+      case Shift.day:
+        return Icons.wb_sunny;
+      case Shift.night:
+        return Icons.nightlight;
+      case Shift.split:
+        return Icons.schedule;
+      default:
+        return Icons.access_time;
+    }
   }
 
-  Color _getDivisionColor(Division division) {
-    return Colors.blue;
+  Color _getShiftColor(String shift) {
+    switch (shift) {
+      case Shift.day:
+        return Colors.amber;
+      case Shift.night:
+        return Colors.indigo;
+      case Shift.split:
+        return Colors.teal;
+      default:
+        return Colors.grey;
+    }
   }
 }

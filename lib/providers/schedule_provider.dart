@@ -13,17 +13,41 @@ class ScheduleProvider extends ChangeNotifier {
 
   void _initializeSampleSchedule(List<Employee> employees) {
     final today = DateTime.now();
-    final shifts = Shift.validShifts;
     
+    // Determine which shift group is working today based on swing schedule
+    final workingShiftGroup = ShiftGroup.getWorkingShiftGroup(today);
+    
+    // Assign shifts based on employee ID and shift group
+    // Blue Shift: IDs 1-3 (Day), IDs 4-6 (Night)
+    // Gold Shift: IDs 7-8 (Day), IDs 9-10 (Night), IDs 11-12 (Split)
     for (final employee in employees) {
-      if (employee.division != null) {
+      if (employee.division != null && employee.shiftGroup != null) {
+        String shift;
+        final id = int.parse(employee.id);
+        
+        // Determine shift type based on employee ID
+        if (id >= 1 && id <= 3) {
+          shift = Shift.day;
+        } else if (id >= 4 && id <= 6) {
+          shift = Shift.night;
+        } else if (id >= 7 && id <= 8) {
+          shift = Shift.day;
+        } else if (id >= 9 && id <= 10) {
+          shift = Shift.night;
+        } else {
+          shift = Shift.split;
+        }
+        
+        // Only add schedule entry if this employee's shift group is working today
+        final isWorking = employee.shiftGroup == workingShiftGroup;
+        
         _scheduleEntries.add(ScheduleEntry(
           id: 'sched_${employee.id}_${today.toIso8601String()}',
           employee: employee,
           division: employee.division!,
           date: today,
-          shift: shifts[int.parse(employee.id) % shifts.length],
-          isOnDuty: true,
+          shift: shift,
+          isOnDuty: isWorking,
         ));
       }
     }
@@ -54,6 +78,29 @@ class ScheduleProvider extends ChangeNotifier {
     return _scheduleEntries
         .where((entry) =>
             entry.division == division &&
+            entry.isOnDuty &&
+            entry.date.year == today.year &&
+            entry.date.month == today.month &&
+            entry.date.day == today.day)
+        .toList();
+  }
+
+  List<ScheduleEntry> getScheduleByShift(String shift, {DateTime? date}) {
+    var entries = _scheduleEntries.where((e) => e.shift == shift);
+    if (date != null) {
+      entries = entries.where((entry) =>
+          entry.date.year == date.year &&
+          entry.date.month == date.month &&
+          entry.date.day == date.day);
+    }
+    return entries.toList();
+  }
+
+  List<ScheduleEntry> getCurrentlyOnDutyByShift(String shift) {
+    final today = DateTime.now();
+    return _scheduleEntries
+        .where((entry) =>
+            entry.shift == shift &&
             entry.isOnDuty &&
             entry.date.year == today.year &&
             entry.date.month == today.month &&

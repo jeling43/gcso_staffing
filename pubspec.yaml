@@ -1,5 +1,5 @@
 name: gcso_staffing
-description: GCSO Sheriff's Office Staffing Tracker - Track staffing across Jail, Patrol, and Courthouse divisions.
+description: GCSO Sheriff's Office Staffing Tracker - Track staffing by shift in the Patrol Division.
 publish_to: 'none'
 version: 1.0.0+1
 
