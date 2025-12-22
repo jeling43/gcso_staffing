@@ -36,6 +36,18 @@ class DashboardScreen extends StatelessWidget {
     final workingShiftGroup = ShiftGroup.getWorkingShiftGroup(today);
     final currentShiftType = _getCurrentShiftType();
     
+    // Determine colors based on shift group
+    final isAShift = workingShiftGroup == ShiftGroup.a;
+    final gradientColors = isAShift 
+        ? [Colors.amber.shade700, Colors.amber.shade500]
+        : [Colors.blue.shade700, Colors.blue.shade500];
+    final shadowColor = isAShift 
+        ? Colors.amber.shade700.withOpacity(0.4)
+        : Colors.blue.shade700.withOpacity(0.4);
+    final badgeColor = isAShift 
+        ? Colors.amber.shade700
+        : Colors.blue.shade700;
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('GCSO Staffing Dashboard'),
@@ -69,14 +81,14 @@ class DashboardScreen extends StatelessWidget {
                 Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Colors.blue.shade700, Colors.blue.shade500],
+                      colors: gradientColors,
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.blue.shade700.withOpacity(0.4),
+                        color: shadowColor,
                         blurRadius: 12,
                         offset: const Offset(0, 6),
                       ),
@@ -107,7 +119,7 @@ class DashboardScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        Shift.getDisplayName(currentShiftType),
+                        '$workingShiftGroup SHIFT',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 28,
@@ -124,7 +136,7 @@ class DashboardScreen extends StatelessWidget {
                         child: Text(
                           '${currentShiftStaff.length} ON DUTY',
                           style: TextStyle(
-                            color: Colors.blue.shade700,
+                            color: badgeColor,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
@@ -147,7 +159,7 @@ class DashboardScreen extends StatelessWidget {
                                 child: Text(
                                   entry.employee.rank,
                                   style: TextStyle(
-                                    color: Colors.blue.shade700,
+                                    color: badgeColor,
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                   ),
