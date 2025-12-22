@@ -12,14 +12,11 @@ class Rank {
 
 /// Valid shift names
 class Shift {
-  static const String aDays = 'A-Days';
-  static const String aSplit = 'A-Split';
-  static const String aNight = 'A-Night';
-  static const String bDays = 'B-Days';
-  static const String bSplit = 'B-Split';
-  static const String bNight = 'B-Night';
+  static const String day = 'Day';
+  static const String night = 'Night';
+  static const String split = 'Split';
   
-  static const List<String> validShifts = [aDays, aSplit, aNight, bDays, bSplit, bNight];
+  static const List<String> validShifts = [day, night, split];
 }
 
 /// Represents an employee in the Sheriff's Office

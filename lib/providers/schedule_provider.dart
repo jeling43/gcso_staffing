@@ -13,16 +13,29 @@ class ScheduleProvider extends ChangeNotifier {
 
   void _initializeSampleSchedule(List<Employee> employees) {
     final today = DateTime.now();
-    final shifts = Shift.validShifts;
     
+    // Assign specific shifts to employees based on ID
+    // IDs 1-5: Day shift
+    // IDs 6-10: Night shift
+    // ID 11: Split shift
     for (final employee in employees) {
       if (employee.division != null) {
+        String shift;
+        final id = int.parse(employee.id);
+        if (id >= 1 && id <= 5) {
+          shift = Shift.day;
+        } else if (id >= 6 && id <= 10) {
+          shift = Shift.night;
+        } else {
+          shift = Shift.split;
+        }
+        
         _scheduleEntries.add(ScheduleEntry(
           id: 'sched_${employee.id}_${today.toIso8601String()}',
           employee: employee,
           division: employee.division!,
           date: today,
-          shift: shifts[int.parse(employee.id) % shifts.length],
+          shift: shift,
           isOnDuty: true,
         ));
       }
@@ -54,6 +67,29 @@ class ScheduleProvider extends ChangeNotifier {
     return _scheduleEntries
         .where((entry) =>
             entry.division == division &&
+            entry.isOnDuty &&
+            entry.date.year == today.year &&
+            entry.date.month == today.month &&
+            entry.date.day == today.day)
+        .toList();
+  }
+
+  List<ScheduleEntry> getScheduleByShift(String shift, {DateTime? date}) {
+    var entries = _scheduleEntries.where((e) => e.shift == shift);
+    if (date != null) {
+      entries = entries.where((entry) =>
+          entry.date.year == date.year &&
+          entry.date.month == date.month &&
+          entry.date.day == date.day);
+    }
+    return entries.toList();
+  }
+
+  List<ScheduleEntry> getCurrentlyOnDutyByShift(String shift) {
+    final today = DateTime.now();
+    return _scheduleEntries
+        .where((entry) =>
+            entry.shift == shift &&
             entry.isOnDuty &&
             entry.date.year == today.year &&
             entry.date.month == today.month &&
