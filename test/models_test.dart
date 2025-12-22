@@ -150,22 +150,61 @@ void main() {
 
       final shifts = Shift.validShifts;
       
-      // Should have Day, Night, Split shifts
-      expect(shifts.length, equals(3));
-      expect(shifts.contains(Shift.day), isTrue);
-      expect(shifts.contains(Shift.night), isTrue);
-      expect(shifts.contains(Shift.split), isTrue);
+      // Should have 8 shifts (4 for group A, 4 for group B)
+      expect(shifts.length, equals(8));
+      expect(shifts.contains(Shift.aDays), isTrue);
+      expect(shifts.contains(Shift.aSplit1200), isTrue);
+      expect(shifts.contains(Shift.aSplit1400), isTrue);
+      expect(shifts.contains(Shift.aNight), isTrue);
+      expect(shifts.contains(Shift.bDays), isTrue);
+      expect(shifts.contains(Shift.bSplit1200), isTrue);
+      expect(shifts.contains(Shift.bSplit1400), isTrue);
+      expect(shifts.contains(Shift.bNight), isTrue);
       
-      for (final shift in shifts) {
-        final entry = ScheduleEntry(
-          id: 'sched_$shift',
-          employee: employee,
-          division: Division.patrol,
-          date: DateTime(2024, 1, 15),
-          shift: shift,
-        );
-        expect(entry.shift, equals(shift));
-      }
+      // Test creating schedule entries with the base shift types
+      final dayEntry = ScheduleEntry(
+        id: 'sched_day',
+        employee: employee,
+        division: Division.patrol,
+        date: DateTime(2024, 1, 15),
+        shift: Shift.day,
+      );
+      expect(dayEntry.shift, equals(Shift.day));
+      
+      final split1200Entry = ScheduleEntry(
+        id: 'sched_split1200',
+        employee: employee,
+        division: Division.patrol,
+        date: DateTime(2024, 1, 15),
+        shift: Shift.split1200,
+      );
+      expect(split1200Entry.shift, equals(Shift.split1200));
+      
+      final split1400Entry = ScheduleEntry(
+        id: 'sched_split1400',
+        employee: employee,
+        division: Division.patrol,
+        date: DateTime(2024, 1, 15),
+        shift: Shift.split1400,
+      );
+      expect(split1400Entry.shift, equals(Shift.split1400));
+    });
+    
+    test('getDisplayName returns user-friendly names', () {
+      expect(Shift.getDisplayName(Shift.aDays), equals('Days Shift (A) - 06:00-18:00'));
+      expect(Shift.getDisplayName(Shift.aSplit1200), equals('Split Shift 1200 (A) - 12:00-24:00'));
+      expect(Shift.getDisplayName(Shift.aSplit1400), equals('Split Shift 1400 (A) - 14:00-02:00'));
+      expect(Shift.getDisplayName(Shift.aNight), equals('Night Shift (A) - 18:00-06:00'));
+      expect(Shift.getDisplayName(Shift.bDays), equals('Days Shift (B) - 06:00-18:00'));
+      expect(Shift.getDisplayName(Shift.bSplit1200), equals('Split Shift 1200 (B) - 12:00-24:00'));
+      expect(Shift.getDisplayName(Shift.bSplit1400), equals('Split Shift 1400 (B) - 14:00-02:00'));
+      expect(Shift.getDisplayName(Shift.bNight), equals('Night Shift (B) - 18:00-06:00'));
+      
+      // Test fallback for base shift types
+      expect(Shift.getDisplayName(Shift.day), equals('Days Shift - 06:00-18:00'));
+      expect(Shift.getDisplayName(Shift.night), equals('Night Shift - 18:00-06:00'));
+      expect(Shift.getDisplayName(Shift.split1200), equals('Split Shift 1200 - 12:00-24:00'));
+      expect(Shift.getDisplayName(Shift.split1400), equals('Split Shift 1400 - 14:00-02:00'));
     });
     
     test('swing schedule calculates correctly', () {
@@ -267,6 +306,43 @@ void main() {
       
       final updatedEmployee = provider.employees.firstWhere((e) => e.id == employee.id);
       expect(updatedEmployee.division, equals(Division.patrol));
+    });
+  });
+
+  group('ScheduleProvider', () {
+    test('canAddToSplit allows non-split shifts', () {
+      final employeeProvider = EmployeeProvider();
+      final scheduleProvider = ScheduleProvider(employeeProvider.employees);
+      final today = DateTime.now();
+      
+      // Non-split shifts should always return true
+      expect(scheduleProvider.canAddToSplit(Shift.day, today, Division.patrol), isTrue);
+      expect(scheduleProvider.canAddToSplit(Shift.night, today, Division.patrol), isTrue);
+    });
+    
+    test('canAddToSplit enforces 1-person limit for split shifts', () {
+      final employeeProvider = EmployeeProvider();
+      final scheduleProvider = ScheduleProvider(employeeProvider.employees);
+      final today = DateTime.now();
+      
+      // Get current on-duty split shift staff
+      final split1200Staff = scheduleProvider.getCurrentlyOnDutyByShift(Shift.split1200);
+      final split1400Staff = scheduleProvider.getCurrentlyOnDutyByShift(Shift.split1400);
+      
+      // If no one is on split1200, should be able to add
+      if (split1200Staff.isEmpty) {
+        expect(scheduleProvider.canAddToSplit(Shift.split1200, today, Division.patrol), isTrue);
+      } else {
+        // If someone is already on split1200, should not be able to add
+        expect(scheduleProvider.canAddToSplit(Shift.split1200, today, Division.patrol), isFalse);
+      }
+      
+      // Same for split1400
+      if (split1400Staff.isEmpty) {
+        expect(scheduleProvider.canAddToSplit(Shift.split1400, today, Division.patrol), isTrue);
+      } else {
+        expect(scheduleProvider.canAddToSplit(Shift.split1400, today, Division.patrol), isFalse);
+      }
     });
   });
 }

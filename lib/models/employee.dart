@@ -14,9 +14,58 @@ class Rank {
 class Shift {
   static const String day = 'Day';
   static const String night = 'Night';
-  static const String split = 'Split';
+  static const String split1200 = 'Split-1200';
+  static const String split1400 = 'Split-1400';
   
-  static const List<String> validShifts = [day, night, split];
+  // Group A shifts
+  static const String aDays = 'A-Days';
+  static const String aSplit1200 = 'A-Split-1200';
+  static const String aSplit1400 = 'A-Split-1400';
+  static const String aNight = 'A-Night';
+  
+  // Group B shifts
+  static const String bDays = 'B-Days';
+  static const String bSplit1200 = 'B-Split-1200';
+  static const String bSplit1400 = 'B-Split-1400';
+  static const String bNight = 'B-Night';
+  
+  static const List<String> validShifts = [
+    aDays, aSplit1200, aSplit1400, aNight,
+    bDays, bSplit1200, bSplit1400, bNight
+  ];
+  
+  /// Get user-friendly display name for a shift
+  static String getDisplayName(String shift) {
+    switch (shift) {
+      case aDays:
+        return 'Days Shift (A) - 06:00-18:00';
+      case aSplit1200:
+        return 'Split Shift 1200 (A) - 12:00-24:00';
+      case aSplit1400:
+        return 'Split Shift 1400 (A) - 14:00-02:00';
+      case aNight:
+        return 'Night Shift (A) - 18:00-06:00';
+      case bDays:
+        return 'Days Shift (B) - 06:00-18:00';
+      case bSplit1200:
+        return 'Split Shift 1200 (B) - 12:00-24:00';
+      case bSplit1400:
+        return 'Split Shift 1400 (B) - 14:00-02:00';
+      case bNight:
+        return 'Night Shift (B) - 18:00-06:00';
+      // Fallback for generic shift types
+      case day:
+        return 'Days Shift - 06:00-18:00';
+      case night:
+        return 'Night Shift - 18:00-06:00';
+      case split1200:
+        return 'Split Shift 1200 - 12:00-24:00';
+      case split1400:
+        return 'Split Shift 1400 - 14:00-02:00';
+      default:
+        return shift;
+    }
+  }
 }
 
 /// Shift groups for swing schedule rotation
