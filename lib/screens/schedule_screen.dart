@@ -282,7 +282,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     
     Employee? selectedEmployee;
     Division selectedDivision = _selectedDivision ?? Division.jail;
-    String selectedShift = 'Day';
+    String selectedShift = 'A-Days';
     
     showDialog(
       context: context,
@@ -333,7 +333,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   DropdownButtonFormField<String>(
                     value: selectedShift,
                     decoration: const InputDecoration(labelText: 'Shift'),
-                    items: ['Day', 'Night', 'Swing']
+                    items: ['A-Days', 'A-Split', 'A-Night', 'B-Days', 'B-Split', 'B-Night']
                         .map((s) => DropdownMenuItem(
                               value: s,
                               child: Text(s),
@@ -398,7 +398,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 DropdownButtonFormField<String>(
                   value: selectedShift,
                   decoration: const InputDecoration(labelText: 'Shift'),
-                  items: ['Day', 'Night', 'Swing']
+                  items: ['A-Days', 'A-Split', 'A-Night', 'B-Days', 'B-Split', 'B-Night']
                       .map((s) => DropdownMenuItem(
                             value: s,
                             child: Text(s),
