@@ -293,12 +293,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   DropdownButtonFormField<String>(
                     value: selectedShift,
                     decoration: const InputDecoration(labelText: 'Shift'),
-                    items: Shift.validShifts
-                        .map((s) => DropdownMenuItem(
-                              value: s,
-                              child: Text(s),
-                            ))
-                        .toList(),
+                    items: const [
+                      DropdownMenuItem(value: Shift.day, child: Text('Day')),
+                      DropdownMenuItem(value: Shift.night, child: Text('Night')),
+                      DropdownMenuItem(value: Shift.split1200, child: Text('Split-1200')),
+                      DropdownMenuItem(value: Shift.split1400, child: Text('Split-1400')),
+                    ],
                     onChanged: (value) {
                       if (value != null) {
                         setState(() => selectedShift = value);
@@ -358,12 +358,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 DropdownButtonFormField<String>(
                   value: selectedShift,
                   decoration: const InputDecoration(labelText: 'Shift'),
-                  items: Shift.validShifts
-                      .map((s) => DropdownMenuItem(
-                            value: s,
-                            child: Text(s),
-                          ))
-                      .toList(),
+                  items: const [
+                    DropdownMenuItem(value: Shift.day, child: Text('Day')),
+                    DropdownMenuItem(value: Shift.night, child: Text('Night')),
+                    DropdownMenuItem(value: Shift.split1200, child: Text('Split-1200')),
+                    DropdownMenuItem(value: Shift.split1400, child: Text('Split-1400')),
+                  ],
                   onChanged: (value) {
                     if (value != null) {
                       setState(() => selectedShift = value);

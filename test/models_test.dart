@@ -208,35 +208,41 @@ void main() {
     });
     
     test('swing schedule calculates correctly', () {
-      // B shift starts Jan 2, 2026
-      final bStart = DateTime(2026, 1, 2);
+      // A shift starts Jan 5, 2026
+      final aStart = DateTime(2026, 1, 5);
       
-      // Day 0 (Jan 2) - B working
-      expect(ShiftGroup.getWorkingShiftGroup(bStart), equals(ShiftGroup.b));
+      // Day 0 (Jan 5) - A working
+      expect(ShiftGroup.getWorkingShiftGroup(aStart), equals(ShiftGroup.a));
       
-      // Day 1 (Jan 3) - B working
-      expect(ShiftGroup.getWorkingShiftGroup(bStart.add(const Duration(days: 1))), equals(ShiftGroup.b));
+      // Day 1 (Jan 6) - A working
+      expect(ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 1))), equals(ShiftGroup.a));
       
-      // Day 2 (Jan 4) - B working
-      expect(ShiftGroup.getWorkingShiftGroup(bStart.add(const Duration(days: 2))), equals(ShiftGroup.b));
+      // Day 2 (Jan 7) - B working
+      expect(ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 2))), equals(ShiftGroup.b));
       
-      // Day 3 (Jan 5) - A working
-      expect(ShiftGroup.getWorkingShiftGroup(bStart.add(const Duration(days: 3))), equals(ShiftGroup.a));
+      // Day 3 (Jan 8) - B working
+      expect(ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 3))), equals(ShiftGroup.b));
       
-      // Day 4 (Jan 6) - A working
-      expect(ShiftGroup.getWorkingShiftGroup(bStart.add(const Duration(days: 4))), equals(ShiftGroup.a));
+      // Day 4 (Jan 9) - A working
+      expect(ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 4))), equals(ShiftGroup.a));
       
-      // Day 5 (Jan 7) - B working
-      expect(ShiftGroup.getWorkingShiftGroup(bStart.add(const Duration(days: 5))), equals(ShiftGroup.b));
+      // Day 5 (Jan 10) - A working
+      expect(ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 5))), equals(ShiftGroup.a));
       
-      // Day 6 (Jan 8) - B working
-      expect(ShiftGroup.getWorkingShiftGroup(bStart.add(const Duration(days: 6))), equals(ShiftGroup.b));
+      // Day 6 (Jan 11) - A working
+      expect(ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 6))), equals(ShiftGroup.a));
       
-      // Day 7 (Jan 9) - A working
-      expect(ShiftGroup.getWorkingShiftGroup(bStart.add(const Duration(days: 7))), equals(ShiftGroup.a));
+      // Day 7 (Jan 12) - B working
+      expect(ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 7))), equals(ShiftGroup.b));
       
-      // Day 10 (Jan 12) - B working (start of new cycle)
-      expect(ShiftGroup.getWorkingShiftGroup(bStart.add(const Duration(days: 10))), equals(ShiftGroup.b));
+      // Day 8 (Jan 13) - B working
+      expect(ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 8))), equals(ShiftGroup.b));
+      
+      // Day 9 (Jan 14) - B working
+      expect(ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 9))), equals(ShiftGroup.b));
+      
+      // Day 10 (Jan 15) - A working (start of new cycle)
+      expect(ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 10))), equals(ShiftGroup.a));
     });
   });
 
