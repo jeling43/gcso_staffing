@@ -6,8 +6,13 @@ class Rank {
   static const String sergeantFirstClass = 'SFC';
   static const String corporal = 'CPL';
   static const String deputy = 'DEP';
-  
-  static const List<String> validRanks = [lieutenant, sergeantFirstClass, corporal, deputy];
+
+  static const List<String> validRanks = [
+    lieutenant,
+    sergeantFirstClass,
+    corporal,
+    deputy
+  ];
 }
 
 /// Valid shift names
@@ -16,24 +21,30 @@ class Shift {
   static const String night = 'Night';
   static const String split1200 = 'Split-1200';
   static const String split1400 = 'Split-1400';
-  
+
   // Group A shifts
   static const String aDays = 'A-Days';
   static const String aSplit1200 = 'A-Split-1200';
   static const String aSplit1400 = 'A-Split-1400';
   static const String aNight = 'A-Night';
-  
+
   // Group B shifts
   static const String bDays = 'B-Days';
   static const String bSplit1200 = 'B-Split-1200';
   static const String bSplit1400 = 'B-Split-1400';
   static const String bNight = 'B-Night';
-  
+
   static const List<String> validShifts = [
-    aDays, aSplit1200, aSplit1400, aNight,
-    bDays, bSplit1200, bSplit1400, bNight
+    aDays,
+    aSplit1200,
+    aSplit1400,
+    aNight,
+    bDays,
+    bSplit1200,
+    bSplit1400,
+    bNight
   ];
-  
+
   /// Get user-friendly display name for a shift
   static String getDisplayName(String shift) {
     switch (shift) {
@@ -72,36 +83,38 @@ class Shift {
 class ShiftGroup {
   static const String a = 'A';
   static const String b = 'B';
-  
+
   static const List<String> validGroups = [a, b];
-  
-  /// A shift start date (January 5, 2026 - Monday)
-  /// Within a 10-day cycle:
-  /// - A Shift pattern: 2 on, 2 off, 3 on, 3 off
-  /// - B Shift pattern: 2 off, 2 on, 3 off, 3 on
-  static final DateTime aShiftStartDate = DateTime(2026, 1, 5);
-  
+
+  /// Shift cycle start date (January 2, 2026 - B Shift works first weekend)
+  /// 14-day swing schedule cycle - shifts alternate weekends (Fri-Sat-Sun)
+  /// Pattern: Weekend shift works Fri-Sat-Sun (3 days), then weekdays alternate 2 on, 2 off
+  static final DateTime cycleStartDate = DateTime(2026, 1, 2);
+
   /// Calculate which shift group is working on a given date
-  /// 10-day swing schedule cycle:
-  /// - Cycle Day 0-1: A Shift works (2 days on)
-  /// - Cycle Day 2-3: B Shift works (2 days on, A off)
-  /// - Cycle Day 4-6: A Shift works (3 days on)
-  /// - Cycle Day 7-9: B Shift works (3 days on, A off)
+  /// 14-day swing schedule cycle:
+  /// - Days 0-2 (Fri-Sun): B works weekend
+  /// - Days 3-4 (Mon-Tue): A works 2 days
+  /// - Days 5-6 (Wed-Thu): B works 2 days
+  /// - Days 7-9 (Fri-Sun): A works weekend
+  /// - Days 10-11 (Mon-Tue): B works 2 days
+  /// - Days 12-13 (Wed-Thu): A works 2 days
   static String getWorkingShiftGroup(DateTime date) {
-    final daysSinceStart = date.difference(aShiftStartDate).inDays;
-    final cycleDay = daysSinceStart % 10;
-    
-    if (cycleDay >= 0 && cycleDay <= 1) {
-      return a; // Cycle days 0-1: A works 2 days
-    } else if (cycleDay >= 2 && cycleDay <= 3) {
-      return b; // Cycle days 2-3: B works 2 days (A off)
-    } else if (cycleDay >= 4 && cycleDay <= 6) {
-      return a; // Cycle days 4-6: A works 3 days
+    final daysSinceStart = date.difference(cycleStartDate).inDays;
+    final cycleDay = daysSinceStart % 14;
+
+    // B Shift working days:  0-2 (weekend), 5-6 (weekdays), 10-11 (weekdays)
+    // A Shift working days: 3-4 (weekdays), 7-9 (weekend), 12-13 (weekdays)
+    if ((cycleDay >= 0 && cycleDay <= 2) || // B weekend (Fri-Sat-Sun)
+        (cycleDay >= 5 && cycleDay <= 6) || // B weekdays (Wed-Thu)
+        (cycleDay >= 10 && cycleDay <= 11)) {
+      // B weekdays (Mon-Tue)
+      return b;
     } else {
-      return b; // Cycle days 7-9: B works 3 days (A off)
+      return a;
     }
   }
-  
+
   /// Check if a shift group is working on a given date
   static bool isShiftGroupWorking(String shiftGroup, DateTime date) {
     return getWorkingShiftGroup(date) == shiftGroup;
@@ -133,7 +146,7 @@ class Employee {
   }) : assert(Rank.validRanks.contains(rank), 'Invalid rank: $rank');
 
   String get fullName => '$firstName $lastName';
-  
+
   /// Get the full shift assignment (e.g., "B Shift - Nights")
   String get shiftAssignment {
     if (shiftGroup == null || shiftType == null) {
