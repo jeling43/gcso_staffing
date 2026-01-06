@@ -23,10 +23,10 @@ class EmployeeProvider extends ChangeNotifier {
       // B Shift - Day - 3 employees
       Employee(
         id: '1',
-        firstName: 'Sarah',
-        lastName: 'Johnson',
-        badgeNumber: 'P001',
-        rank: Rank.lieutenant,
+        firstName: 'J.Rex',
+        lastName: 'Anderson',
+        badgeNumber: '170',
+        rank: Rank.sergeantFirstClass,
         isSupervisor: true,
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
@@ -34,10 +34,10 @@ class EmployeeProvider extends ChangeNotifier {
       ),
       Employee(
         id: '2',
-        firstName: 'Michael',
-        lastName: 'Williams',
-        badgeNumber: 'P002',
-        rank: Rank.sergeantFirstClass,
+        firstName: 'J.D',
+        lastName: 'Newport',
+        badgeNumber: '103',
+        rank: Rank.deputy,
         isSupervisor: false,
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
@@ -158,7 +158,7 @@ class EmployeeProvider extends ChangeNotifier {
         shiftType: Shift.split1400,
       ),
     ]);
-    
+
     // Set default current user as supervisor
     _currentUser = _employees.first;
   }

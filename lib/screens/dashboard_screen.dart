@@ -18,19 +18,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final workingShiftGroup = ShiftGroup.getWorkingShiftGroup(_selectedDate);
-    
+
     // Determine colors based on shift group
     final isAShift = workingShiftGroup == ShiftGroup.a;
-    final gradientColors = isAShift 
+    final gradientColors = isAShift
         ? [Colors.amber.shade700, Colors.amber.shade500]
         : [Colors.blue.shade700, Colors.blue.shade500];
-    final shadowColor = isAShift 
+    final shadowColor = isAShift
         ? Colors.amber.shade700.withOpacity(0.4)
         : Colors.blue.shade700.withOpacity(0.4);
-    final badgeColor = isAShift 
-        ? Colors.amber.shade700
-        : Colors.blue.shade700;
-    
+    final badgeColor = isAShift ? Colors.amber.shade700 : Colors.blue.shade700;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('GCSO Staffing Dashboard'),
@@ -70,7 +68,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           icon: const Icon(Icons.chevron_left),
                           onPressed: () {
                             setState(() {
-                              _selectedDate = _selectedDate.subtract(const Duration(days: 1));
+                              _selectedDate = _selectedDate
+                                  .subtract(const Duration(days: 1));
                             });
                           },
                           tooltip: 'Previous Day',
@@ -79,8 +78,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           child: Column(
                             children: [
                               Text(
-                                DateFormat('EEEE, MMMM d, yyyy').format(_selectedDate),
-                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                DateFormat('EEEE, MMMM d, yyyy')
+                                    .format(_selectedDate),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(
                                       fontWeight: FontWeight.bold,
                                     ),
                                 textAlign: TextAlign.center,
@@ -102,7 +105,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           icon: const Icon(Icons.chevron_right),
                           onPressed: () {
                             setState(() {
-                              _selectedDate = _selectedDate.add(const Duration(days: 1));
+                              _selectedDate =
+                                  _selectedDate.add(const Duration(days: 1));
                             });
                           },
                           tooltip: 'Next Day',
@@ -112,7 +116,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 // Prominent Working Shift Group Section
                 Container(
                   decoration: BoxDecoration(
@@ -153,19 +157,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Swing Schedule: 2 on, 2 off, 3 on, 3 off',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
-                          fontSize: 14,
-                        ),
-                      ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Staff Breakdown by Shift Type
                 Text(
                   'Staff Breakdown',
@@ -174,7 +170,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 // Day Shift
                 _buildShiftTypeSection(
                   context,
@@ -186,7 +182,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   badgeColor,
                 ),
                 const SizedBox(height: 12),
-                
+
                 // Night Shift
                 _buildShiftTypeSection(
                   context,
@@ -198,7 +194,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   badgeColor,
                 ),
                 const SizedBox(height: 12),
-                
+
                 // Split Shifts (Combined)
                 _buildSplitShiftsSection(
                   context,
@@ -226,7 +222,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final shiftEmployees = scheduleEntries
         .where((e) => e.shift == shiftType && e.isOnDuty)
         .toList();
-    
+
     return Card(
       elevation: 2,
       child: Column(
@@ -236,7 +232,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
               color: color,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(12)),
             ),
             child: Row(
               children: [
@@ -253,7 +250,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
@@ -302,8 +300,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final split1400Employees = scheduleEntries
         .where((e) => e.shift == Shift.split1400 && e.isOnDuty)
         .toList();
-    final totalSplitEmployees = split1200Employees.length + split1400Employees.length;
-    
+    final totalSplitEmployees =
+        split1200Employees.length + split1400Employees.length;
+
     return Card(
       elevation: 2,
       child: Column(
@@ -313,7 +312,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
               color: Colors.purple,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(12)),
             ),
             child: Row(
               children: [
@@ -330,7 +330,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
@@ -370,7 +371,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       spacing: 8,
                       runSpacing: 8,
                       children: split1200Employees.map((entry) {
-                        return _buildEmployeeCard(entry, badgeColor, showShiftType: true);
+                        return _buildEmployeeCard(entry, badgeColor,
+                            showShiftType: true);
                       }).toList(),
                     ),
                     const SizedBox(height: 12),
@@ -387,7 +389,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       spacing: 8,
                       runSpacing: 8,
                       children: split1400Employees.map((entry) {
-                        return _buildEmployeeCard(entry, badgeColor, showShiftType: true);
+                        return _buildEmployeeCard(entry, badgeColor,
+                            showShiftType: true);
                       }).toList(),
                     ),
                   ],
@@ -400,7 +403,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildEmployeeCard(ScheduleEntry entry, Color badgeColor, {bool showShiftType = false}) {
+  Widget _buildEmployeeCard(ScheduleEntry entry, Color badgeColor,
+      {bool showShiftType = false}) {
     return Container(
       constraints: const BoxConstraints(minWidth: 180),
       padding: const EdgeInsets.all(12),
