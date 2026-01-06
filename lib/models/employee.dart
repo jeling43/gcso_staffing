@@ -75,25 +75,30 @@ class ShiftGroup {
   
   static const List<String> validGroups = [a, b];
   
-  /// B shift start date (January 2, 2026)
-  static final DateTime bShiftStartDate = DateTime(2026, 1, 2);
+  /// A shift start date (January 5, 2026 - Monday)
+  /// Within a 10-day cycle:
+  /// - A Shift pattern: 2 on, 2 off, 3 on, 3 off
+  /// - B Shift pattern: 2 off, 2 on, 3 off, 3 on
+  static final DateTime aShiftStartDate = DateTime(2026, 1, 5);
   
   /// Calculate which shift group is working on a given date
-  /// Swing schedule: 3 on, 2 off, 2 on, 3 off (10-day cycle)
+  /// 10-day swing schedule cycle:
+  /// - Cycle Day 0-1: A Shift works (2 days on)
+  /// - Cycle Day 2-3: B Shift works (2 days on, A off)
+  /// - Cycle Day 4-6: A Shift works (3 days on)
+  /// - Cycle Day 7-9: B Shift works (3 days on, A off)
   static String getWorkingShiftGroup(DateTime date) {
-    final daysSinceStart = date.difference(bShiftStartDate).inDays;
+    final daysSinceStart = date.difference(aShiftStartDate).inDays;
     final cycleDay = daysSinceStart % 10;
     
-    // B shift works: cycle days 0-2, 5-6 (3 on, 2 off, 2 on, 3 off)
-    // A shift works: cycle days 3-4, 7-9 (opposite of B)
-    if (cycleDay >= 0 && cycleDay <= 2) {
-      return b; // Cycle days 0-2 (first 3 days on)
-    } else if (cycleDay >= 3 && cycleDay <= 4) {
-      return a; // Cycle days 3-4 (2 days off for B)
-    } else if (cycleDay >= 5 && cycleDay <= 6) {
-      return b; // Cycle days 5-6 (2 days on)
+    if (cycleDay >= 0 && cycleDay <= 1) {
+      return a; // Cycle days 0-1: A works 2 days
+    } else if (cycleDay >= 2 && cycleDay <= 3) {
+      return b; // Cycle days 2-3: B works 2 days (A off)
+    } else if (cycleDay >= 4 && cycleDay <= 6) {
+      return a; // Cycle days 4-6: A works 3 days
     } else {
-      return a; // Cycle days 7-9 (3 days off for B)
+      return b; // Cycle days 7-9: B works 3 days (A off)
     }
   }
   
