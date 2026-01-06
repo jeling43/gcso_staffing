@@ -113,10 +113,23 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         },
       ),
       floatingActionButton: isSupervisor
-          ? FloatingActionButton.extended(
-              onPressed: () => _showAddScheduleDialog(context),
-              label: const Text('Add Schedule'),
-              icon: const Icon(Icons.add),
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                FloatingActionButton.extended(
+                  onPressed: () => _showGenerateSchedulesDialog(context),
+                  label: const Text('Generate Schedules'),
+                  icon: const Icon(Icons.auto_awesome),
+                  heroTag: 'generate',
+                ),
+                const SizedBox(height: 16),
+                FloatingActionButton.extended(
+                  onPressed: () => _showAddScheduleDialog(context),
+                  label: const Text('Add Schedule'),
+                  icon: const Icon(Icons.add),
+                  heroTag: 'add',
+                ),
+              ],
             )
           : null,
     );
@@ -389,6 +402,163 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showGenerateSchedulesDialog(BuildContext context) {
+    DateTime startDate = DateTime.now();
+    DateTime endDate = DateTime.now().add(const Duration(days: 30));
+    
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          final employeeProvider = context.read<EmployeeProvider>();
+          final employees = employeeProvider.getEmployeesByDivision(Division.patrol);
+          final eligibleEmployees = employees.where(
+            (e) => e.shiftGroup != null && e.shiftType != null
+          ).length;
+          
+          return AlertDialog(
+            title: const Text('Generate Schedules'),
+            content: SizedBox(
+              width: 400,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Automatically create schedule entries for all employees based on their shift group assignments and the swing rotation pattern.',
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  const SizedBox(height: 16),
+                  ListTile(
+                    leading: const Icon(Icons.calendar_today),
+                    title: const Text('Start Date'),
+                    subtitle: Text(DateFormat('EEEE, MMMM d, yyyy').format(startDate)),
+                    onTap: () async {
+                      final date = await showDatePicker(
+                        context: context,
+                        initialDate: startDate,
+                        firstDate: DateTime.now().subtract(const Duration(days: 365)),
+                        lastDate: DateTime.now().add(const Duration(days: 365)),
+                      );
+                      if (date != null) {
+                        setState(() {
+                          startDate = date;
+                          if (endDate.isBefore(startDate)) {
+                            endDate = startDate.add(const Duration(days: 30));
+                          }
+                        });
+                      }
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.event),
+                    title: const Text('End Date'),
+                    subtitle: Text(DateFormat('EEEE, MMMM d, yyyy').format(endDate)),
+                    onTap: () async {
+                      final date = await showDatePicker(
+                        context: context,
+                        initialDate: endDate,
+                        firstDate: startDate,
+                        lastDate: DateTime.now().add(const Duration(days: 365)),
+                      );
+                      if (date != null) {
+                        setState(() => endDate = date);
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.blue),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Preview:',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 4),
+                        Text('• Date range: ${endDate.difference(startDate).inDays + 1} days'),
+                        Text('• Eligible employees: $eligibleEmployees'),
+                        Text('• Estimated entries: ~${((endDate.difference(startDate).inDays + 1) * eligibleEmployees / 2).round()}'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _generateSchedules(context, startDate, endDate);
+                },
+                child: const Text('Generate'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  void _generateSchedules(BuildContext context, DateTime startDate, DateTime endDate) {
+    final employeeProvider = context.read<EmployeeProvider>();
+    final scheduleProvider = context.read<ScheduleProvider>();
+    
+    int entriesCreated = 0;
+    final employees = employeeProvider.getEmployeesByDivision(Division.patrol);
+    
+    // Loop through each date
+    for (var date = startDate; 
+         !date.isAfter(endDate); 
+         date = date.add(const Duration(days: 1))) {
+      // Determine which shift group is working
+      final workingShiftGroup = ShiftGroup.getWorkingShiftGroup(date);
+      
+      // Create entries for employees in the working shift group
+      for (final employee in employees) {
+        if (employee.shiftGroup == workingShiftGroup && 
+            employee.shiftType != null && 
+            employee.division == Division.patrol) {
+          
+          // Check if entry already exists (avoid duplicates)
+          final existingEntries = scheduleProvider.getScheduleForDate(date);
+          final alreadyExists = existingEntries.any((e) => 
+            e.employee.id == employee.id
+          );
+          
+          if (!alreadyExists) {
+            scheduleProvider.addScheduleEntry(ScheduleEntry(
+              id: 'sched_${employee.id}_${date.toIso8601String()}',
+              employee: employee,
+              division: Division.patrol,
+              date: date,
+              shift: employee.shiftType!,
+              isOnDuty: true,
+            ));
+            entriesCreated++;
+          }
+        }
+      }
+    }
+    
+    // Show success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Generated $entriesCreated schedule entries'),
+        backgroundColor: Colors.green,
       ),
     );
   }
