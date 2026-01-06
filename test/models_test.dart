@@ -208,7 +208,7 @@ void main() {
     });
     
     test('swing schedule calculates correctly', () {
-      // A shift starts Jan 5, 2026
+      // A shift starts Jan 5, 2026 (Monday)
       final aStart = DateTime(2026, 1, 5);
       
       // Day 0 (Jan 5) - A working

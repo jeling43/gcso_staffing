@@ -75,7 +75,7 @@ class ShiftGroup {
   
   static const List<String> validGroups = [a, b];
   
-  /// A shift start date (January 5, 2026 - Sunday)
+  /// A shift start date (January 5, 2026 - Monday)
   /// A Shift pattern: 2 on, 2 off, 3 on, 3 off (10-day cycle)
   /// B Shift pattern: 2 off, 2 on, 3 off, 3 on (opposite of A)
   static final DateTime aShiftStartDate = DateTime(2026, 1, 5);
