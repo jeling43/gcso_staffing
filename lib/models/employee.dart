@@ -76,16 +76,17 @@ class ShiftGroup {
   static const List<String> validGroups = [a, b];
   
   /// A shift start date (January 5, 2026 - Monday)
-  /// A Shift pattern: 2 on, 2 off, 3 on, 3 off (10-day cycle)
-  /// B Shift pattern: 2 off, 2 on, 3 off, 3 on (opposite of A)
+  /// Within a 10-day cycle:
+  /// - A Shift pattern: 2 on, 2 off, 3 on, 3 off
+  /// - B Shift pattern: 2 off, 2 on, 3 off, 3 on
   static final DateTime aShiftStartDate = DateTime(2026, 1, 5);
   
   /// Calculate which shift group is working on a given date
-  /// Swing schedule: 2 on, 2 off, 3 on, 3 off (10-day cycle)
-  /// Cycle Day 0-1: A Shift (2 days on)
-  /// Cycle Day 2-3: B Shift (2 days on, A off)
-  /// Cycle Day 4-6: A Shift (3 days on)
-  /// Cycle Day 7-9: B Shift (3 days on, A off)
+  /// 10-day swing schedule cycle:
+  /// - Cycle Day 0-1: A Shift works (2 days on)
+  /// - Cycle Day 2-3: B Shift works (2 days on, A off)
+  /// - Cycle Day 4-6: A Shift works (3 days on)
+  /// - Cycle Day 7-9: B Shift works (3 days on, A off)
   static String getWorkingShiftGroup(DateTime date) {
     final daysSinceStart = date.difference(aShiftStartDate).inDays;
     final cycleDay = daysSinceStart % 10;
