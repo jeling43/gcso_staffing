@@ -522,7 +522,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     
     // Loop through each date
     for (var date = startDate; 
-         date.isBefore(endDate) || date.isAtSameMomentAs(endDate); 
+         !date.isAfter(endDate); 
          date = date.add(const Duration(days: 1))) {
       // Determine which shift group is working
       final workingShiftGroup = ShiftGroup.getWorkingShiftGroup(date);
@@ -536,10 +536,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           // Check if entry already exists (avoid duplicates)
           final existingEntries = scheduleProvider.getScheduleForDate(date);
           final alreadyExists = existingEntries.any((e) => 
-            e.employee.id == employee.id && 
-            e.date.year == date.year && 
-            e.date.month == date.month && 
-            e.date.day == date.day
+            e.employee.id == employee.id
           );
           
           if (!alreadyExists) {

@@ -155,7 +155,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Swing Schedule: 3 on, 2 off, 2 on, 3 off',
+                        'Swing Schedule: 2 on, 2 off, 3 on, 3 off',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.9),
                           fontSize: 14,
