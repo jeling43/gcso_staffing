@@ -1,40 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
 
 /// Dashboard screen showing staffing overview by shift
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
-  /// Get current shift type based on current time
-  String _getCurrentShiftType() {
-    final now = DateTime.now();
-    final hour = now.hour;
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
 
-    // Split-1400 takes priority: 14:00-02:00 (2 PM to 2 AM)
-    if (hour >= 14 || hour < 2) {
-      return Shift.split1400;
-    }
-    // Split-1200: 12:00-24:00 (12 PM to midnight)
-    else if (hour >= 12 && hour < 24) {
-      return Shift.split1200;
-    }
-    // Days: 6:00-18:00
-    else if (hour >= 6 && hour < 18) {
-      return Shift.day;
-    }
-    // Night: 18:00-06:00 (and 0:00-6:00)
-    else {
-      return Shift.night;
-    }
-  }
+class _DashboardScreenState extends State<DashboardScreen> {
+  DateTime _selectedDate = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
-    final today = DateTime.now();
-    final workingShiftGroup = ShiftGroup.getWorkingShiftGroup(today);
-    final currentShiftType = _getCurrentShiftType();
+    final workingShiftGroup = ShiftGroup.getWorkingShiftGroup(_selectedDate);
     
     // Determine colors based on shift group
     final isAShift = workingShiftGroup == ShiftGroup.a;
@@ -70,14 +53,67 @@ class DashboardScreen extends StatelessWidget {
       ),
       body: Consumer<ScheduleProvider>(
         builder: (context, scheduleProvider, _) {
-          final currentShiftStaff = scheduleProvider.getCurrentlyOnDutyByShift(currentShiftType);
-          
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Prominent Current Shift Section
+                // Date Navigation Header
+                Card(
+                  elevation: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.chevron_left),
+                          onPressed: () {
+                            setState(() {
+                              _selectedDate = _selectedDate.subtract(const Duration(days: 1));
+                            });
+                          },
+                          tooltip: 'Previous Day',
+                        ),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Text(
+                                DateFormat('EEEE, MMMM d, yyyy').format(_selectedDate),
+                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 4),
+                              TextButton.icon(
+                                onPressed: () {
+                                  setState(() {
+                                    _selectedDate = DateTime.now();
+                                  });
+                                },
+                                icon: const Icon(Icons.today, size: 16),
+                                label: const Text('Today'),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.chevron_right),
+                          onPressed: () {
+                            setState(() {
+                              _selectedDate = _selectedDate.add(const Duration(days: 1));
+                            });
+                          },
+                          tooltip: 'Next Day',
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                
+                // Prominent Working Shift Group Section
                 Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -96,198 +132,78 @@ class DashboardScreen extends StatelessWidget {
                   ),
                   padding: const EdgeInsets.all(24.0),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(
-                            Icons.access_time,
+                          Icon(
+                            isAShift ? Icons.star : Icons.brightness_2,
                             color: Colors.white,
                             size: 32,
                           ),
                           const SizedBox(width: 12),
-                          const Text(
-                            'CURRENT SHIFT',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                          Text(
+                            '$workingShiftGroup SHIFT WORKING',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
                               letterSpacing: 1.2,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
                       Text(
-                        '$workingShiftGroup SHIFT',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
+                        'Swing Schedule: 3 on, 2 off, 2 on, 3 off',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9),
+                          fontSize: 14,
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          '${currentShiftStaff.length} ON DUTY',
-                          style: TextStyle(
-                            color: badgeColor,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      if (currentShiftStaff.isNotEmpty)
-                        ...currentShiftStaff.map((entry) => Container(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 20,
-                                backgroundColor: Colors.white,
-                                child: Text(
-                                  entry.employee.rank,
-                                  style: TextStyle(
-                                    color: badgeColor,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${entry.employee.rank} ${entry.employee.lastName}',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
-                                      'Badge #${entry.employee.badgeNumber}',
-                                      style: const TextStyle(
-                                        color: Colors.white70,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ))
-                      else
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Text(
-                            'No staff currently on duty',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
                 
-                // All Patrol Shifts Today Section
-                Row(
-                  children: [
-                    Icon(
-                      Icons.calendar_today,
-                      size: 20,
-                      color: Colors.grey[600],
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Working Today: $workingShiftGroup Shift',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
+                // Staff Breakdown by Shift Type
                 Text(
-                  'Swing Schedule: 3 on, 2 off, 2 on, 3 off',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey[600],
-                      ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'All Patrol Shifts Today',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  'Staff Breakdown',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                 ),
                 const SizedBox(height: 16),
                 
-                // Days Shift
-                _buildShiftSummaryCard(
+                // Day Shift
+                _buildShiftTypeSection(
                   context,
                   scheduleProvider,
-                  'Days Shift',
+                  'Day Shift',
                   Shift.day,
                   Icons.wb_sunny,
                   Colors.orange,
-                ),
-                const SizedBox(height: 12),
-                
-                // Split Shift 1200
-                _buildShiftSummaryCard(
-                  context,
-                  scheduleProvider,
-                  'Split Shift 1200',
-                  Shift.split1200,
-                  Icons.schedule,
-                  Colors.purple,
-                  maxStaff: 1,
-                ),
-                const SizedBox(height: 12),
-                
-                // Split Shift 1400
-                _buildShiftSummaryCard(
-                  context,
-                  scheduleProvider,
-                  'Split Shift 1400',
-                  Shift.split1400,
-                  Icons.access_alarm,
-                  Colors.deepPurple,
-                  maxStaff: 1,
+                  badgeColor,
                 ),
                 const SizedBox(height: 12),
                 
                 // Night Shift
-                _buildShiftSummaryCard(
+                _buildShiftTypeSection(
                   context,
                   scheduleProvider,
                   'Night Shift',
                   Shift.night,
                   Icons.nightlight_round,
                   Colors.indigo,
+                  badgeColor,
+                ),
+                const SizedBox(height: 12),
+                
+                // Split Shifts (Combined)
+                _buildSplitShiftsSection(
+                  context,
+                  scheduleProvider,
+                  badgeColor,
                 ),
               ],
             ),
@@ -297,17 +213,19 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildShiftSummaryCard(
+  Widget _buildShiftTypeSection(
     BuildContext context,
     ScheduleProvider scheduleProvider,
     String shiftName,
     String shiftType,
     IconData icon,
-    Color color, {
-    int? maxStaff,
-  }) {
-    final staffList = scheduleProvider.getCurrentlyOnDutyByShift(shiftType);
-    final isAtCapacity = maxStaff != null && staffList.length >= maxStaff;
+    Color color,
+    Color badgeColor,
+  ) {
+    final scheduleEntries = scheduleProvider.getScheduleForDate(_selectedDate);
+    final shiftEmployees = scheduleEntries
+        .where((e) => e.shift == shiftType && e.isOnDuty)
+        .toList();
     
     return Card(
       elevation: 2,
@@ -322,147 +240,226 @@ class DashboardScreen extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(
-                  icon,
-                  color: Colors.white,
-                  size: 28,
-                ),
+                Icon(icon, color: Colors.white, size: 28),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        shiftName,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        Shift.getDisplayName(shiftType),
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (maxStaff != null)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
+                  child: Text(
+                    shiftName,
+                    style: const TextStyle(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '${staffList.length}/$maxStaff',
-                      style: TextStyle(
-                        color: color,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  )
-                else
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '${staffList.length}',
-                      style: TextStyle(
-                        color: color,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          
-          // Warning banner for at-capacity split shifts
-          if (isAtCapacity)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              color: Colors.orange.shade100,
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.warning_amber_rounded,
-                    color: Colors.orange.shade700,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'At Maximum Capacity',
-                    style: TextStyle(
-                      color: Colors.orange.shade700,
-                      fontSize: 12,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                ],
-              ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${shiftEmployees.length} officers',
+                    style: TextStyle(
+                      color: color,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: shiftEmployees.isEmpty
+                ? const Text(
+                    'No officers scheduled',
+                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                  )
+                : Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: shiftEmployees.map((entry) {
+                      return _buildEmployeeCard(entry, badgeColor);
+                    }).toList(),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSplitShiftsSection(
+    BuildContext context,
+    ScheduleProvider scheduleProvider,
+    Color badgeColor,
+  ) {
+    final scheduleEntries = scheduleProvider.getScheduleForDate(_selectedDate);
+    final split1200Employees = scheduleEntries
+        .where((e) => e.shift == Shift.split1200 && e.isOnDuty)
+        .toList();
+    final split1400Employees = scheduleEntries
+        .where((e) => e.shift == Shift.split1400 && e.isOnDuty)
+        .toList();
+    final totalSplitEmployees = split1200Employees.length + split1400Employees.length;
+    
+    return Card(
+      elevation: 2,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Colors.purple,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.schedule, color: Colors.white, size: 28),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text(
+                    'Split Shifts',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '$totalSplitEmployees officers',
+                    style: const TextStyle(
+                      color: Colors.purple,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'On Duty Staff',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                if (staffList.isEmpty)
+                if (split1200Employees.isEmpty && split1400Employees.isEmpty)
                   const Text(
-                    'No staff currently on duty',
-                    style: TextStyle(color: Colors.grey, fontSize: 13),
+                    'No officers scheduled',
+                    style: TextStyle(color: Colors.grey, fontSize: 14),
                   )
-                else
-                  ...staffList.map((entry) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4.0),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 14,
-                              backgroundColor: color.withOpacity(0.2),
-                              child: Text(
-                                entry.employee.rank,
-                                style: TextStyle(
-                                  color: color,
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                '${entry.employee.rank} ${entry.employee.lastName} #${entry.employee.badgeNumber}',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )),
+                else ...[
+                  if (split1200Employees.isNotEmpty) ...[
+                    Text(
+                      'Split-1200 (12:00-24:00)',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: split1200Employees.map((entry) {
+                        return _buildEmployeeCard(entry, badgeColor, showShiftType: true);
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                  if (split1400Employees.isNotEmpty) ...[
+                    Text(
+                      'Split-1400 (14:00-02:00)',
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: split1400Employees.map((entry) {
+                        return _buildEmployeeCard(entry, badgeColor, showShiftType: true);
+                      }).toList(),
+                    ),
+                  ],
+                ],
               ],
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmployeeCard(ScheduleEntry entry, Color badgeColor, {bool showShiftType = false}) {
+    return Container(
+      constraints: const BoxConstraints(minWidth: 180),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: 16,
+                backgroundColor: badgeColor.withOpacity(0.2),
+                child: Text(
+                  entry.employee.rank,
+                  style: TextStyle(
+                    color: badgeColor,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  '${entry.employee.rank} ${entry.employee.lastName}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Badge: ${entry.employee.badgeNumber}',
+            style: TextStyle(
+              color: Colors.grey.shade600,
+              fontSize: 12,
+            ),
+          ),
+          if (showShiftType) ...[
+            const SizedBox(height: 4),
+            Text(
+              entry.shift,
+              style: TextStyle(
+                color: Colors.purple.shade700,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ],
       ),
     );
