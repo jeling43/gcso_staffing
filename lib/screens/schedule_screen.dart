@@ -716,8 +716,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 onPressed: selectedEmployee == null
                     ? null
                     : () {
+                        // Generate unique ID using employee ID, date, shift, and timestamp
+                        final uniqueId = 'fillin_${selectedEmployee!.id}_${_selectedDate.toIso8601String()}_${shift}_${DateTime.now().millisecondsSinceEpoch}';
                         scheduleProvider.addScheduleEntry(ScheduleEntry(
-                          id: 'fillin_${DateTime.now().millisecondsSinceEpoch}',
+                          id: uniqueId,
                           employee: selectedEmployee!,
                           division: Division.patrol,
                           date: _selectedDate,
