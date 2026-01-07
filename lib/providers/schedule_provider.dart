@@ -30,6 +30,7 @@ class ScheduleProvider extends ChangeNotifier {
           date: today,
           shift: employee.shiftType!,
           isOnDuty: isWorking,
+          isTemporary: false,
         ));
       }
     }
@@ -108,11 +109,23 @@ class ScheduleProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Toggle the on-duty status of a schedule entry
   void toggleOnDutyStatus(String id) {
     final index = _scheduleEntries.indexWhere((e) => e.id == id);
     if (index != -1) {
       final entry = _scheduleEntries[index];
       _scheduleEntries[index] = entry.copyWith(isOnDuty: !entry.isOnDuty);
+      notifyListeners();
+    }
+  }
+
+  /// Mark an employee as absent or present for a specific schedule entry
+  /// This is a more explicit method than toggleOnDutyStatus for marking absences
+  void markEmployeeAbsent(String scheduleEntryId, bool isAbsent) {
+    final index = _scheduleEntries.indexWhere((e) => e.id == scheduleEntryId);
+    if (index != -1) {
+      final entry = _scheduleEntries[index];
+      _scheduleEntries[index] = entry.copyWith(isOnDuty: !isAbsent);
       notifyListeners();
     }
   }
