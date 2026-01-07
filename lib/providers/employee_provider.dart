@@ -16,7 +16,7 @@ class EmployeeProvider extends ChangeNotifier {
 
   void _initializeSampleData() {
     // GCSO Patrol Division Roster - Effective 12/23/2025
-    // 42 total employees across all shifts
+    // 39 total employees across all shifts
     _employees.addAll([
       // A-DAY (0600-1800) - 5 employees
       Employee(
