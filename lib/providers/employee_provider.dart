@@ -31,7 +31,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
         shiftType: Shift.day,
-        employmentStatus: 'Full-time',
+        employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
         id: '2',
@@ -43,7 +43,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
         shiftType: Shift.day,
-        employmentStatus: 'Full-time',
+        employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
         id: '3',
@@ -55,7 +55,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
         shiftType: Shift.day,
-        employmentStatus: 'Part-time',
+        employmentStatus: EmploymentStatus.partTime,
       ),
       Employee(
         id: '4',
@@ -67,7 +67,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
         shiftType: Shift.day,
-        employmentStatus: 'Full-time',
+        employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
         id: '5',
@@ -79,7 +79,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
         shiftType: Shift.day,
-        employmentStatus: 'Part-time',
+        employmentStatus: EmploymentStatus.partTime,
       ),
 
       // B Shift - Night - 3 employees
@@ -93,7 +93,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
         shiftType: Shift.night,
-        employmentStatus: 'Full-time',
+        employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
         id: '5',
@@ -105,7 +105,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
         shiftType: Shift.night,
-        employmentStatus: 'Full-time',
+        employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
         id: '6',
@@ -117,7 +117,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
         shiftType: Shift.night,
-        employmentStatus: 'Part-time',
+        employmentStatus: EmploymentStatus.partTime,
       ),
       // A Shift - Day - 2 employees
       Employee(
@@ -130,7 +130,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
         shiftType: Shift.day,
-        employmentStatus: 'Full-time',
+        employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
         id: '8',
@@ -142,7 +142,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
         shiftType: Shift.day,
-        employmentStatus: 'Part-time',
+        employmentStatus: EmploymentStatus.partTime,
       ),
       // A Shift - Night - 2 employees
       Employee(
@@ -155,7 +155,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
         shiftType: Shift.night,
-        employmentStatus: 'Full-time',
+        employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
         id: '10',
@@ -167,7 +167,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
         shiftType: Shift.night,
-        employmentStatus: 'Full-time',
+        employmentStatus: EmploymentStatus.fullTime,
       ),
       // A Shift - Split - 2 employees
       Employee(
@@ -180,7 +180,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
         shiftType: Shift.split1200,
-        employmentStatus: 'Part-time',
+        employmentStatus: EmploymentStatus.partTime,
       ),
       Employee(
         id: '12',
@@ -192,7 +192,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
         shiftType: Shift.split1400,
-        employmentStatus: 'Full-time',
+        employmentStatus: EmploymentStatus.fullTime,
       ),
     ]);
 

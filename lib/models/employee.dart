@@ -15,6 +15,17 @@ class Rank {
   ];
 }
 
+/// Valid employment status values for employees
+class EmploymentStatus {
+  static const String fullTime = 'Full-time';
+  static const String partTime = 'Part-time';
+
+  static const List<String> validStatuses = [
+    fullTime,
+    partTime,
+  ];
+}
+
 /// Valid shift names
 class Shift {
   static const String day = 'Day';

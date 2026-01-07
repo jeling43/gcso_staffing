@@ -669,10 +669,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             bool matchesStatus;
             if (employmentStatusFilter == 'All') {
               matchesStatus = true; // Show all employees including those with null status
-            } else if (employmentStatusFilter == 'Full-time') {
-              matchesStatus = employee.employmentStatus == 'Full-time';
-            } else if (employmentStatusFilter == 'Part-time') {
-              matchesStatus = employee.employmentStatus == 'Part-time';
+            } else if (employmentStatusFilter == EmploymentStatus.fullTime) {
+              matchesStatus = employee.employmentStatus == EmploymentStatus.fullTime;
+            } else if (employmentStatusFilter == EmploymentStatus.partTime) {
+              matchesStatus = employee.employmentStatus == EmploymentStatus.partTime;
             } else {
               matchesStatus = false;
             }
@@ -725,19 +725,19 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                             ),
                             ChoiceChip(
                               label: const Text('Full-time'),
-                              selected: employmentStatusFilter == 'Full-time',
+                              selected: employmentStatusFilter == EmploymentStatus.fullTime,
                               onSelected: (selected) {
                                 if (selected) {
-                                  setState(() => employmentStatusFilter = 'Full-time');
+                                  setState(() => employmentStatusFilter = EmploymentStatus.fullTime);
                                 }
                               },
                             ),
                             ChoiceChip(
                               label: const Text('Part-time'),
-                              selected: employmentStatusFilter == 'Part-time',
+                              selected: employmentStatusFilter == EmploymentStatus.partTime,
                               onSelected: (selected) {
                                 if (selected) {
-                                  setState(() => employmentStatusFilter = 'Part-time');
+                                  setState(() => employmentStatusFilter = EmploymentStatus.partTime);
                                 }
                               },
                             ),

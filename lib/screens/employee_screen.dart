@@ -197,8 +197,8 @@ class EmployeeScreen extends StatelessWidget {
                     value: selectedEmploymentStatus,
                     decoration: const InputDecoration(labelText: 'Employment Status'),
                     items: const [
-                      DropdownMenuItem(value: 'Full-time', child: Text('Full-time')),
-                      DropdownMenuItem(value: 'Part-time', child: Text('Part-time')),
+                      DropdownMenuItem(value: EmploymentStatus.fullTime, child: Text('Full-time')),
+                      DropdownMenuItem(value: EmploymentStatus.partTime, child: Text('Part-time')),
                     ],
                     onChanged: (value) {
                       setState(() => selectedEmploymentStatus = value);
@@ -338,8 +338,8 @@ class EmployeeScreen extends StatelessWidget {
                     value: selectedEmploymentStatus,
                     decoration: const InputDecoration(labelText: 'Employment Status'),
                     items: const [
-                      DropdownMenuItem(value: 'Full-time', child: Text('Full-time')),
-                      DropdownMenuItem(value: 'Part-time', child: Text('Part-time')),
+                      DropdownMenuItem(value: EmploymentStatus.fullTime, child: Text('Full-time')),
+                      DropdownMenuItem(value: EmploymentStatus.partTime, child: Text('Part-time')),
                     ],
                     onChanged: (value) {
                       setState(() => selectedEmploymentStatus = value);
