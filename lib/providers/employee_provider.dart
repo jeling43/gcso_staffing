@@ -368,8 +368,8 @@ class EmployeeProvider extends ChangeNotifier {
         rank: Rank.deputy,
         isSupervisor: false,
         division: Division.patrol,
-        shiftGroup: ShiftGroup.a,
-        shiftType: Shift.day,
+        shiftGroup: null,
+        shiftType: null,
         employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
