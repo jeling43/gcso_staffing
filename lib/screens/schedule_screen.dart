@@ -666,15 +666,14 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 employee.badgeNumber.toLowerCase().contains(searchQuery.toLowerCase());
             
             // Employment status filter
-            bool matchesStatus;
+            final bool matchesStatus;
             if (employmentStatusFilter == EmploymentStatus.all) {
               matchesStatus = true; // Show all employees including those with null status
             } else if (employmentStatusFilter == EmploymentStatus.fullTime) {
               matchesStatus = employee.employmentStatus == EmploymentStatus.fullTime;
-            } else if (employmentStatusFilter == EmploymentStatus.partTime) {
-              matchesStatus = employee.employmentStatus == EmploymentStatus.partTime;
             } else {
-              matchesStatus = false;
+              // employmentStatusFilter == EmploymentStatus.partTime
+              matchesStatus = employee.employmentStatus == EmploymentStatus.partTime;
             }
             
             return matchesSearch && matchesStatus;
