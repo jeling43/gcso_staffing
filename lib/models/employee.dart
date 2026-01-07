@@ -5,6 +5,7 @@ class Rank {
   static const String captain = 'CAPT';
   static const String lieutenant = 'LT';
   static const String sergeantFirstClass = 'SFC';
+  static const String sergeant = 'SGT';
   static const String corporal = 'CPL';
   static const String deputy = 'DEP';
 
