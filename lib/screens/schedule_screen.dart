@@ -666,9 +666,16 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 employee.badgeNumber.toLowerCase().contains(searchQuery.toLowerCase());
             
             // Employment status filter
-            final matchesStatus = employmentStatusFilter == 'All' ||
-                (employmentStatusFilter == 'Full-time' && employee.employmentStatus == 'Full-time') ||
-                (employmentStatusFilter == 'Part-time' && employee.employmentStatus == 'Part-time');
+            bool matchesStatus;
+            if (employmentStatusFilter == 'All') {
+              matchesStatus = true; // Show all employees including those with null status
+            } else if (employmentStatusFilter == 'Full-time') {
+              matchesStatus = employee.employmentStatus == 'Full-time';
+            } else if (employmentStatusFilter == 'Part-time') {
+              matchesStatus = employee.employmentStatus == 'Part-time';
+            } else {
+              matchesStatus = false;
+            }
             
             return matchesSearch && matchesStatus;
           }).toList();
@@ -808,7 +815,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                                       style: const TextStyle(fontSize: 12),
                                     ),
                                     trailing: isSelected
-                                        ? Icon(Icons.check_circle, color: Colors.blue)
+                                        ? const Icon(Icons.check_circle, color: Colors.blue)
                                         : null,
                                   ),
                                 ),
