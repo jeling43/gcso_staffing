@@ -146,8 +146,20 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       date: _selectedDate,
     );
 
-    return [
-      Card(
+    // Group entries by shift type
+    final shiftGroups = <String, List<ScheduleEntry>>{};
+    for (final entry in entries) {
+      shiftGroups.putIfAbsent(entry.shift, () => []).add(entry);
+    }
+
+    // Define shift order
+    final shiftOrder = [Shift.day, Shift.night, Shift.split1200, Shift.split1400];
+    
+    return shiftOrder.where((shift) => shiftGroups.containsKey(shift)).map((shift) {
+      final shiftEntries = shiftGroups[shift]!;
+      final onDutyCount = shiftEntries.where((e) => e.isOnDuty).length;
+      
+      return Card(
         margin: const EdgeInsets.only(bottom: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,38 +173,44 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               child: Row(
                 children: [
                   const Icon(
-                    Icons.directions_car,
+                    Icons.access_time,
                     color: Colors.blue,
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Patrol Division',
+                    '${shift} Shift',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const Spacer(),
                   Text(
-                    '${entries.where((e) => e.isOnDuty).length} on duty',
+                    '$onDutyCount on duty',
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                 ],
               ),
             ),
-            if (entries.isEmpty)
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text('No schedule entries for this date'),
-              )
-            else
-              ...entries.map((entry) => _buildScheduleEntryTile(
-                    context,
-                    entry,
-                    isSupervisor,
-                    scheduleProvider,
-                  )),
+            ...shiftEntries.map((entry) => _buildScheduleEntryTile(
+                  context,
+                  entry,
+                  isSupervisor,
+                  scheduleProvider,
+                )),
+            if (isSupervisor)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: OutlinedButton.icon(
+                  onPressed: () => _showAddFillInDialog(context, shift),
+                  icon: const Icon(Icons.person_add),
+                  label: const Text('Add Fill-in'),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 48),
+                  ),
+                ),
+              ),
           ],
         ),
-      ),
-    ];
+      );
+    }).toList();
   }
 
   Widget _buildScheduleEntryTile(
@@ -201,52 +219,111 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     bool isSupervisor,
     ScheduleProvider scheduleProvider,
   ) {
-    return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: entry.isOnDuty ? Colors.green : Colors.grey,
-        child: Text(
-          entry.employee.firstName[0] + entry.employee.lastName[0],
-          style: const TextStyle(color: Colors.white),
-        ),
+    // Determine visual styling based on employee status
+    final isAbsent = !entry.isOnDuty;
+    final isTemporary = entry.isTemporary;
+    
+    // Visual distinction for temporary employees
+    final backgroundColor = isTemporary ? Colors.blue.withOpacity(0.05) : null;
+    final leadingIcon = isTemporary ? '👥' : '👤';
+    
+    return Container(
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        border: isTemporary 
+            ? Border.all(color: Colors.blue.withOpacity(0.3), style: BorderStyle.solid)
+            : null,
       ),
-      title: Text(entry.employee.fullName),
-      subtitle: Text('${entry.shift} Shift • Badge: ${entry.employee.badgeNumber}'),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Chip(
-            label: Text(entry.isOnDuty ? 'On Duty' : 'Off Duty'),
-            backgroundColor: entry.isOnDuty ? Colors.green[100] : Colors.grey[300],
+      child: ListTile(
+        leading: isAbsent
+            ? CircleAvatar(
+                backgroundColor: Colors.grey[400],
+                child: Text(
+                  entry.employee.firstName[0] + entry.employee.lastName[0],
+                  style: const TextStyle(color: Colors.white),
+                ),
+              )
+            : CircleAvatar(
+                backgroundColor: isTemporary ? Colors.blue[300] : Colors.green,
+                child: Text(
+                  leadingIcon,
+                  style: const TextStyle(fontSize: 20),
+                ),
+              ),
+        title: Text(
+          isAbsent ? '${entry.employee.fullName} (Absent)' : entry.employee.fullName,
+          style: TextStyle(
+            color: isAbsent ? Colors.grey : null,
+            decoration: isAbsent ? TextDecoration.lineThrough : null,
           ),
-          if (isSupervisor) ...[
-            const SizedBox(width: 8),
-            PopupMenuButton<String>(
-              onSelected: (value) {
-                if (value == 'toggle') {
-                  scheduleProvider.toggleOnDutyStatus(entry.id);
-                } else if (value == 'edit') {
-                  _showEditScheduleDialog(context, entry);
-                } else if (value == 'remove') {
-                  scheduleProvider.removeScheduleEntry(entry.id);
-                }
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  value: 'toggle',
-                  child: Text(entry.isOnDuty ? 'Mark Off Duty' : 'Mark On Duty'),
-                ),
-                const PopupMenuItem(
-                  value: 'edit',
-                  child: Text('Edit'),
-                ),
-                const PopupMenuItem(
-                  value: 'remove',
-                  child: Text('Remove'),
-                ),
-              ],
-            ),
+        ),
+        subtitle: Text(
+          '${entry.shift} Shift • Badge: ${entry.employee.badgeNumber}${isTemporary ? ' • Fill-in' : ''}',
+          style: TextStyle(color: isAbsent ? Colors.grey : null),
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (!isAbsent)
+              Chip(
+                label: Text(isTemporary ? 'Fill-in' : 'On Duty'),
+                backgroundColor: isTemporary ? Colors.blue[100] : Colors.green[100],
+              ),
+            if (isSupervisor) ...[
+              const SizedBox(width: 8),
+              PopupMenuButton<String>(
+                onSelected: (value) {
+                  if (value == 'markAbsent') {
+                    scheduleProvider.markEmployeeAbsent(entry.id, true);
+                  } else if (value == 'markPresent') {
+                    scheduleProvider.markEmployeeAbsent(entry.id, false);
+                  } else if (value == 'removeFillIn') {
+                    scheduleProvider.removeScheduleEntry(entry.id);
+                  } else if (value == 'edit') {
+                    _showEditScheduleDialog(context, entry);
+                  } else if (value == 'remove') {
+                    scheduleProvider.removeScheduleEntry(entry.id);
+                  }
+                },
+                itemBuilder: (context) {
+                  final menuItems = <PopupMenuEntry<String>>[];
+                  
+                  if (isTemporary) {
+                    // Temporary employees: show "Remove Fill-in"
+                    menuItems.add(const PopupMenuItem(
+                      value: 'removeFillIn',
+                      child: Text('Remove Fill-in'),
+                    ));
+                  } else if (isAbsent) {
+                    // Absent employees: show "Mark Present"
+                    menuItems.add(const PopupMenuItem(
+                      value: 'markPresent',
+                      child: Text('Mark Present'),
+                    ));
+                  } else {
+                    // Regular employees on duty: show "Mark Absent"
+                    menuItems.add(const PopupMenuItem(
+                      value: 'markAbsent',
+                      child: Text('Mark Absent'),
+                    ));
+                  }
+                  
+                  // Add Edit and Remove for all entries
+                  menuItems.add(const PopupMenuItem(
+                    value: 'edit',
+                    child: Text('Edit'),
+                  ));
+                  menuItems.add(const PopupMenuItem(
+                    value: 'remove',
+                    child: Text('Remove'),
+                  ));
+                  
+                  return menuItems;
+                },
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -337,6 +414,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                           date: _selectedDate,
                           shift: selectedShift,
                           isOnDuty: true,
+                          isTemporary: false,
                         ));
                         Navigator.pop(context);
                       },
@@ -547,6 +625,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               date: date,
               shift: employee.shiftType!,
               isOnDuty: true,
+              isTemporary: false,
             ));
             entriesCreated++;
           }
@@ -559,6 +638,108 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       SnackBar(
         content: Text('Generated $entriesCreated schedule entries'),
         backgroundColor: Colors.green,
+      ),
+    );
+  }
+
+  void _showAddFillInDialog(BuildContext context, String shift) {
+    final employeeProvider = context.read<EmployeeProvider>();
+    final scheduleProvider = context.read<ScheduleProvider>();
+    
+    Employee? selectedEmployee;
+    
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          // Show ALL employees in the system, not just those in Patrol
+          final allEmployees = employeeProvider.employees;
+          
+          return AlertDialog(
+            title: Text('Add Fill-in to $shift Shift'),
+            content: SizedBox(
+              width: 400,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Select any employee to temporarily add to this shift for ${DateFormat('MMMM d, yyyy').format(_selectedDate)}.',
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<Employee>(
+                    value: selectedEmployee,
+                    decoration: const InputDecoration(
+                      labelText: 'Employee',
+                      helperText: 'All employees from all shifts',
+                    ),
+                    items: allEmployees
+                        .map((e) => DropdownMenuItem(
+                              value: e,
+                              child: Text('${e.fullName} (${e.shiftAssignment})'),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() => selectedEmployee = value);
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.blue),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.info_outline, color: Colors.blue, size: 20),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Fill-ins are temporary and can be removed at any time.',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: selectedEmployee == null
+                    ? null
+                    : () {
+                        // Generate unique ID using employee ID, date, shift, and timestamp
+                        final uniqueId = 'fillin_${selectedEmployee!.id}_${_selectedDate.toIso8601String()}_${shift}_${DateTime.now().millisecondsSinceEpoch}';
+                        scheduleProvider.addScheduleEntry(ScheduleEntry(
+                          id: uniqueId,
+                          employee: selectedEmployee!,
+                          division: Division.patrol,
+                          date: _selectedDate,
+                          shift: shift,
+                          isOnDuty: true,
+                          isTemporary: true,
+                        ));
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Added ${selectedEmployee!.fullName} as fill-in'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      },
+                child: const Text('Add Fill-in'),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

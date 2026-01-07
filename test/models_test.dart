@@ -135,6 +135,53 @@ void main() {
       expect(entry.division, equals(Division.patrol));
       expect(entry.shift, equals(Shift.day));
       expect(entry.isOnDuty, isTrue);
+      expect(entry.isTemporary, isFalse);
+    });
+
+    test('creates temporary schedule entry (fill-in)', () {
+      final employee = Employee(
+        id: '1',
+        firstName: 'John',
+        lastName: 'Doe',
+        badgeNumber: 'B001',
+        rank: Rank.deputy,
+        division: Division.patrol,
+      );
+
+      final entry = ScheduleEntry(
+        id: 'fillin1',
+        employee: employee,
+        division: Division.patrol,
+        date: DateTime(2024, 1, 15),
+        shift: Shift.day,
+        isTemporary: true,
+      );
+
+      expect(entry.isTemporary, isTrue);
+      expect(entry.isOnDuty, isTrue);
+    });
+
+    test('copyWith updates isTemporary field', () {
+      final employee = Employee(
+        id: '1',
+        firstName: 'John',
+        lastName: 'Doe',
+        badgeNumber: 'B001',
+        rank: Rank.deputy,
+        division: Division.patrol,
+      );
+
+      final entry = ScheduleEntry(
+        id: 'sched1',
+        employee: employee,
+        division: Division.patrol,
+        date: DateTime(2024, 1, 15),
+        shift: Shift.day,
+      );
+
+      final updated = entry.copyWith(isTemporary: true);
+      expect(updated.isTemporary, isTrue);
+      expect(entry.isTemporary, isFalse);
     });
 
     test('supports new shift naming convention', () {
@@ -349,6 +396,62 @@ void main() {
       } else {
         expect(scheduleProvider.canAddToSplit(Shift.split1400, today, Division.patrol), isFalse);
       }
+    });
+
+    test('markEmployeeAbsent marks employee as absent', () {
+      final employeeProvider = EmployeeProvider();
+      final scheduleProvider = ScheduleProvider(employeeProvider.employees);
+      
+      // Get any schedule entry
+      final entries = scheduleProvider.scheduleEntries;
+      if (entries.isNotEmpty) {
+        final entry = entries.first;
+        final entryId = entry.id;
+        
+        // Mark as absent
+        scheduleProvider.markEmployeeAbsent(entryId, true);
+        
+        // Verify the employee is marked as not on duty
+        final updatedEntry = scheduleProvider.scheduleEntries.firstWhere((e) => e.id == entryId);
+        expect(updatedEntry.isOnDuty, isFalse);
+        
+        // Mark as present
+        scheduleProvider.markEmployeeAbsent(entryId, false);
+        
+        // Verify the employee is marked as on duty
+        final presentEntry = scheduleProvider.scheduleEntries.firstWhere((e) => e.id == entryId);
+        expect(presentEntry.isOnDuty, isTrue);
+      }
+    });
+
+    test('can add temporary employee (fill-in)', () {
+      final employeeProvider = EmployeeProvider();
+      final scheduleProvider = ScheduleProvider(employeeProvider.employees);
+      final today = DateTime.now();
+      
+      final employee = employeeProvider.employees.first;
+      final initialCount = scheduleProvider.scheduleEntries.length;
+      
+      // Add a temporary employee
+      scheduleProvider.addScheduleEntry(ScheduleEntry(
+        id: 'fillin_test',
+        employee: employee,
+        division: Division.patrol,
+        date: today,
+        shift: Shift.day,
+        isOnDuty: true,
+        isTemporary: true,
+      ));
+      
+      expect(scheduleProvider.scheduleEntries.length, equals(initialCount + 1));
+      
+      // Find the added entry
+      final addedEntry = scheduleProvider.scheduleEntries.firstWhere((e) => e.id == 'fillin_test');
+      expect(addedEntry.isTemporary, isTrue);
+      
+      // Clean up
+      scheduleProvider.removeScheduleEntry('fillin_test');
+      expect(scheduleProvider.scheduleEntries.length, equals(initialCount));
     });
   });
 }
