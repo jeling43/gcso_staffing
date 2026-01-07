@@ -53,7 +53,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
         shiftType: Shift.day,
-        employmentStatus: null,
+        employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
         id: '158',
@@ -139,7 +139,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
         shiftType: Shift.day,
-        employmentStatus: null,
+        employmentStatus: EmploymentStatus.fullTime,
       ),
 
       // A-SPLIT 1200-2400 - 1 employee
@@ -153,7 +153,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
         shiftType: Shift.split1200,
-        employmentStatus: null,
+        employmentStatus: EmploymentStatus.fullTime,
       ),
 
       // B-SPLIT 1200-2400 - 1 employee
@@ -209,20 +209,19 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
         shiftType: Shift.night,
-        employmentStatus: null,
+        employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
-        id: '120',
-        firstName: 'J.P.',
-        lastName: 'COFFEY',
-        badgeNumber: '120',
-        rank: Rank.deputy,
-        isSupervisor: false,
-        division: Division.patrol,
-        shiftGroup: ShiftGroup.a,
-        shiftType: Shift.night,
-        employmentStatus: null,
-      ),
+          id: '120',
+          firstName: 'J.P.',
+          lastName: 'COFFEY',
+          badgeNumber: '120',
+          rank: Rank.deputy,
+          isSupervisor: false,
+          division: Division.patrol,
+          shiftGroup: ShiftGroup.a,
+          shiftType: Shift.night,
+          employmentStatus: EmploymentStatus.fullTime),
       Employee(
         id: '106',
         firstName: 'B.D.',
@@ -233,7 +232,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
         shiftType: Shift.night,
-        employmentStatus: null,
+        employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
         id: '109',
@@ -245,7 +244,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
         shiftType: Shift.night,
-        employmentStatus: null,
+        employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
         id: '177',
@@ -257,7 +256,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
         shiftType: Shift.night,
-        employmentStatus: null,
+        employmentStatus: EmploymentStatus.fullTime,
       ),
 
       // B-NIGHT (1800-0600) - 5 employees
@@ -295,7 +294,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
         shiftType: Shift.night,
-        employmentStatus: null,
+        employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
         id: '181',
@@ -307,7 +306,7 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
         shiftType: Shift.night,
-        employmentStatus: null,
+        employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
         id: '188',
@@ -319,10 +318,10 @@ class EmployeeProvider extends ChangeNotifier {
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
         shiftType: Shift.night,
-        employmentStatus: null,
+        employmentStatus: EmploymentStatus.fullTime,
       ),
 
-      // K-9 - 1 employee (assigned to A-Day)
+      // K-9
       Employee(
         id: '415',
         firstName: 'F.D.',
@@ -331,12 +330,12 @@ class EmployeeProvider extends ChangeNotifier {
         rank: Rank.corporal,
         isSupervisor: true,
         division: Division.patrol,
-        shiftGroup: ShiftGroup.a,
-        shiftType: Shift.day,
-        employmentStatus: null,
+        shiftGroup: null,
+        shiftType: null,
+        employmentStatus: EmploymentStatus.fullTime,
       ),
 
-      // SRO (School Resource Officers) - 4 employees (assigned to A-Day)
+      // SRO
       Employee(
         id: '013',
         firstName: 'J.T.',
@@ -345,26 +344,26 @@ class EmployeeProvider extends ChangeNotifier {
         rank: Rank.captain,
         isSupervisor: true,
         division: Division.patrol,
-        shiftGroup: ShiftGroup.a,
-        shiftType: Shift.day,
-        employmentStatus: null,
+        shiftGroup: null,
+        shiftType: null,
+        employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
         id: '023',
         firstName: 'G.B.',
-        lastName: 'BRANNON',
+        lastName: 'BRANNON (CHAMPS)',
         badgeNumber: '023',
         rank: Rank.lieutenant,
         isSupervisor: true,
         division: Division.patrol,
-        shiftGroup: ShiftGroup.a,
-        shiftType: Shift.day,
-        employmentStatus: null,
+        shiftGroup: null,
+        shiftType: null,
+        employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
         id: '184',
         firstName: 'E.A.',
-        lastName: 'OCHOA',
+        lastName: 'OCHOA (CHAMPS/FTO)',
         badgeNumber: '184',
         rank: Rank.deputy,
         isSupervisor: false,
@@ -376,17 +375,17 @@ class EmployeeProvider extends ChangeNotifier {
       Employee(
         id: '193',
         firstName: 'J.A.',
-        lastName: 'MORSE',
+        lastName: 'MORSE (FTO)',
         badgeNumber: '193',
         rank: Rank.deputy,
         isSupervisor: false,
         division: Division.patrol,
-        shiftGroup: ShiftGroup.a,
-        shiftType: Shift.day,
+        shiftGroup: null,
+        shiftType: null,
         employmentStatus: EmploymentStatus.fullTime,
       ),
 
-      // PART TIME - 8 employees (all assigned to A-Day)
+      // PART TIME
       Employee(
         id: '131',
         firstName: 'D.C.',
@@ -395,8 +394,8 @@ class EmployeeProvider extends ChangeNotifier {
         rank: Rank.deputy,
         isSupervisor: false,
         division: Division.patrol,
-        shiftGroup: ShiftGroup.a,
-        shiftType: Shift.day,
+        shiftGroup: null,
+        shiftType: null,
         employmentStatus: EmploymentStatus.partTime,
       ),
       Employee(
@@ -407,8 +406,8 @@ class EmployeeProvider extends ChangeNotifier {
         rank: Rank.deputy,
         isSupervisor: false,
         division: Division.patrol,
-        shiftGroup: ShiftGroup.a,
-        shiftType: Shift.day,
+        shiftGroup: null,
+        shiftType: null,
         employmentStatus: EmploymentStatus.partTime,
       ),
       Employee(
@@ -419,8 +418,8 @@ class EmployeeProvider extends ChangeNotifier {
         rank: Rank.deputy,
         isSupervisor: false,
         division: Division.patrol,
-        shiftGroup: ShiftGroup.a,
-        shiftType: Shift.day,
+        shiftGroup: null,
+        shiftType: null,
         employmentStatus: EmploymentStatus.partTime,
       ),
       Employee(
@@ -431,8 +430,8 @@ class EmployeeProvider extends ChangeNotifier {
         rank: Rank.deputy,
         isSupervisor: false,
         division: Division.patrol,
-        shiftGroup: ShiftGroup.a,
-        shiftType: Shift.day,
+        shiftGroup: null,
+        shiftType: null,
         employmentStatus: EmploymentStatus.partTime,
       ),
       Employee(
@@ -443,8 +442,8 @@ class EmployeeProvider extends ChangeNotifier {
         rank: Rank.deputy,
         isSupervisor: false,
         division: Division.patrol,
-        shiftGroup: ShiftGroup.a,
-        shiftType: Shift.day,
+        shiftGroup: null,
+        shiftType: null,
         employmentStatus: EmploymentStatus.partTime,
       ),
       Employee(
@@ -455,8 +454,8 @@ class EmployeeProvider extends ChangeNotifier {
         rank: Rank.deputy,
         isSupervisor: false,
         division: Division.patrol,
-        shiftGroup: ShiftGroup.a,
-        shiftType: Shift.day,
+        shiftGroup: null,
+        shiftType: null,
         employmentStatus: EmploymentStatus.partTime,
       ),
       Employee(
@@ -467,8 +466,8 @@ class EmployeeProvider extends ChangeNotifier {
         rank: Rank.deputy,
         isSupervisor: false,
         division: Division.patrol,
-        shiftGroup: ShiftGroup.a,
-        shiftType: Shift.day,
+        shiftGroup: null,
+        shiftType: null,
         employmentStatus: EmploymentStatus.partTime,
       ),
       Employee(
@@ -479,12 +478,12 @@ class EmployeeProvider extends ChangeNotifier {
         rank: Rank.deputy,
         isSupervisor: false,
         division: Division.patrol,
-        shiftGroup: ShiftGroup.a,
-        shiftType: Shift.day,
+        shiftGroup: null,
+        shiftType: null,
         employmentStatus: EmploymentStatus.partTime,
       ),
 
-      // FTO (Field Training Officers) - 2 employees (assigned to A-Day)
+      // Deputies on FTO
       Employee(
         id: '111',
         firstName: 'J.T.',
@@ -493,8 +492,8 @@ class EmployeeProvider extends ChangeNotifier {
         rank: Rank.deputy,
         isSupervisor: false,
         division: Division.patrol,
-        shiftGroup: ShiftGroup.a,
-        shiftType: Shift.day,
+        shiftGroup: null,
+        shiftType: null,
         employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
@@ -505,8 +504,8 @@ class EmployeeProvider extends ChangeNotifier {
         rank: Rank.deputy,
         isSupervisor: false,
         division: Division.patrol,
-        shiftGroup: ShiftGroup.a,
-        shiftType: Shift.day,
+        shiftGroup: null,
+        shiftType: null,
         employmentStatus: EmploymentStatus.fullTime,
       ),
     ]);
