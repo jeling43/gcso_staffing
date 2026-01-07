@@ -671,9 +671,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               matchesStatus = true; // Show all employees including those with null status
             } else if (employmentStatusFilter == EmploymentStatus.fullTime) {
               matchesStatus = employee.employmentStatus == EmploymentStatus.fullTime;
-            } else {
-              // employmentStatusFilter == EmploymentStatus.partTime
+            } else if (employmentStatusFilter == EmploymentStatus.partTime) {
               matchesStatus = employee.employmentStatus == EmploymentStatus.partTime;
+            } else {
+              // Fallback for unexpected values
+              matchesStatus = false;
             }
             
             return matchesSearch && matchesStatus;
@@ -714,7 +716,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                           spacing: 8,
                           children: [
                             ChoiceChip(
-                              label: const Text('All'),
+                              label: Text(EmploymentStatus.all),
                               selected: employmentStatusFilter == EmploymentStatus.all,
                               onSelected: (selected) {
                                 if (selected) {
@@ -723,7 +725,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                               },
                             ),
                             ChoiceChip(
-                              label: const Text('Full-time'),
+                              label: Text(EmploymentStatus.fullTime),
                               selected: employmentStatusFilter == EmploymentStatus.fullTime,
                               onSelected: (selected) {
                                 if (selected) {
@@ -732,7 +734,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                               },
                             ),
                             ChoiceChip(
-                              label: const Text('Part-time'),
+                              label: Text(EmploymentStatus.partTime),
                               selected: employmentStatusFilter == EmploymentStatus.partTime,
                               onSelected: (selected) {
                                 if (selected) {
