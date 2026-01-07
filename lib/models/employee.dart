@@ -13,6 +13,7 @@ class Rank {
     captain,
     lieutenant,
     sergeantFirstClass,
+    sergeant,
     corporal,
     deputy
   ];
