@@ -648,7 +648,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     
     Employee? selectedEmployee;
     String searchQuery = '';
-    String employmentStatusFilter = 'All'; // 'All', 'Full-time', 'Part-time'
+    String employmentStatusFilter = EmploymentStatus.all; // 'All', 'Full-time', 'Part-time'
     
     showDialog(
       context: context,
@@ -667,7 +667,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             
             // Employment status filter
             bool matchesStatus;
-            if (employmentStatusFilter == 'All') {
+            if (employmentStatusFilter == EmploymentStatus.all) {
               matchesStatus = true; // Show all employees including those with null status
             } else if (employmentStatusFilter == EmploymentStatus.fullTime) {
               matchesStatus = employee.employmentStatus == EmploymentStatus.fullTime;
@@ -716,10 +716,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                           children: [
                             ChoiceChip(
                               label: const Text('All'),
-                              selected: employmentStatusFilter == 'All',
+                              selected: employmentStatusFilter == EmploymentStatus.all,
                               onSelected: (selected) {
                                 if (selected) {
-                                  setState(() => employmentStatusFilter = 'All');
+                                  setState(() => employmentStatusFilter = EmploymentStatus.all);
                                 }
                               },
                             ),

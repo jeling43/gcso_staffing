@@ -19,6 +19,7 @@ class Rank {
 class EmploymentStatus {
   static const String fullTime = 'Full-time';
   static const String partTime = 'Part-time';
+  static const String all = 'All'; // For filter UI
 
   static const List<String> validStatuses = [
     fullTime,
