@@ -125,6 +125,7 @@ class EmployeeScreen extends StatelessWidget {
     String selectedRank = Rank.deputy;
     String? selectedShiftGroup;
     String? selectedShiftType;
+    String? selectedEmploymentStatus;
     
     showDialog(
       context: context,
@@ -192,6 +193,20 @@ class EmployeeScreen extends StatelessWidget {
                     },
                   ),
                   const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: selectedEmploymentStatus,
+                    decoration: const InputDecoration(labelText: 'Employment Status'),
+                    items: EmploymentStatus.validStatuses
+                        .map((status) => DropdownMenuItem(
+                              value: status,
+                              child: Text(status),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() => selectedEmploymentStatus = value);
+                    },
+                  ),
+                  const SizedBox(height: 16),
                   const ListTile(
                     leading: Icon(Icons.directions_car),
                     title: Text('Division: Patrol'),
@@ -230,6 +245,7 @@ class EmployeeScreen extends StatelessWidget {
                     division: Division.patrol,
                     shiftGroup: selectedShiftGroup,
                     shiftType: selectedShiftType,
+                    employmentStatus: selectedEmploymentStatus,
                   ));
                   Navigator.pop(context);
                 }
@@ -252,6 +268,7 @@ class EmployeeScreen extends StatelessWidget {
     String selectedRank = employee.rank;
     String? selectedShiftGroup = employee.shiftGroup;
     String? selectedShiftType = employee.shiftType;
+    String? selectedEmploymentStatus = employee.employmentStatus;
     
     showDialog(
       context: context,
@@ -319,6 +336,20 @@ class EmployeeScreen extends StatelessWidget {
                     },
                   ),
                   const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: selectedEmploymentStatus,
+                    decoration: const InputDecoration(labelText: 'Employment Status'),
+                    items: EmploymentStatus.validStatuses
+                        .map((status) => DropdownMenuItem(
+                              value: status,
+                              child: Text(status),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() => selectedEmploymentStatus = value);
+                    },
+                  ),
+                  const SizedBox(height: 16),
                   CheckboxListTile(
                     title: const Text('Supervisor'),
                     value: isSupervisor,
@@ -348,6 +379,7 @@ class EmployeeScreen extends StatelessWidget {
                     isSupervisor: isSupervisor,
                     shiftGroup: selectedShiftGroup,
                     shiftType: selectedShiftType,
+                    employmentStatus: selectedEmploymentStatus,
                   ));
                   Navigator.pop(context);
                 }

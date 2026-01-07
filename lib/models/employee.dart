@@ -15,6 +15,18 @@ class Rank {
   ];
 }
 
+/// Valid employment status values for employees
+class EmploymentStatus {
+  static const String fullTime = 'Full-time';
+  static const String partTime = 'Part-time';
+  static const String all = 'All'; // For filter UI
+
+  static const List<String> validStatuses = [
+    fullTime,
+    partTime,
+  ];
+}
+
 /// Valid shift names
 class Shift {
   static const String day = 'Day';
@@ -132,6 +144,7 @@ class Employee {
   final Division? division; // Employees can only be assigned to one division
   final String? shiftGroup; // "A" or "B" for swing schedule rotation
   final String? shiftType; // "Day", "Night", "Split-1200", "Split-1400"
+  final String? employmentStatus; // "Full-time", "Part-time", or null
 
   Employee({
     required this.id,
@@ -143,6 +156,7 @@ class Employee {
     this.division,
     this.shiftGroup,
     this.shiftType,
+    this.employmentStatus,
   }) : assert(Rank.validRanks.contains(rank), 'Invalid rank: $rank');
 
   String get fullName => '$firstName $lastName';
@@ -165,6 +179,7 @@ class Employee {
     Division? division,
     String? shiftGroup,
     String? shiftType,
+    String? employmentStatus,
   }) {
     return Employee(
       id: id ?? this.id,
@@ -176,6 +191,7 @@ class Employee {
       division: division ?? this.division,
       shiftGroup: shiftGroup ?? this.shiftGroup,
       shiftType: shiftType ?? this.shiftType,
+      employmentStatus: employmentStatus ?? this.employmentStatus,
     );
   }
 
