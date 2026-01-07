@@ -647,6 +647,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     final scheduleProvider = context.read<ScheduleProvider>();
     
     Employee? selectedEmployee;
+    String searchQuery = '';
+    String employmentStatusFilter = 'All'; // 'All', 'Full-time', 'Part-time'
     
     showDialog(
       context: context,
@@ -655,10 +657,26 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           // Show ALL employees in the system, not just those in Patrol
           final allEmployees = employeeProvider.employees;
           
+          // Filter employees based on search and employment status
+          final filteredEmployees = allEmployees.where((employee) {
+            // Search filter (case-insensitive)
+            final matchesSearch = searchQuery.isEmpty ||
+                employee.firstName.toLowerCase().contains(searchQuery.toLowerCase()) ||
+                employee.lastName.toLowerCase().contains(searchQuery.toLowerCase()) ||
+                employee.badgeNumber.toLowerCase().contains(searchQuery.toLowerCase());
+            
+            // Employment status filter
+            final matchesStatus = employmentStatusFilter == 'All' ||
+                (employmentStatusFilter == 'Full-time' && employee.employmentStatus == 'Full-time') ||
+                (employmentStatusFilter == 'Part-time' && employee.employmentStatus == 'Part-time');
+            
+            return matchesSearch && matchesStatus;
+          }).toList();
+          
           return AlertDialog(
             title: Text('Add Fill-in to $shift Shift'),
             content: SizedBox(
-              width: 400,
+              width: 500,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -667,21 +685,136 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                     style: const TextStyle(fontSize: 14),
                   ),
                   const SizedBox(height: 16),
-                  DropdownButtonFormField<Employee>(
-                    value: selectedEmployee,
+                  // Search field
+                  TextField(
                     decoration: const InputDecoration(
-                      labelText: 'Employee',
-                      helperText: 'All employees from all shifts',
+                      labelText: 'Search',
+                      hintText: 'Search by name or badge number',
+                      prefixIcon: Icon(Icons.search),
+                      border: OutlineInputBorder(),
                     ),
-                    items: allEmployees
-                        .map((e) => DropdownMenuItem(
-                              value: e,
-                              child: Text('${e.fullName} (${e.shiftAssignment})'),
-                            ))
-                        .toList(),
                     onChanged: (value) {
-                      setState(() => selectedEmployee = value);
+                      setState(() => searchQuery = value);
                     },
+                  ),
+                  const SizedBox(height: 16),
+                  // Employment status filter
+                  Row(
+                    children: [
+                      const Text('Filter: ', style: TextStyle(fontWeight: FontWeight.w500)),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Wrap(
+                          spacing: 8,
+                          children: [
+                            ChoiceChip(
+                              label: const Text('All'),
+                              selected: employmentStatusFilter == 'All',
+                              onSelected: (selected) {
+                                if (selected) {
+                                  setState(() => employmentStatusFilter = 'All');
+                                }
+                              },
+                            ),
+                            ChoiceChip(
+                              label: const Text('Full-time'),
+                              selected: employmentStatusFilter == 'Full-time',
+                              onSelected: (selected) {
+                                if (selected) {
+                                  setState(() => employmentStatusFilter = 'Full-time');
+                                }
+                              },
+                            ),
+                            ChoiceChip(
+                              label: const Text('Part-time'),
+                              selected: employmentStatusFilter == 'Part-time',
+                              onSelected: (selected) {
+                                if (selected) {
+                                  setState(() => employmentStatusFilter = 'Part-time');
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  // Employee count
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Showing ${filteredEmployees.length} employee${filteredEmployees.length == 1 ? '' : 's'}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Scrollable list of employees
+                  Container(
+                    constraints: const BoxConstraints(maxHeight: 300),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: filteredEmployees.isEmpty
+                        ? const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(24.0),
+                              child: Text('No employees found'),
+                            ),
+                          )
+                        : ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: filteredEmployees.length,
+                            itemBuilder: (context, index) {
+                              final employee = filteredEmployees[index];
+                              final isSelected = selectedEmployee?.id == employee.id;
+                              
+                              return InkWell(
+                                onTap: () {
+                                  setState(() => selectedEmployee = employee);
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: isSelected ? Colors.blue.shade50 : null,
+                                    border: Border(
+                                      bottom: BorderSide(
+                                        color: Colors.grey.shade200,
+                                        width: 1,
+                                      ),
+                                    ),
+                                  ),
+                                  child: ListTile(
+                                    leading: CircleAvatar(
+                                      backgroundColor: isSelected ? Colors.blue : Colors.grey[400],
+                                      child: Icon(
+                                        isSelected ? Icons.check : Icons.person,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
+                                    ),
+                                    title: Text(
+                                      '${employee.fullName} (#${employee.badgeNumber})',
+                                      style: TextStyle(
+                                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      '${employee.shiftAssignment}${employee.employmentStatus != null ? ' • ${employee.employmentStatus}' : ''}',
+                                      style: const TextStyle(fontSize: 12),
+                                    ),
+                                    trailing: isSelected
+                                        ? Icon(Icons.check_circle, color: Colors.blue)
+                                        : null,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                   ),
                   const SizedBox(height: 16),
                   Container(
