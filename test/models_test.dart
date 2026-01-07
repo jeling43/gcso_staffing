@@ -294,10 +294,10 @@ void main() {
   });
 
   group('EmployeeProvider', () {
-    test('initializes with 12 patrol employees', () {
+    test('initializes with 39 patrol employees', () {
       final provider = EmployeeProvider();
       
-      expect(provider.employees.length, equals(12));
+      expect(provider.employees.length, equals(39));
       expect(provider.currentUser, isNotNull);
     });
     
@@ -318,14 +318,14 @@ void main() {
       }
     });
     
-    test('shift groups are balanced', () {
+    test('shift groups are distributed correctly', () {
       final provider = EmployeeProvider();
       
       final bEmployees = provider.employees.where((e) => e.shiftGroup == ShiftGroup.b).toList();
       final aEmployees = provider.employees.where((e) => e.shiftGroup == ShiftGroup.a).toList();
       
-      expect(bEmployees.length, equals(6));
-      expect(aEmployees.length, equals(6));
+      expect(bEmployees.length, equals(12));
+      expect(aEmployees.length, equals(27));
     });
 
     test('all sample employees have ranks', () {
@@ -342,10 +342,23 @@ void main() {
       
       final patrolEmployees = provider.getEmployeesByDivision(Division.patrol);
       
-      expect(patrolEmployees.length, equals(12));
+      expect(patrolEmployees.length, equals(39));
       for (final employee in patrolEmployees) {
         expect(employee.division, equals(Division.patrol));
       }
+    });
+
+    test('all employees have unique IDs and badge numbers', () {
+      final provider = EmployeeProvider();
+      
+      final ids = provider.employees.map((e) => e.id).toList();
+      final badgeNumbers = provider.employees.map((e) => e.badgeNumber).toList();
+      
+      // Check for unique IDs
+      expect(ids.toSet().length, equals(39));
+      
+      // Check for unique badge numbers
+      expect(badgeNumbers.toSet().length, equals(39));
     });
 
     test('assignToDivision updates employee division', () {

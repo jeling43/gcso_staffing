@@ -2,14 +2,18 @@ import 'division.dart';
 
 /// Valid rank values for employees
 class Rank {
+  static const String captain = 'CAPT';
   static const String lieutenant = 'LT';
   static const String sergeantFirstClass = 'SFC';
+  static const String sergeant = 'SGT';
   static const String corporal = 'CPL';
   static const String deputy = 'DEP';
 
   static const List<String> validRanks = [
+    captain,
     lieutenant,
     sergeantFirstClass,
+    sergeant,
     corporal,
     deputy
   ];
