@@ -16,8 +16,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   DateTime _selectedDate = DateTime.now();
   // Track selected lieutenants for each shift
   final Map<String, Employee?> _selectedLieutenants = {
-    'Day': null,
-    'Night': null,
+    Shift.day: null,
+    Shift.night: null,
   };
 
   @override
