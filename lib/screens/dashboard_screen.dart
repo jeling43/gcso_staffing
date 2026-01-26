@@ -479,17 +479,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               isExpanded: true,
               underline: const SizedBox(),
               items: supervisors.map((employee) {
-                // Determine color based on rank
-                Color textColor;
-                if (employee.rank == Rank.lieutenant) {
-                  textColor = Colors.amber.shade700; // Gold for lieutenants
-                } else if (employee.rank == Rank.sergeant ||
-                    employee.rank == Rank.sergeantFirstClass) {
-                  textColor = Colors.deepOrange.shade700; // Different color for SGT/SFC
-                } else {
-                  textColor = Colors.black87;
-                }
-
+                final textColor = _getSupervisorColor(employee);
                 return DropdownMenuItem<Employee>(
                   value: employee,
                   child: Text(
@@ -509,17 +499,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               },
               selectedItemBuilder: (BuildContext context) {
                 return supervisors.map((employee) {
-                  // Determine color for selected item
-                  Color textColor;
-                  if (employee.rank == Rank.lieutenant) {
-                    textColor = Colors.amber.shade700;
-                  } else if (employee.rank == Rank.sergeant ||
-                      employee.rank == Rank.sergeantFirstClass) {
-                    textColor = Colors.deepOrange.shade700;
-                  } else {
-                    textColor = Colors.black87;
-                  }
-
+                  final textColor = _getSupervisorColor(employee);
                   return Text(
                     '${employee.rank} ${employee.lastName}',
                     style: TextStyle(
@@ -535,6 +515,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
     );
+  }
+
+  /// Get color for supervisor based on rank
+  Color _getSupervisorColor(Employee employee) {
+    if (employee.rank == Rank.lieutenant) {
+      return Colors.amber.shade700; // Gold for lieutenants
+    } else if (employee.rank == Rank.sergeant ||
+        employee.rank == Rank.sergeantFirstClass) {
+      return Colors.deepOrange.shade700; // Different color for SGT/SFC
+    }
+    return Colors.black87;
   }
 
   Widget _buildEmployeeCard(ScheduleEntry entry, Color badgeColor,
