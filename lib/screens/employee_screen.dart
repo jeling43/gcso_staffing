@@ -159,6 +159,7 @@ class EmployeeScreen extends StatelessWidget {
                     items: const [
                       DropdownMenuItem(value: Rank.lieutenant, child: Text('Lieutenant (LT)')),
                       DropdownMenuItem(value: Rank.sergeantFirstClass, child: Text('Sergeant First Class (SFC)')),
+                      DropdownMenuItem(value: Rank.sergeant, child: Text('Sergeant (SGT)')),
                       DropdownMenuItem(value: Rank.corporal, child: Text('Corporal (CPL)')),
                       DropdownMenuItem(value: Rank.deputy, child: Text('Deputy (DEP)')),
                     ],
@@ -302,6 +303,7 @@ class EmployeeScreen extends StatelessWidget {
                     items: const [
                       DropdownMenuItem(value: Rank.lieutenant, child: Text('Lieutenant (LT)')),
                       DropdownMenuItem(value: Rank.sergeantFirstClass, child: Text('Sergeant First Class (SFC)')),
+                      DropdownMenuItem(value: Rank.sergeant, child: Text('Sergeant (SGT)')),
                       DropdownMenuItem(value: Rank.corporal, child: Text('Corporal (CPL)')),
                       DropdownMenuItem(value: Rank.deputy, child: Text('Deputy (DEP)')),
                     ],
