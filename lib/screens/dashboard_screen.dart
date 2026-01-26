@@ -14,6 +14,11 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   DateTime _selectedDate = DateTime.now();
+  // Track selected lieutenants for each shift
+  final Map<String, Employee?> _selectedLieutenants = {
+    'Day': null,
+    'Night': null,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -223,6 +228,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
         .where((e) => e.shift == shiftType && e.isOnDuty)
         .toList();
 
+    // Get supervisors (LT, SGT, SFC) for dropdown
+    final supervisors = shiftEmployees
+        .where((e) =>
+            e.employee.rank == Rank.lieutenant ||
+            e.employee.rank == Rank.sergeant ||
+            e.employee.rank == Rank.sergeantFirstClass)
+        .map((e) => e.employee)
+        .toList();
+
+    // Sort: SGT/SFC first, then LT
+    supervisors.sort((a, b) {
+      // SGT and SFC should come first
+      final aIsSgtOrSfc = a.rank == Rank.sergeant || a.rank == Rank.sergeantFirstClass;
+      final bIsSgtOrSfc = b.rank == Rank.sergeant || b.rank == Rank.sergeantFirstClass;
+      
+      if (aIsSgtOrSfc && !bIsSgtOrSfc) return -1;
+      if (!aIsSgtOrSfc && bIsSgtOrSfc) return 1;
+      
+      // If both are same type, sort by last name
+      return a.lastName.compareTo(b.lastName);
+    });
+
     return Card(
       elevation: 2,
       child: Column(
@@ -235,36 +262,49 @@ class _DashboardScreenState extends State<DashboardScreen> {
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(12)),
             ),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(icon, color: Colors.white, size: 28),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    shiftName,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                Row(
+                  children: [
+                    Icon(icon, color: Colors.white, size: 28),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        shiftName,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    '${shiftEmployees.length} officers',
-                    style: TextStyle(
-                      color: color,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '${shiftEmployees.length} officers',
+                        style: TextStyle(
+                          color: color,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
+                if (supervisors.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  _buildLieutenantDropdown(
+                    context,
+                    shiftType,
+                    supervisors,
+                  ),
+                ],
               ],
             ),
           ),
@@ -396,6 +436,100 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ],
                 ],
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLieutenantDropdown(
+    BuildContext context,
+    String shiftType,
+    List<Employee> supervisors,
+  ) {
+    final selectedLieutenant = _selectedLieutenants[shiftType];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.supervisor_account, size: 18, color: Colors.black87),
+          const SizedBox(width: 8),
+          const Text(
+            'Shift Supervisor:',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: DropdownButton<Employee>(
+              value: selectedLieutenant,
+              hint: const Text(
+                'Select Supervisor',
+                style: TextStyle(fontSize: 14),
+              ),
+              isExpanded: true,
+              underline: const SizedBox(),
+              items: supervisors.map((employee) {
+                // Determine color based on rank
+                Color textColor;
+                if (employee.rank == Rank.lieutenant) {
+                  textColor = Colors.amber.shade700; // Gold for lieutenants
+                } else if (employee.rank == Rank.sergeant ||
+                    employee.rank == Rank.sergeantFirstClass) {
+                  textColor = Colors.deepOrange.shade700; // Different color for SGT/SFC
+                } else {
+                  textColor = Colors.black87;
+                }
+
+                return DropdownMenuItem<Employee>(
+                  value: employee,
+                  child: Text(
+                    '${employee.rank} ${employee.lastName}',
+                    style: TextStyle(
+                      color: textColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                );
+              }).toList(),
+              onChanged: (Employee? newValue) {
+                setState(() {
+                  _selectedLieutenants[shiftType] = newValue;
+                });
+              },
+              selectedItemBuilder: (BuildContext context) {
+                return supervisors.map((employee) {
+                  // Determine color for selected item
+                  Color textColor;
+                  if (employee.rank == Rank.lieutenant) {
+                    textColor = Colors.amber.shade700;
+                  } else if (employee.rank == Rank.sergeant ||
+                      employee.rank == Rank.sergeantFirstClass) {
+                    textColor = Colors.deepOrange.shade700;
+                  } else {
+                    textColor = Colors.black87;
+                  }
+
+                  return Text(
+                    '${employee.rank} ${employee.lastName}',
+                    style: TextStyle(
+                      color: textColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  );
+                }).toList();
+              },
             ),
           ),
         ],
