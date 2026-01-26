@@ -54,8 +54,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-      body: Consumer<ScheduleProvider>(
-        builder: (context, scheduleProvider, _) {
+      body: Consumer2<ScheduleProvider, EmployeeProvider>(
+        builder: (context, scheduleProvider, employeeProvider, _) {
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -180,6 +180,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 _buildShiftTypeSection(
                   context,
                   scheduleProvider,
+                  employeeProvider,
                   'Day Shift',
                   Shift.day,
                   Icons.wb_sunny,
@@ -192,6 +193,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 _buildShiftTypeSection(
                   context,
                   scheduleProvider,
+                  employeeProvider,
                   'Night Shift',
                   Shift.night,
                   Icons.nightlight_round,
@@ -217,6 +219,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildShiftTypeSection(
     BuildContext context,
     ScheduleProvider scheduleProvider,
+    EmployeeProvider employeeProvider,
     String shiftName,
     String shiftType,
     IconData icon,
@@ -228,22 +231,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
         .where((e) => e.shift == shiftType && e.isOnDuty)
         .toList();
 
-    // Get supervisors (LT, SGT, SFC) for dropdown
-    final supervisors = shiftEmployees
+    // Get ALL supervisors (LT, SGT, SFC) from employee provider, not just those on this shift
+    final supervisors = employeeProvider.employees
         .where((e) =>
-            e.employee.rank == Rank.lieutenant ||
-            e.employee.rank == Rank.sergeant ||
-            e.employee.rank == Rank.sergeantFirstClass)
-        .map((e) => e.employee)
+            e.rank == Rank.lieutenant ||
+            e.rank == Rank.sergeant ||
+            e.rank == Rank.sergeantFirstClass)
         .toList();
 
-    // Sort: SGT/SFC first, then LT
+    // Sort: LT first, then SGT/SFC, each group sorted by last name
     supervisors.sort((a, b) {
-      final aIsSgtOrSfc = _isSgtOrSfc(a);
-      final bIsSgtOrSfc = _isSgtOrSfc(b);
+      final aIsLt = a.rank == Rank.lieutenant;
+      final bIsLt = b.rank == Rank.lieutenant;
       
-      if (aIsSgtOrSfc && !bIsSgtOrSfc) return -1;
-      if (!aIsSgtOrSfc && bIsSgtOrSfc) return 1;
+      if (aIsLt && !bIsLt) return -1;
+      if (!aIsLt && bIsLt) return 1;
       
       // If both are same type, sort by last name
       return a.lastName.compareTo(b.lastName);
@@ -454,10 +456,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade300, width: 1),
       ),
       child: Row(
         children: [
-          const Icon(Icons.supervisor_account, size: 18, color: Colors.black87),
+          const Icon(Icons.supervisor_account, size: 20, color: Colors.black87),
           const SizedBox(width: 8),
           const Text(
             'Shift Supervisor:',
@@ -471,9 +474,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Expanded(
             child: DropdownButton<Employee>(
               value: selectedLieutenant,
-              hint: const Text(
-                'Select Supervisor',
-                style: TextStyle(fontSize: 14),
+              hint: Text(
+                'Select Lieutenant or Sergeant',
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
               ),
               isExpanded: true,
               underline: const SizedBox(),
