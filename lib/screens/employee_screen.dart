@@ -7,6 +7,11 @@ import '../providers/providers.dart';
 class EmployeeScreen extends StatelessWidget {
   const EmployeeScreen({super.key});
 
+  /// Helper method to check if a rank can be a supervisor
+  static bool _canBeSupervisor(String rank) {
+    return rank == Rank.lieutenant;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -164,7 +169,13 @@ class EmployeeScreen extends StatelessWidget {
                       DropdownMenuItem(value: Rank.deputy, child: Text('Deputy (DEP)')),
                     ],
                     onChanged: (value) {
-                      setState(() => selectedRank = value ?? Rank.deputy);
+                      setState(() {
+                        selectedRank = value ?? Rank.deputy;
+                        // Only LT can be supervisors
+                        if (!EmployeeScreen._canBeSupervisor(selectedRank)) {
+                          isSupervisor = false;
+                        }
+                      });
                     },
                   ),
                   const SizedBox(height: 16),
@@ -217,10 +228,16 @@ class EmployeeScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   CheckboxListTile(
                     title: const Text('Supervisor'),
+                    subtitle: !EmployeeScreen._canBeSupervisor(selectedRank)
+                        ? const Text('Only LT can be supervisors',
+                            style: TextStyle(fontSize: 12))
+                        : null,
                     value: isSupervisor,
-                    onChanged: (value) {
-                      setState(() => isSupervisor = value ?? false);
-                    },
+                    onChanged: EmployeeScreen._canBeSupervisor(selectedRank)
+                        ? (value) {
+                            setState(() => isSupervisor = value ?? false);
+                          }
+                        : null,
                   ),
                 ],
               ),
@@ -308,7 +325,13 @@ class EmployeeScreen extends StatelessWidget {
                       DropdownMenuItem(value: Rank.deputy, child: Text('Deputy (DEP)')),
                     ],
                     onChanged: (value) {
-                      setState(() => selectedRank = value ?? Rank.deputy);
+                      setState(() {
+                        selectedRank = value ?? Rank.deputy;
+                        // Only LT can be supervisors
+                        if (!EmployeeScreen._canBeSupervisor(selectedRank)) {
+                          isSupervisor = false;
+                        }
+                      });
                     },
                   ),
                   const SizedBox(height: 16),
@@ -354,10 +377,16 @@ class EmployeeScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   CheckboxListTile(
                     title: const Text('Supervisor'),
+                    subtitle: !EmployeeScreen._canBeSupervisor(selectedRank)
+                        ? const Text('Only LT can be supervisors',
+                            style: TextStyle(fontSize: 12))
+                        : null,
                     value: isSupervisor,
-                    onChanged: (value) {
-                      setState(() => isSupervisor = value ?? false);
-                    },
+                    onChanged: EmployeeScreen._canBeSupervisor(selectedRank)
+                        ? (value) {
+                            setState(() => isSupervisor = value ?? false);
+                          }
+                        : null,
                   ),
                 ],
               ),

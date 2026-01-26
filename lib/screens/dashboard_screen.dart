@@ -231,25 +231,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
         .where((e) => e.shift == shiftType && e.isOnDuty)
         .toList();
 
-    // Get ALL supervisors (LT, SGT, SFC) from employee provider, not just those on this shift
+    // Get ALL supervisors (LT only) from employee provider, not just those on this shift
     final supervisors = employeeProvider.employees
-        .where((e) =>
-            e.rank == Rank.lieutenant ||
-            e.rank == Rank.sergeant ||
-            e.rank == Rank.sergeantFirstClass)
+        .where((e) => e.rank == Rank.lieutenant)
         .toList();
 
-    // Sort: LT first, then SGT/SFC, each group sorted by last name
-    supervisors.sort((a, b) {
-      final aIsLt = a.rank == Rank.lieutenant;
-      final bIsLt = b.rank == Rank.lieutenant;
-      
-      if (aIsLt && !bIsLt) return -1;
-      if (!aIsLt && bIsLt) return 1;
-      
-      // If both are same type, sort by last name
-      return a.lastName.compareTo(b.lastName);
-    });
+    // Sort by last name
+    supervisors.sort((a, b) => a.lastName.compareTo(b.lastName));
 
     return Card(
       elevation: 2,
@@ -475,7 +463,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: DropdownButton<Employee>(
               value: selectedLieutenant,
               hint: Text(
-                'Select Lieutenant or Sergeant',
+                'Select Lieutenant',
                 style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
               ),
               isExpanded: true,
@@ -505,18 +493,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   /// Get color for supervisor based on rank
   Color _getSupervisorColor(Employee employee) {
-    if (employee.rank == Rank.lieutenant) {
-      return Colors.amber.shade700; // Gold for lieutenants
-    } else if (_isSgtOrSfc(employee)) {
-      return Colors.deepOrange.shade700; // Different color for SGT/SFC
-    }
-    return Colors.black87;
-  }
-
-  /// Check if employee is SGT or SFC
-  bool _isSgtOrSfc(Employee employee) {
-    return employee.rank == Rank.sergeant ||
-        employee.rank == Rank.sergeantFirstClass;
+    // Only LT can be supervisors now
+    return Colors.amber.shade700; // Gold for lieutenants
   }
 
   /// Build supervisor text widget with appropriate styling
@@ -524,6 +502,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final textColor = _getSupervisorColor(employee);
     return Text(
       '${employee.rank} ${employee.lastName}',
+      textAlign: TextAlign.center,
       style: TextStyle(
         color: textColor,
         fontWeight: FontWeight.bold,
