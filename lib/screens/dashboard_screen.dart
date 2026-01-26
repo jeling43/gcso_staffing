@@ -239,9 +239,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     // Sort: SGT/SFC first, then LT
     supervisors.sort((a, b) {
-      // SGT and SFC should come first
-      final aIsSgtOrSfc = a.rank == Rank.sergeant || a.rank == Rank.sergeantFirstClass;
-      final bIsSgtOrSfc = b.rank == Rank.sergeant || b.rank == Rank.sergeantFirstClass;
+      final aIsSgtOrSfc = _isSgtOrSfc(a);
+      final bIsSgtOrSfc = _isSgtOrSfc(b);
       
       if (aIsSgtOrSfc && !bIsSgtOrSfc) return -1;
       if (!aIsSgtOrSfc && bIsSgtOrSfc) return 1;
@@ -479,17 +478,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               isExpanded: true,
               underline: const SizedBox(),
               items: supervisors.map((employee) {
-                final textColor = _getSupervisorColor(employee);
                 return DropdownMenuItem<Employee>(
                   value: employee,
-                  child: Text(
-                    '${employee.rank} ${employee.lastName}',
-                    style: TextStyle(
-                      color: textColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
+                  child: _buildSupervisorText(employee),
                 );
               }).toList(),
               onChanged: (Employee? newValue) {
@@ -499,15 +490,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               },
               selectedItemBuilder: (BuildContext context) {
                 return supervisors.map((employee) {
-                  final textColor = _getSupervisorColor(employee);
-                  return Text(
-                    '${employee.rank} ${employee.lastName}',
-                    style: TextStyle(
-                      color: textColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  );
+                  return _buildSupervisorText(employee);
                 }).toList();
               },
             ),
@@ -521,11 +504,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Color _getSupervisorColor(Employee employee) {
     if (employee.rank == Rank.lieutenant) {
       return Colors.amber.shade700; // Gold for lieutenants
-    } else if (employee.rank == Rank.sergeant ||
-        employee.rank == Rank.sergeantFirstClass) {
+    } else if (_isSgtOrSfc(employee)) {
       return Colors.deepOrange.shade700; // Different color for SGT/SFC
     }
     return Colors.black87;
+  }
+
+  /// Check if employee is SGT or SFC
+  bool _isSgtOrSfc(Employee employee) {
+    return employee.rank == Rank.sergeant ||
+        employee.rank == Rank.sergeantFirstClass;
+  }
+
+  /// Build supervisor text widget with appropriate styling
+  Widget _buildSupervisorText(Employee employee) {
+    final textColor = _getSupervisorColor(employee);
+    return Text(
+      '${employee.rank} ${employee.lastName}',
+      style: TextStyle(
+        color: textColor,
+        fontWeight: FontWeight.bold,
+        fontSize: 14,
+      ),
+    );
   }
 
   Widget _buildEmployeeCard(ScheduleEntry entry, Color badgeColor,
