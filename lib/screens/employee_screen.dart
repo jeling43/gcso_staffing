@@ -164,7 +164,15 @@ class EmployeeScreen extends StatelessWidget {
                       DropdownMenuItem(value: Rank.deputy, child: Text('Deputy (DEP)')),
                     ],
                     onChanged: (value) {
-                      setState(() => selectedRank = value ?? Rank.deputy);
+                      setState(() {
+                        selectedRank = value ?? Rank.deputy;
+                        // Only LT, SGT, SFC can be supervisors
+                        if (selectedRank != Rank.lieutenant &&
+                            selectedRank != Rank.sergeant &&
+                            selectedRank != Rank.sergeantFirstClass) {
+                          isSupervisor = false;
+                        }
+                      });
                     },
                   ),
                   const SizedBox(height: 16),
@@ -217,10 +225,20 @@ class EmployeeScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   CheckboxListTile(
                     title: const Text('Supervisor'),
+                    subtitle: (selectedRank != Rank.lieutenant &&
+                            selectedRank != Rank.sergeant &&
+                            selectedRank != Rank.sergeantFirstClass)
+                        ? const Text('Only LT, SGT, and SFC can be supervisors',
+                            style: TextStyle(fontSize: 12))
+                        : null,
                     value: isSupervisor,
-                    onChanged: (value) {
-                      setState(() => isSupervisor = value ?? false);
-                    },
+                    onChanged: (selectedRank == Rank.lieutenant ||
+                            selectedRank == Rank.sergeant ||
+                            selectedRank == Rank.sergeantFirstClass)
+                        ? (value) {
+                            setState(() => isSupervisor = value ?? false);
+                          }
+                        : null,
                   ),
                 ],
               ),
@@ -308,7 +326,15 @@ class EmployeeScreen extends StatelessWidget {
                       DropdownMenuItem(value: Rank.deputy, child: Text('Deputy (DEP)')),
                     ],
                     onChanged: (value) {
-                      setState(() => selectedRank = value ?? Rank.deputy);
+                      setState(() {
+                        selectedRank = value ?? Rank.deputy;
+                        // Only LT, SGT, SFC can be supervisors
+                        if (selectedRank != Rank.lieutenant &&
+                            selectedRank != Rank.sergeant &&
+                            selectedRank != Rank.sergeantFirstClass) {
+                          isSupervisor = false;
+                        }
+                      });
                     },
                   ),
                   const SizedBox(height: 16),
@@ -354,10 +380,20 @@ class EmployeeScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   CheckboxListTile(
                     title: const Text('Supervisor'),
+                    subtitle: (selectedRank != Rank.lieutenant &&
+                            selectedRank != Rank.sergeant &&
+                            selectedRank != Rank.sergeantFirstClass)
+                        ? const Text('Only LT, SGT, and SFC can be supervisors',
+                            style: TextStyle(fontSize: 12))
+                        : null,
                     value: isSupervisor,
-                    onChanged: (value) {
-                      setState(() => isSupervisor = value ?? false);
-                    },
+                    onChanged: (selectedRank == Rank.lieutenant ||
+                            selectedRank == Rank.sergeant ||
+                            selectedRank == Rank.sergeantFirstClass)
+                        ? (value) {
+                            setState(() => isSupervisor = value ?? false);
+                          }
+                        : null,
                   ),
                 ],
               ),

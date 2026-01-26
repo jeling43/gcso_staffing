@@ -524,6 +524,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final textColor = _getSupervisorColor(employee);
     return Text(
       '${employee.rank} ${employee.lastName}',
+      textAlign: TextAlign.center,
       style: TextStyle(
         color: textColor,
         fontWeight: FontWeight.bold,
