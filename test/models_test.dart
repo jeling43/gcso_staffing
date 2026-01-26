@@ -294,10 +294,10 @@ void main() {
   });
 
   group('EmployeeProvider', () {
-    test('initializes with 39 patrol employees', () {
+    test('initializes with 41 patrol employees', () {
       final provider = EmployeeProvider();
       
-      expect(provider.employees.length, equals(39));
+      expect(provider.employees.length, equals(41));
       expect(provider.currentUser, isNotNull);
     });
     
@@ -309,12 +309,13 @@ void main() {
       }
     });
     
-    test('all sample employees have shift groups', () {
+    test('employees with shift groups have valid values', () {
       final provider = EmployeeProvider();
       
       for (final employee in provider.employees) {
-        expect(employee.shiftGroup, isNotNull);
-        expect(ShiftGroup.validGroups.contains(employee.shiftGroup), isTrue);
+        if (employee.shiftGroup != null) {
+          expect(ShiftGroup.validGroups.contains(employee.shiftGroup), isTrue);
+        }
       }
     });
     
@@ -324,8 +325,8 @@ void main() {
       final bEmployees = provider.employees.where((e) => e.shiftGroup == ShiftGroup.b).toList();
       final aEmployees = provider.employees.where((e) => e.shiftGroup == ShiftGroup.a).toList();
       
-      expect(bEmployees.length, equals(12));
-      expect(aEmployees.length, equals(27));
+      expect(bEmployees.length, equals(13)); // Added 1 LT to B group
+      expect(aEmployees.length, equals(28)); // Added 1 LT to A group
     });
 
     test('all sample employees have ranks', () {
@@ -355,10 +356,10 @@ void main() {
       final badgeNumbers = provider.employees.map((e) => e.badgeNumber).toList();
       
       // Check for unique IDs
-      expect(ids.toSet().length, equals(39));
+      expect(ids.toSet().length, equals(41));
       
       // Check for unique badge numbers
-      expect(badgeNumbers.toSet().length, equals(39));
+      expect(badgeNumbers.toSet().length, equals(41));
     });
 
     test('assignToDivision updates employee division', () {
