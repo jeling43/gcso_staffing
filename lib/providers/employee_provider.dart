@@ -76,7 +76,7 @@ class EmployeeProvider extends ChangeNotifier {
         isSupervisor: false,
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
-        shiftType: Shift.night,
+        shiftType: Shift.day,
         employmentStatus: EmploymentStatus.fullTime,
       ),
 
