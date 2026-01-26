@@ -28,7 +28,7 @@ class EmployeeProvider extends ChangeNotifier {
         isSupervisor: true,
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
-        shiftType: Shift.day,
+        shiftType: Shift.night,
         employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
@@ -76,7 +76,7 @@ class EmployeeProvider extends ChangeNotifier {
         isSupervisor: false,
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
-        shiftType: Shift.day,
+        shiftType: Shift.night,
         employmentStatus: EmploymentStatus.fullTime,
       ),
 
@@ -208,7 +208,7 @@ class EmployeeProvider extends ChangeNotifier {
         isSupervisor: true,
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
-        shiftType: Shift.night,
+        shiftType: Shift.day,
         employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
@@ -269,7 +269,7 @@ class EmployeeProvider extends ChangeNotifier {
         isSupervisor: true,
         division: Division.patrol,
         shiftGroup: ShiftGroup.b,
-        shiftType: Shift.night,
+        shiftType: Shift.day,
         employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
