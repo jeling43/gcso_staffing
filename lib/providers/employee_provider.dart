@@ -360,6 +360,32 @@ class EmployeeProvider extends ChangeNotifier {
         shiftType: null,
         employmentStatus: EmploymentStatus.fullTime,
       ),
+      
+      // Additional Lieutenants for Day and Night Shifts
+      Employee(
+        id: '024',
+        firstName: 'M.J.',
+        lastName: 'ANDERSON',
+        badgeNumber: '024',
+        rank: Rank.lieutenant,
+        isSupervisor: true,
+        division: Division.patrol,
+        shiftGroup: ShiftGroup.a,
+        shiftType: Shift.day,
+        employmentStatus: EmploymentStatus.fullTime,
+      ),
+      Employee(
+        id: '025',
+        firstName: 'R.T.',
+        lastName: 'WILLIAMS',
+        badgeNumber: '025',
+        rank: Rank.lieutenant,
+        isSupervisor: true,
+        division: Division.patrol,
+        shiftGroup: ShiftGroup.b,
+        shiftType: Shift.night,
+        employmentStatus: EmploymentStatus.fullTime,
+      ),
       Employee(
         id: '184',
         firstName: 'E.A.',
