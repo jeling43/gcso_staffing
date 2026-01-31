@@ -20,34 +20,65 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Shift.night: null,
   };
 
+  // Modern color palette
+  static const Color _primaryNavy = Color(0xFF1E3A5F);
+  static const Color _accentGold = Color(0xFFD4AF37);
+  static const Color _surfaceColor = Color(0xFFF8FAFC);
+
   @override
   Widget build(BuildContext context) {
     final workingShiftGroup = ShiftGroup.getWorkingShiftGroup(_selectedDate);
 
-    // Determine colors based on shift group
+    // Modern color scheme based on shift group
     final isAShift = workingShiftGroup == ShiftGroup.a;
     final gradientColors = isAShift
-        ? [Colors.amber.shade700, Colors.amber.shade500]
-        : [Colors.blue.shade700, Colors.blue.shade500];
+        ? [const Color(0xFFD4AF37), const Color(0xFFF4D03F)]  // Gold gradient
+        : [const Color(0xFF1E3A5F), const Color(0xFF2E5077)];  // Navy gradient
     final shadowColor = isAShift
-        ? Colors.amber.shade700.withOpacity(0.4)
-        : Colors.blue.shade700.withOpacity(0.4);
-    final badgeColor = isAShift ? Colors.amber.shade700 : Colors.blue.shade700;
+        ? const Color(0xFFD4AF37).withOpacity(0.3)
+        : const Color(0xFF1E3A5F).withOpacity(0.3);
+    final badgeColor = isAShift ? const Color(0xFFD4AF37) : const Color(0xFF1E3A5F);
 
     return Scaffold(
+      backgroundColor: _surfaceColor,
       appBar: AppBar(
-        title: const Text('GCSO Staffing Dashboard'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.shield, size: 22),
+            ),
+            const SizedBox(width: 12),
+            const Text('Staffing Dashboard'),
+          ],
+        ),
         actions: [
           Consumer<EmployeeProvider>(
             builder: (context, provider, _) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Center(
-                  child: Text(
-                    'Logged in as: ${provider.currentUser?.fullName ?? "Guest"}',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
+              return Container(
+                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.person, size: 18),
+                    const SizedBox(width: 8),
+                    Text(
+                      provider.currentUser?.fullName ?? "Guest",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
               );
             },
@@ -57,20 +88,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
       body: Consumer2<ScheduleProvider, EmployeeProvider>(
         builder: (context, scheduleProvider, employeeProvider, _) {
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(24.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Date Navigation Header
-                Card(
-                  elevation: 2,
+                // Modern Date Navigation Header
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 20,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(20.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        IconButton(
-                          icon: const Icon(Icons.chevron_left),
+                        _buildNavButton(
+                          icon: Icons.chevron_left_rounded,
                           onPressed: () {
                             setState(() {
                               _selectedDate = _selectedDate
@@ -83,31 +124,48 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           child: Column(
                             children: [
                               Text(
-                                DateFormat('EEEE, MMMM d, yyyy')
-                                    .format(_selectedDate),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                textAlign: TextAlign.center,
+                                DateFormat('EEEE').format(_selectedDate),
+                                style: TextStyle(
+                                  color: _primaryNavy.withOpacity(0.6),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 0.5,
+                                ),
                               ),
                               const SizedBox(height: 4),
+                              Text(
+                                DateFormat('MMMM d, yyyy')
+                                    .format(_selectedDate),
+                                style: const TextStyle(
+                                  color: _primaryNavy,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 8),
                               TextButton.icon(
                                 onPressed: () {
                                   setState(() {
                                     _selectedDate = DateTime.now();
                                   });
                                 },
-                                icon: const Icon(Icons.today, size: 16),
+                                icon: const Icon(Icons.today_rounded, size: 18),
                                 label: const Text('Today'),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: _primaryNavy,
+                                  backgroundColor: _primaryNavy.withOpacity(0.08),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.chevron_right),
+                        _buildNavButton(
+                          icon: Icons.chevron_right_rounded,
                           onPressed: () {
                             setState(() {
                               _selectedDate =
@@ -120,9 +178,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
 
-                // Prominent Working Shift Group Section
+                // Modern Working Shift Group Section
                 Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -130,34 +188,51 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
                         color: shadowColor,
-                        blurRadius: 12,
-                        offset: const Offset(0, 6),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
                       ),
                     ],
                   ),
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
+                  padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 28.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(
+                          isAShift ? Icons.wb_sunny_rounded : Icons.nightlight_round,
+                          color: Colors.white,
+                          size: 32,
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(
-                            isAShift ? Icons.star : Icons.brightness_2,
-                            color: Colors.white,
-                            size: 32,
-                          ),
-                          const SizedBox(width: 12),
                           Text(
-                            '$workingShiftGroup SHIFT WORKING',
-                            style: const TextStyle(
+                            '$workingShiftGroup SHIFT',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.9),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 2,
+                            ),
+                          ),
+                          const Text(
+                            'CURRENTLY WORKING',
+                            style: TextStyle(
                               color: Colors.white,
-                              fontSize: 32,
+                              fontSize: 28,
                               fontWeight: FontWeight.bold,
-                              letterSpacing: 1.2,
+                              letterSpacing: 1,
                             ),
                           ),
                         ],
@@ -165,16 +240,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
 
-                // Staff Breakdown by Shift Type
-                Text(
-                  'Staff Breakdown',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                // Staff Breakdown by Shift Type - Modern Header
+                Row(
+                  children: [
+                    Container(
+                      width: 4,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: _primaryNavy,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Staff Breakdown',
+                      style: TextStyle(
+                        color: _primaryNavy,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
                 // Day Shift
                 _buildShiftTypeSection(
@@ -183,11 +273,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   employeeProvider,
                   'Day Shift',
                   Shift.day,
-                  Icons.wb_sunny,
-                  Colors.orange,
+                  Icons.wb_sunny_rounded,
+                  const Color(0xFFF59E0B),  // Modern amber
                   badgeColor,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
 
                 // Night Shift
                 _buildShiftTypeSection(
@@ -197,10 +287,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   'Night Shift',
                   Shift.night,
                   Icons.nightlight_round,
-                  Colors.indigo,
+                  const Color(0xFF4F46E5),  // Modern indigo
                   badgeColor,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
 
                 // Split Shifts (Combined)
                 _buildSplitShiftsSection(
@@ -212,6 +302,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildNavButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+    required String tooltip,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(12),
+        child: Tooltip(
+          message: tooltip,
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: _primaryNavy.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              color: _primaryNavy,
+              size: 24,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -239,55 +358,84 @@ class _DashboardScreenState extends State<DashboardScreen> {
     // Sort by last name
     supervisors.sort((a, b) => a.lastName.compareTo(b.lastName));
 
-    return Card(
-      elevation: 2,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.15),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(20.0),
             decoration: BoxDecoration(
-              color: color,
+              gradient: LinearGradient(
+                colors: [color, color.withOpacity(0.85)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(12)),
+                  const BorderRadius.vertical(top: Radius.circular(20)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(icon, color: Colors.white, size: 28),
-                    const SizedBox(width: 12),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(icon, color: Colors.white, size: 24),
+                    ),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Text(
                         shiftName,
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
+                          horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Text(
-                        '${shiftEmployees.length} officers',
-                        style: TextStyle(
-                          color: color,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.people_rounded, color: color, size: 18),
+                          const SizedBox(width: 6),
+                          Text(
+                            '${shiftEmployees.length}',
+                            style: TextStyle(
+                              color: color,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
                 if (supervisors.isNotEmpty) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   _buildLieutenantDropdown(
                     context,
                     shiftType,
@@ -298,15 +446,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(20.0),
             child: shiftEmployees.isEmpty
-                ? const Text(
-                    'No officers scheduled',
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                ? Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.info_outline, color: Colors.grey.shade400, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'No officers scheduled',
+                          style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+                        ),
+                      ],
+                    ),
                   )
                 : Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
+                    spacing: 12,
+                    runSpacing: 12,
                     children: shiftEmployees.map((entry) {
                       return _buildEmployeeCard(entry, badgeColor);
                     }).toList(),
@@ -332,91 +494,168 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final totalSplitEmployees =
         split1200Employees.length + split1400Employees.length;
 
-    return Card(
-      elevation: 2,
+    const Color splitColor = Color(0xFF8B5CF6);  // Modern purple
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: splitColor.withOpacity(0.15),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(20.0),
             decoration: BoxDecoration(
-              color: Colors.purple,
+              gradient: LinearGradient(
+                colors: [splitColor, splitColor.withOpacity(0.85)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(12)),
+                  const BorderRadius.vertical(top: Radius.circular(20)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.schedule, color: Colors.white, size: 28),
-                const SizedBox(width: 12),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.schedule_rounded, color: Colors.white, size: 24),
+                ),
+                const SizedBox(width: 14),
                 const Expanded(
                   child: Text(
                     'Split Shifts',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 18,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text(
-                    '$totalSplitEmployees officers',
-                    style: const TextStyle(
-                      color: Colors.purple,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.people_rounded, color: splitColor, size: 18),
+                      const SizedBox(width: 6),
+                      Text(
+                        '$totalSplitEmployees',
+                        style: TextStyle(
+                          color: splitColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (split1200Employees.isEmpty && split1400Employees.isEmpty)
-                  const Text(
-                    'No officers scheduled',
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.info_outline, color: Colors.grey.shade400, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'No officers scheduled',
+                          style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+                        ),
+                      ],
+                    ),
                   )
                 else ...[
                   if (split1200Employees.isNotEmpty) ...[
-                    Text(
-                      'Split-1200 (12:00-24:00)',
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: splitColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.access_time_rounded, color: splitColor, size: 16),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Split-1200 (12:00-24:00)',
+                            style: TextStyle(
+                              color: splitColor,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
                           ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
                     Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                      spacing: 12,
+                      runSpacing: 12,
                       children: split1200Employees.map((entry) {
                         return _buildEmployeeCard(entry, badgeColor,
                             showShiftType: true);
                       }).toList(),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 20),
                   ],
                   if (split1400Employees.isNotEmpty) ...[
-                    Text(
-                      'Split-1400 (14:00-02:00)',
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: splitColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.access_time_rounded, color: splitColor, size: 16),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Split-1400 (14:00-02:00)',
+                            style: TextStyle(
+                              color: splitColor,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
                           ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
                     Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                      spacing: 12,
+                      runSpacing: 12,
                       children: split1400Employees.map((entry) {
                         return _buildEmployeeCard(entry, badgeColor,
                             showShiftType: true);
@@ -440,34 +679,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final selectedLieutenant = _selectedLieutenants[shiftType];
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade300, width: 1),
+        color: Colors.white.withOpacity(0.95),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          const Icon(Icons.supervisor_account, size: 20, color: Colors.black87),
-          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: _accentGold.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(Icons.supervisor_account_rounded, size: 18, color: _accentGold),
+          ),
+          const SizedBox(width: 10),
           const Text(
-            'Shift Supervisor:',
+            'Supervisor:',
             style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF374151),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
           Expanded(
             child: DropdownButton<Employee>(
               value: selectedLieutenant,
               hint: Text(
                 'Select Lieutenant',
-                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
               ),
               isExpanded: true,
               underline: const SizedBox(),
+              icon: Icon(Icons.keyboard_arrow_down_rounded, color: _primaryNavy),
               items: supervisors.map((employee) {
                 return DropdownMenuItem<Employee>(
                   value: employee,
@@ -494,7 +740,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   /// Get color for supervisor based on rank
   Color _getSupervisorColor(Employee employee) {
     // Only LT can be supervisors now
-    return Colors.amber.shade700; // Gold for lieutenants
+    return _accentGold; // Gold for lieutenants
   }
 
   /// Build supervisor text widget with appropriate styling
@@ -505,8 +751,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       textAlign: TextAlign.center,
       style: TextStyle(
         color: textColor,
-        fontWeight: FontWeight.bold,
-        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        fontSize: 13,
       ),
     );
   }
@@ -515,11 +761,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       {bool showShiftType = false}) {
     return Container(
       constraints: const BoxConstraints(minWidth: 180),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade300),
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.grey.shade200),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -528,47 +774,73 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: badgeColor.withOpacity(0.2),
-                child: Text(
-                  entry.employee.rank,
-                  style: TextStyle(
-                    color: badgeColor,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [badgeColor, badgeColor.withOpacity(0.8)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Center(
+                  child: Text(
+                    entry.employee.rank,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               Flexible(
                 child: Text(
                   '${entry.employee.rank} ${entry.employee.lastName}',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
                     fontSize: 14,
+                    color: _primaryNavy,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            'Badge: ${entry.employee.badgeNumber}',
-            style: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: 12,
-            ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.badge_outlined, size: 14, color: Colors.grey.shade500),
+              const SizedBox(width: 4),
+              Text(
+                '#${entry.employee.badgeNumber}',
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
           if (showShiftType) ...[
-            const SizedBox(height: 4),
-            Text(
-              entry.shift,
-              style: TextStyle(
-                color: Colors.purple.shade700,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
+            const SizedBox(height: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFF8B5CF6).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                entry.shift,
+                style: const TextStyle(
+                  color: Color(0xFF8B5CF6),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],
