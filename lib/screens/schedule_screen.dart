@@ -15,97 +15,168 @@ class ScheduleScreen extends StatefulWidget {
 class _ScheduleScreenState extends State<ScheduleScreen> {
   DateTime _selectedDate = DateTime.now();
 
+  // Modern color palette
+  static const Color _primaryNavy = Color(0xFF1E3A5F);
+  static const Color _surfaceColor = Color(0xFFF8FAFC);
+  static const Color _accentGold = Color(0xFFD4AF37);
+
   @override
   Widget build(BuildContext context) {
     final employeeProvider = context.watch<EmployeeProvider>();
     final isSupervisor = employeeProvider.isCurrentUserSupervisor;
 
     return Scaffold(
+      backgroundColor: _surfaceColor,
       appBar: AppBar(
-        title: const Text('Schedule Management'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.calendar_month_rounded, size: 22),
+            ),
+            const SizedBox(width: 12),
+            const Text('Schedule Management'),
+          ],
+        ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.calendar_today),
-            onPressed: () => _selectDate(context),
-            tooltip: 'Select Date',
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.date_range_rounded),
+              onPressed: () => _selectDate(context),
+              tooltip: 'Select Date',
+            ),
           ),
         ],
       ),
       body: Consumer<ScheduleProvider>(
         builder: (context, scheduleProvider, _) {
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(24.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Schedule',
-                          style: Theme.of(context).textTheme.headlineMedium,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          DateFormat('EEEE, MMMM d, yyyy').format(_selectedDate),
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Colors.grey[600],
+                // Modern date navigation header
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 20,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            DateFormat('EEEE').format(_selectedDate),
+                            style: TextStyle(
+                              color: _primaryNavy.withOpacity(0.6),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            DateFormat('MMMM d, yyyy').format(_selectedDate),
+                            style: const TextStyle(
+                              color: _primaryNavy,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          _buildNavButton(
+                            icon: Icons.chevron_left_rounded,
+                            onPressed: () {
+                              setState(() {
+                                _selectedDate = _selectedDate.subtract(const Duration(days: 1));
+                              });
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          TextButton.icon(
+                            onPressed: () {
+                              setState(() {
+                                _selectedDate = DateTime.now();
+                              });
+                            },
+                            icon: const Icon(Icons.today_rounded, size: 18),
+                            label: const Text('Today'),
+                            style: TextButton.styleFrom(
+                              foregroundColor: _primaryNavy,
+                              backgroundColor: _primaryNavy.withOpacity(0.08),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
                               ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.chevron_left),
-                          onPressed: () {
-                            setState(() {
-                              _selectedDate = _selectedDate.subtract(const Duration(days: 1));
-                            });
-                          },
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            setState(() {
-                              _selectedDate = DateTime.now();
-                            });
-                          },
-                          child: const Text('Today'),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.chevron_right),
-                          onPressed: () {
-                            setState(() {
-                              _selectedDate = _selectedDate.add(const Duration(days: 1));
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          _buildNavButton(
+                            icon: Icons.chevron_right_rounded,
+                            onPressed: () {
+                              setState(() {
+                                _selectedDate = _selectedDate.add(const Duration(days: 1));
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 if (!isSupervisor)
                   Container(
                     padding: const EdgeInsets.all(16.0),
                     decoration: BoxDecoration(
-                      color: Colors.amber[50],
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.amber),
+                      color: _accentGold.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: _accentGold.withOpacity(0.3)),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
-                        Icon(Icons.info_outline, color: Colors.amber),
-                        SizedBox(width: 8),
-                        Text('Only supervisors can modify the schedule.'),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: _accentGold.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(Icons.info_outline_rounded, color: _accentGold, size: 20),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Only supervisors can modify the schedule.',
+                          style: TextStyle(
+                            color: _accentGold.withOpacity(0.9),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 ..._buildScheduleCards(context, scheduleProvider, isSupervisor),
               ],
             ),
@@ -119,19 +190,48 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 FloatingActionButton.extended(
                   onPressed: () => _showGenerateSchedulesDialog(context),
                   label: const Text('Generate Schedules'),
-                  icon: const Icon(Icons.auto_awesome),
+                  icon: const Icon(Icons.auto_awesome_rounded),
                   heroTag: 'generate',
+                  backgroundColor: _accentGold,
+                  foregroundColor: Colors.white,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 FloatingActionButton.extended(
                   onPressed: () => _showAddScheduleDialog(context),
                   label: const Text('Add Schedule'),
-                  icon: const Icon(Icons.add),
+                  icon: const Icon(Icons.add_rounded),
                   heroTag: 'add',
+                  backgroundColor: _primaryNavy,
+                  foregroundColor: Colors.white,
                 ),
               ],
             )
           : null,
+    );
+  }
+
+  Widget _buildNavButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: _primaryNavy.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            icon,
+            color: _primaryNavy,
+            size: 22,
+          ),
+        ),
+      ),
     );
   }
 
@@ -158,33 +258,80 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     return shiftOrder.where((shift) => shiftGroups.containsKey(shift)).map((shift) {
       final shiftEntries = shiftGroups[shift]!;
       final onDutyCount = shiftEntries.where((e) => e.isOnDuty).length;
+      final shiftColor = _getShiftColor(shift);
       
-      return Card(
+      return Container(
         margin: const EdgeInsets.only(bottom: 16.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: shiftColor.withOpacity(0.15),
+              blurRadius: 20,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(18.0),
               decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.2),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                gradient: LinearGradient(
+                  colors: [shiftColor, shiftColor.withOpacity(0.85)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
               ),
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.access_time,
-                    color: Colors.blue,
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      _getShiftIcon(shift),
+                      color: Colors.white,
+                      size: 22,
+                    ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 14),
                   Text(
-                    '${shift} Shift',
-                    style: Theme.of(context).textTheme.titleLarge,
+                    '$shift Shift',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                   const Spacer(),
-                  Text(
-                    '$onDutyCount on duty',
-                    style: TextStyle(color: Colors.grey[600]),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.people_rounded, color: shiftColor, size: 16),
+                        const SizedBox(width: 6),
+                        Text(
+                          '$onDutyCount',
+                          style: TextStyle(
+                            color: shiftColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -200,10 +347,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: OutlinedButton.icon(
                   onPressed: () => _showAddFillInDialog(context, shift),
-                  icon: const Icon(Icons.person_add),
+                  icon: const Icon(Icons.person_add_rounded),
                   label: const Text('Add Fill-in'),
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 48),
+                    foregroundColor: _primaryNavy,
+                    side: BorderSide(color: _primaryNavy.withOpacity(0.3)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
               ),
@@ -211,6 +363,34 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         ),
       );
     }).toList();
+  }
+
+  Color _getShiftColor(String shift) {
+    switch (shift) {
+      case Shift.day:
+        return const Color(0xFFF59E0B);  // Amber
+      case Shift.night:
+        return const Color(0xFF4F46E5);  // Indigo
+      case Shift.split1200:
+      case Shift.split1400:
+        return const Color(0xFF8B5CF6);  // Purple
+      default:
+        return _primaryNavy;
+    }
+  }
+
+  IconData _getShiftIcon(String shift) {
+    switch (shift) {
+      case Shift.day:
+        return Icons.wb_sunny_rounded;
+      case Shift.night:
+        return Icons.nightlight_round;
+      case Shift.split1200:
+      case Shift.split1400:
+        return Icons.schedule_rounded;
+      default:
+        return Icons.access_time_rounded;
+    }
   }
 
   Widget _buildScheduleEntryTile(
@@ -224,54 +404,134 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     final isTemporary = entry.isTemporary;
     
     // Visual distinction for temporary employees
-    final backgroundColor = isTemporary ? Colors.blue.withOpacity(0.05) : null;
-    final leadingIcon = isTemporary ? '👥' : '👤';
+    final backgroundColor = isTemporary 
+        ? const Color(0xFF4F46E5).withOpacity(0.05) 
+        : Colors.white;
     
     return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
         color: backgroundColor,
+        borderRadius: BorderRadius.circular(12),
         border: isTemporary 
-            ? Border.all(color: Colors.blue.withOpacity(0.3), style: BorderStyle.solid)
-            : null,
+            ? Border.all(color: const Color(0xFF4F46E5).withOpacity(0.2))
+            : Border.all(color: Colors.grey.shade100),
       ),
       child: ListTile(
-        leading: isAbsent
-            ? CircleAvatar(
-                backgroundColor: Colors.grey[400],
-                child: Text(
-                  entry.employee.firstName[0] + entry.employee.lastName[0],
-                  style: const TextStyle(color: Colors.white),
-                ),
-              )
-            : CircleAvatar(
-                backgroundColor: isTemporary ? Colors.blue[300] : Colors.green,
-                child: Text(
-                  leadingIcon,
-                  style: const TextStyle(fontSize: 20),
-                ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        leading: Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: isAbsent
+                  ? [Colors.grey.shade400, Colors.grey.shade500]
+                  : isTemporary
+                      ? [const Color(0xFF4F46E5), const Color(0xFF7C3AED)]
+                      : [const Color(0xFF10B981), const Color(0xFF059669)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Center(
+            child: Text(
+              entry.employee.firstName[0] + entry.employee.lastName[0],
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
               ),
-        title: Text(
-          isAbsent ? '${entry.employee.fullName} (Absent)' : entry.employee.fullName,
-          style: TextStyle(
-            color: isAbsent ? Colors.grey : null,
-            decoration: isAbsent ? TextDecoration.lineThrough : null,
+            ),
           ),
         ),
-        subtitle: Text(
-          '${entry.shift} Shift • Badge: ${entry.employee.badgeNumber}${isTemporary ? ' • Fill-in' : ''}',
-          style: TextStyle(color: isAbsent ? Colors.grey : null),
+        title: Row(
+          children: [
+            Flexible(
+              child: Text(
+                isAbsent ? '${entry.employee.fullName} (Absent)' : entry.employee.fullName,
+                style: TextStyle(
+                  color: isAbsent ? Colors.grey.shade500 : _primaryNavy,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                  decoration: isAbsent ? TextDecoration.lineThrough : null,
+                ),
+              ),
+            ),
+            if (isTemporary) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF4F46E5).withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Text(
+                  'Fill-in',
+                  style: TextStyle(
+                    color: Color(0xFF4F46E5),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Row(
+            children: [
+              Icon(Icons.badge_outlined, size: 14, color: Colors.grey.shade500),
+              const SizedBox(width: 4),
+              Text(
+                '#${entry.employee.badgeNumber}',
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontSize: 13,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Icon(Icons.access_time_rounded, size: 14, color: Colors.grey.shade500),
+              const SizedBox(width: 4),
+              Text(
+                entry.shift,
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (!isAbsent)
-              Chip(
-                label: Text(isTemporary ? 'Fill-in' : 'On Duty'),
-                backgroundColor: isTemporary ? Colors.blue[100] : Colors.green[100],
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isTemporary 
+                      ? const Color(0xFF4F46E5).withOpacity(0.1) 
+                      : const Color(0xFF10B981).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  isTemporary ? 'Fill-in' : 'On Duty',
+                  style: TextStyle(
+                    color: isTemporary ? const Color(0xFF4F46E5) : const Color(0xFF059669),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                ),
               ),
             if (isSupervisor) ...[
               const SizedBox(width: 8),
               PopupMenuButton<String>(
+                icon: Icon(Icons.more_vert_rounded, color: Colors.grey.shade600),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 onSelected: (value) {
                   if (value == 'markAbsent') {
                     scheduleProvider.markEmployeeAbsent(entry.id, true);

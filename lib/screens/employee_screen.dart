@@ -7,6 +7,10 @@ import '../providers/providers.dart';
 class EmployeeScreen extends StatelessWidget {
   const EmployeeScreen({super.key});
 
+  // Modern color palette
+  static const Color _primaryNavy = Color(0xFF1E3A5F);
+  static const Color _surfaceColor = Color(0xFFF8FAFC);
+
   /// Helper method to check if a rank can be a supervisor
   static bool _canBeSupervisor(String rank) {
     return rank == Rank.lieutenant;
@@ -15,88 +19,181 @@ class EmployeeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: _surfaceColor,
       appBar: AppBar(
-        title: const Text('Employees'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.people_rounded, size: 22),
+            ),
+            const SizedBox(width: 12),
+            const Text('Employee Directory'),
+          ],
+        ),
       ),
       body: Consumer<EmployeeProvider>(
         builder: (context, employeeProvider, _) {
           final employees = employeeProvider.employees;
           
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(24.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Patrol Division - Employee Directory',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'All Patrol staff members - ${employees.length} total',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey[600],
+                // Modern header section
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 20,
+                        offset: const Offset(0, 4),
                       ),
-                ),
-                const SizedBox(height: 24),
-                Card(
-                  margin: const EdgeInsets.only(bottom: 16.0),
-                  child: Column(
+                    ],
+                  ),
+                  child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                          gradient: LinearGradient(
+                            colors: [_primaryNavy, _primaryNavy.withOpacity(0.8)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                        child: Row(
+                        child: const Icon(
+                          Icons.directions_car_rounded,
+                          color: Colors.white,
+                          size: 32,
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(
-                              Icons.directions_car,
-                              color: Colors.white,
-                              size: 32,
-                            ),
-                            const SizedBox(width: 12),
                             Text(
                               'Patrol Division',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
+                              style: TextStyle(
+                                color: _primaryNavy,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Employee Directory',
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: _primaryNavy.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.people_rounded, color: _primaryNavy, size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${employees.length} Total',
+                              style: TextStyle(
+                                color: _primaryNavy,
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
                         ),
                       ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Section header
+                Row(
+                  children: [
+                    Container(
+                      width: 4,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: _primaryNavy,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'All Staff Members',
+                      style: TextStyle(
+                        color: _primaryNavy,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Employee list with modern cards
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 20,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
                       if (employees.isEmpty)
-                        const ListTile(
-                          title: Text('No employees assigned'),
+                        Padding(
+                          padding: const EdgeInsets.all(32.0),
+                          child: Column(
+                            children: [
+                              Icon(Icons.person_off_rounded, size: 48, color: Colors.grey.shade300),
+                              const SizedBox(height: 12),
+                              Text(
+                                'No employees assigned',
+                                style: TextStyle(color: Colors.grey.shade500, fontSize: 16),
+                              ),
+                            ],
+                          ),
                         )
                       else
-                        ...employees.map((employee) => ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: Colors.blue,
-                                child: Text(
-                                  employee.rank,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              title: Text('${employee.rank} ${employee.lastName} #${employee.badgeNumber}'),
-                              subtitle: Text(
-                                '${employee.firstName} ${employee.lastName}${employee.isSupervisor ? " • Supervisor" : ""}\n${employee.shiftAssignment}',
-                              ),
-                              trailing: employeeProvider.isCurrentUserSupervisor
-                                  ? IconButton(
-                                      icon: const Icon(Icons.edit),
-                                      onPressed: () => _showEditEmployeeDialog(context, employee),
-                                    )
-                                  : null,
-                            )),
+                        ...employees.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final employee = entry.value;
+                          final isLast = index == employees.length - 1;
+                          
+                          return _buildEmployeeListItem(
+                            context,
+                            employee,
+                            employeeProvider,
+                            isLast: isLast,
+                          );
+                        }),
                     ],
                   ),
                 ),
@@ -113,11 +210,178 @@ class EmployeeScreen extends StatelessWidget {
           return FloatingActionButton.extended(
             onPressed: () => _showAddEmployeeDialog(context),
             label: const Text('Add Employee'),
-            icon: const Icon(Icons.person_add),
+            icon: const Icon(Icons.person_add_rounded),
+            backgroundColor: _primaryNavy,
+            foregroundColor: Colors.white,
           );
         },
       ),
     );
+  }
+
+  Widget _buildEmployeeListItem(
+    BuildContext context,
+    Employee employee,
+    EmployeeProvider employeeProvider, {
+    required bool isLast,
+  }) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      _getRankColor(employee.rank),
+                      _getRankColor(employee.rank).withOpacity(0.8),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Center(
+                  child: Text(
+                    employee.rank,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          '${employee.rank} ${employee.lastName}',
+                          style: TextStyle(
+                            color: _primaryNavy,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: _primaryNavy.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            '#${employee.badgeNumber}',
+                            style: TextStyle(
+                              color: _primaryNavy,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        if (employee.isSupervisor) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFD4AF37).withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.star_rounded, size: 12, color: Color(0xFFD4AF37)),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Supervisor',
+                                  style: TextStyle(
+                                    color: Color(0xFFD4AF37),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${employee.firstName} ${employee.lastName}',
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      employee.shiftAssignment,
+                      style: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (employeeProvider.isCurrentUserSupervisor)
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => _showEditEmployeeDialog(context, employee),
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: _primaryNavy.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        Icons.edit_rounded,
+                        size: 18,
+                        color: _primaryNavy,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        if (!isLast)
+          Divider(
+            height: 1,
+            indent: 80,
+            endIndent: 16,
+            color: Colors.grey.shade100,
+          ),
+      ],
+    );
+  }
+
+  Color _getRankColor(String rank) {
+    switch (rank) {
+      case Rank.captain:
+        return const Color(0xFFD4AF37); // Gold
+      case Rank.lieutenant:
+        return const Color(0xFFD4AF37); // Gold
+      case Rank.sergeantFirstClass:
+        return const Color(0xFF4F46E5); // Indigo
+      case Rank.sergeant:
+        return const Color(0xFF4F46E5); // Indigo
+      case Rank.corporal:
+        return const Color(0xFF0EA5E9); // Sky blue
+      default:
+        return _primaryNavy;
+    }
   }
 
   void _showAddEmployeeDialog(BuildContext context) {

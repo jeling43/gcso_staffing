@@ -29,12 +29,89 @@ class GCSOStaffingApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.indigo,
+            seedColor: const Color(0xFF1E3A5F), // Deep navy blue
             brightness: Brightness.light,
           ),
           useMaterial3: true,
-          appBarTheme: const AppBarTheme(
+          appBarTheme: AppBarTheme(
             centerTitle: false,
+            elevation: 0,
+            scrolledUnderElevation: 2,
+            backgroundColor: const Color(0xFF1E3A5F),
+            foregroundColor: Colors.white,
+            titleTextStyle: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+            ),
+          ),
+          cardTheme: CardTheme(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            clipBehavior: Clip.antiAlias,
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+          floatingActionButtonTheme: const FloatingActionButtonThemeData(
+            elevation: 2,
+            highlightElevation: 4,
+          ),
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            fillColor: Colors.grey.shade50,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey.shade200),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFF1E3A5F), width: 2),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          ),
+          navigationRailTheme: NavigationRailThemeData(
+            backgroundColor: const Color(0xFF1E3A5F),
+            selectedIconTheme: const IconThemeData(color: Colors.white, size: 26),
+            unselectedIconTheme: IconThemeData(color: Colors.white.withOpacity(0.7), size: 24),
+            selectedLabelTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+            unselectedLabelTextStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+            indicatorColor: Colors.white.withOpacity(0.2),
+          ),
+          navigationBarTheme: NavigationBarThemeData(
+            backgroundColor: Colors.white,
+            elevation: 8,
+            indicatorColor: const Color(0xFF1E3A5F).withOpacity(0.15),
+            labelTextStyle: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
+                return const TextStyle(
+                  color: Color(0xFF1E3A5F),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                );
+              }
+              return TextStyle(
+                color: Colors.grey.shade600,
+                fontWeight: FontWeight.w500,
+                fontSize: 12,
+              );
+            }),
+          ),
+          dividerTheme: DividerThemeData(
+            color: Colors.grey.shade200,
+            thickness: 1,
           ),
         ),
         home: const MainNavigationShell(),
@@ -67,6 +144,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
         // Use rail navigation for larger screens
         if (constraints.maxWidth > 600) {
           return Scaffold(
+            backgroundColor: Colors.grey.shade50,
             body: Row(
               children: [
                 NavigationRail(
@@ -75,6 +153,49 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                     setState(() => _selectedIndex = index);
                   },
                   extended: constraints.maxWidth > 800,
+                  leading: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24.0),
+                    child: constraints.maxWidth > 800
+                        ? Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Icon(
+                                  Icons.shield,
+                                  color: Colors.white,
+                                  size: 28,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              const Text(
+                                'GCSO',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 1,
+                                ),
+                              ),
+                            ],
+                          )
+                        : Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(
+                              Icons.shield,
+                              color: Colors.white,
+                              size: 28,
+                            ),
+                          ),
+                  ),
                   destinations: const [
                     NavigationRailDestination(
                       icon: Icon(Icons.dashboard_outlined),
@@ -93,8 +214,24 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                     ),
                   ],
                 ),
-                const VerticalDivider(thickness: 1, width: 1),
-                Expanded(child: _screens[_selectedIndex]),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(24),
+                        bottomLeft: Radius.circular(24),
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(24),
+                        bottomLeft: Radius.circular(24),
+                      ),
+                      child: _screens[_selectedIndex],
+                    ),
+                  ),
+                ),
               ],
             ),
           );
@@ -102,29 +239,41 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
 
         // Use bottom navigation for smaller screens
         return Scaffold(
+          backgroundColor: Colors.grey.shade50,
           body: _screens[_selectedIndex],
-          bottomNavigationBar: NavigationBar(
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: (index) {
-              setState(() => _selectedIndex = index);
-            },
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.dashboard_outlined),
-                selectedIcon: Icon(Icons.dashboard),
-                label: 'Dashboard',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.people_outlined),
-                selectedIcon: Icon(Icons.people),
-                label: 'Employees',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.calendar_today_outlined),
-                selectedIcon: Icon(Icons.calendar_today),
-                label: 'Schedule',
-              ),
-            ],
+          bottomNavigationBar: Container(
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 20,
+                  offset: const Offset(0, -5),
+                ),
+              ],
+            ),
+            child: NavigationBar(
+              selectedIndex: _selectedIndex,
+              onDestinationSelected: (index) {
+                setState(() => _selectedIndex = index);
+              },
+              destinations: const [
+                NavigationDestination(
+                  icon: Icon(Icons.dashboard_outlined),
+                  selectedIcon: Icon(Icons.dashboard),
+                  label: 'Dashboard',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.people_outlined),
+                  selectedIcon: Icon(Icons.people),
+                  label: 'Employees',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.calendar_today_outlined),
+                  selectedIcon: Icon(Icons.calendar_today),
+                  label: 'Schedule',
+                ),
+              ],
+            ),
           ),
         );
       },
