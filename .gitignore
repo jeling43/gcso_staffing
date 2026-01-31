@@ -43,3 +43,4 @@ app.*.map.json
 
 # Web related
 lib/generated_plugin_registrant.dart
+flutter_linux_3.27.3-stable.tar.xz
