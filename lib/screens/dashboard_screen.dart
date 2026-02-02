@@ -32,12 +32,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     // Modern color scheme based on shift group
     final isAShift = workingShiftGroup == ShiftGroup.a;
     final gradientColors = isAShift
-        ? [const Color(0xFFD4AF37), const Color(0xFFF4D03F)]  // Gold gradient
-        : [const Color(0xFF1E3A5F), const Color(0xFF2E5077)];  // Navy gradient
+        ? [const Color(0xFFD4AF37), const Color(0xFFF4D03F)] // Gold gradient
+        : [const Color(0xFF1E3A5F), const Color(0xFF2E5077)]; // Navy gradient
     final shadowColor = isAShift
         ? const Color(0xFFD4AF37).withOpacity(0.3)
         : const Color(0xFF1E3A5F).withOpacity(0.3);
-    final badgeColor = isAShift ? const Color(0xFFD4AF37) : const Color(0xFF1E3A5F);
+    final badgeColor =
+        isAShift ? const Color(0xFFD4AF37) : const Color(0xFF1E3A5F);
 
     return Scaffold(
       backgroundColor: _surfaceColor,
@@ -61,7 +62,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             builder: (context, provider, _) {
               return Container(
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(20),
@@ -154,8 +156,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 label: const Text('Today'),
                                 style: TextButton.styleFrom(
                                   foregroundColor: _primaryNavy,
-                                  backgroundColor: _primaryNavy.withOpacity(0.08),
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  backgroundColor:
+                                      _primaryNavy.withOpacity(0.08),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 8),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
@@ -197,7 +201,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ],
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 28.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 32.0, vertical: 28.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -208,7 +213,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Icon(
-                          isAShift ? Icons.wb_sunny_rounded : Icons.nightlight_round,
+                          isAShift
+                              ? Icons.wb_sunny_rounded
+                              : Icons.nightlight_round,
                           color: Colors.white,
                           size: 32,
                         ),
@@ -274,7 +281,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   'Day Shift',
                   Shift.day,
                   Icons.wb_sunny_rounded,
-                  const Color(0xFFF59E0B),  // Modern amber
+                  const Color(0xFFF59E0B), // Modern amber
                   badgeColor,
                 ),
                 const SizedBox(height: 16),
@@ -287,7 +294,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   'Night Shift',
                   Shift.night,
                   Icons.nightlight_round,
-                  const Color(0xFF4F46E5),  // Modern indigo
+                  const Color(0xFF4F46E5), // Modern indigo
                   badgeColor,
                 ),
                 const SizedBox(height: 16),
@@ -352,7 +359,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     // Get ALL supervisors (LT only) from employee provider, not just those on this shift
     final supervisors = employeeProvider.employees
-        .where((e) => e.rank == Rank.lieutenant)
+        .where((e) => e.rank == Rank.lieutenant && e.isSupervisor == true)
         .toList();
 
     // Sort by last name
@@ -457,11 +464,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.info_outline, color: Colors.grey.shade400, size: 20),
+                        Icon(Icons.info_outline,
+                            color: Colors.grey.shade400, size: 20),
                         const SizedBox(width: 8),
                         Text(
                           'No officers scheduled',
-                          style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+                          style: TextStyle(
+                              color: Colors.grey.shade500, fontSize: 14),
                         ),
                       ],
                     ),
@@ -494,7 +503,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final totalSplitEmployees =
         split1200Employees.length + split1400Employees.length;
 
-    const Color splitColor = Color(0xFF8B5CF6);  // Modern purple
+    const Color splitColor = Color(0xFF8B5CF6); // Modern purple
 
     return Container(
       decoration: BoxDecoration(
@@ -530,7 +539,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.schedule_rounded, color: Colors.white, size: 24),
+                  child: const Icon(Icons.schedule_rounded,
+                      color: Colors.white, size: 24),
                 ),
                 const SizedBox(width: 14),
                 const Expanded(
@@ -585,11 +595,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.info_outline, color: Colors.grey.shade400, size: 20),
+                        Icon(Icons.info_outline,
+                            color: Colors.grey.shade400, size: 20),
                         const SizedBox(width: 8),
                         Text(
                           'No officers scheduled',
-                          style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+                          style: TextStyle(
+                              color: Colors.grey.shade500, fontSize: 14),
                         ),
                       ],
                     ),
@@ -597,7 +609,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 else ...[
                   if (split1200Employees.isNotEmpty) ...[
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
                         color: splitColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
@@ -605,7 +618,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.access_time_rounded, color: splitColor, size: 16),
+                          Icon(Icons.access_time_rounded,
+                              color: splitColor, size: 16),
                           const SizedBox(width: 8),
                           Text(
                             'Split-1200 (12:00-24:00)',
@@ -631,7 +645,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ],
                   if (split1400Employees.isNotEmpty) ...[
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
                         color: splitColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
@@ -639,7 +654,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.access_time_rounded, color: splitColor, size: 16),
+                          Icon(Icons.access_time_rounded,
+                              color: splitColor, size: 16),
                           const SizedBox(width: 8),
                           Text(
                             'Split-1400 (14:00-02:00)',
@@ -692,7 +708,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               color: _accentGold.withOpacity(0.2),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(Icons.supervisor_account_rounded, size: 18, color: _accentGold),
+            child: Icon(Icons.supervisor_account_rounded,
+                size: 18, color: _accentGold),
           ),
           const SizedBox(width: 10),
           const Text(
@@ -713,7 +730,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               isExpanded: true,
               underline: const SizedBox(),
-              icon: Icon(Icons.keyboard_arrow_down_rounded, color: _primaryNavy),
+              icon:
+                  Icon(Icons.keyboard_arrow_down_rounded, color: _primaryNavy),
               items: supervisors.map((employee) {
                 return DropdownMenuItem<Employee>(
                   value: employee,
