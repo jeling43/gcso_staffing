@@ -6,7 +6,7 @@ A modern Flutter web application for the Sheriff's Office Patrol Division that t
 
 - **Shift-Based Dashboard**: Real-time view of staff on duty by shift (Day, Night, Split)
 - **Employee Management**: Manage Patrol employees with shift assignments
-- **Schedule Management**: Supervisors can update schedules for employees across different shifts
+- **Schedule Management**: Anyone can view and update schedules for employees across different shifts
 - **Responsive Design**: Works on desktop and mobile browsers
 
 ## Shifts
@@ -30,11 +30,6 @@ The application tracks staffing across three shifts in the Patrol Division with 
 - When B is working, A is off, and vice versa
 
 Total: 12 Patrol Division employees
-
-## User Roles
-
-- **Supervisors**: Can add/edit employees and update schedules
-- **Regular Employees**: Can view staffing information and schedules
 
 ## Getting Started
 

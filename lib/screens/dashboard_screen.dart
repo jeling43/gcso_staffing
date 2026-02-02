@@ -57,35 +57,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const Text('Staffing Dashboard'),
           ],
         ),
-        actions: [
-          Consumer<EmployeeProvider>(
-            builder: (context, provider, _) {
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.person, size: 18),
-                    const SizedBox(width: 8),
-                    Text(
-                      provider.currentUser?.fullName ?? "Guest",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ],
       ),
       body: Consumer2<ScheduleProvider, EmployeeProvider>(
         builder: (context, scheduleProvider, employeeProvider, _) {
