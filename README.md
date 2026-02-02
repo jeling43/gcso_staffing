@@ -63,6 +63,29 @@ flutter build web
 
 The built files will be in `build/web/`.
 
+### Deploying to GitHub Pages
+
+This repository includes a GitHub Actions workflow for deploying to GitHub Pages:
+
+1. **Enable GitHub Pages** in your repository:
+   - Go to Settings → Pages
+   - Under "Source", select "GitHub Actions"
+
+2. **Run the deployment workflow**:
+   - Go to the Actions tab
+   - Select "Deploy [GitHub Pages]"
+   - Click "Run workflow"
+   - Select the branch (usually `main`)
+   - Click "Run workflow"
+
+3. Once the workflow completes, your app will be available at:
+   `https://[username].github.io/[repository-name]/`
+
+The workflow will:
+- Build the Flutter web app
+- Upload the build artifacts
+- Deploy to GitHub Pages
+
 ## Project Structure
 
 ```
