@@ -147,36 +147,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                if (!isSupervisor)
-                  Container(
-                    padding: const EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: _accentGold.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: _accentGold.withOpacity(0.3)),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: _accentGold.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(Icons.info_outline_rounded, color: _accentGold, size: 20),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          'Only supervisors can modify the schedule.',
-                          style: TextStyle(
-                            color: _accentGold.withOpacity(0.9),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                const SizedBox(height: 20),
                 ..._buildScheduleCards(context, scheduleProvider, isSupervisor),
               ],
             ),

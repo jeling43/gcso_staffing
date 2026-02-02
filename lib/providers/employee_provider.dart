@@ -4,11 +4,10 @@ import '../models/models.dart';
 /// Provider for managing employees across the application
 class EmployeeProvider extends ChangeNotifier {
   final List<Employee> _employees = [];
-  Employee? _currentUser;
 
   List<Employee> get employees => List.unmodifiable(_employees);
-  Employee? get currentUser => _currentUser;
-  bool get isCurrentUserSupervisor => _currentUser?.isSupervisor ?? false;
+  // Everyone can modify schedule - no user authentication
+  bool get isCurrentUserSupervisor => true;
 
   EmployeeProvider() {
     _initializeSampleData();
@@ -547,14 +546,6 @@ class EmployeeProvider extends ChangeNotifier {
         employmentStatus: EmploymentStatus.fullTime,
       ),
     ]);
-
-    // Set default current user as supervisor
-    _currentUser = _employees.first;
-  }
-
-  void setCurrentUser(Employee? employee) {
-    _currentUser = employee;
-    notifyListeners();
   }
 
   List<Employee> getEmployeesByDivision(Division division) {
