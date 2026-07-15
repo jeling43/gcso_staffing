@@ -133,6 +133,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
 
   static const List<Widget> _screens = [
     DashboardScreen(),
+    BadgeDashboardScreen(),
     EmployeeScreen(),
     ScheduleScreen(),
   ];
@@ -203,6 +204,11 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                       label: Text('Dashboard'),
                     ),
                     NavigationRailDestination(
+                      icon: Icon(Icons.badge_outlined),
+                      selectedIcon: Icon(Icons.badge),
+                      label: Text('Badges'),
+                    ),
+                    NavigationRailDestination(
                       icon: Icon(Icons.people_outlined),
                       selectedIcon: Icon(Icons.people),
                       label: Text('Employees'),
@@ -261,6 +267,11 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                   icon: Icon(Icons.dashboard_outlined),
                   selectedIcon: Icon(Icons.dashboard),
                   label: 'Dashboard',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.badge_outlined),
+                  selectedIcon: Icon(Icons.badge),
+                  label: 'Badges',
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.people_outlined),
