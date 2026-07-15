@@ -20,25 +20,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Shift.night: null,
   };
 
-  // Modern color palette
-  static const Color _primaryNavy = Color(0xFF1E3A5F);
-  static const Color _accentGold = Color(0xFFD4AF37);
-  static const Color _surfaceColor = Color(0xFFF8FAFC);
+  // Design tokens — HCI-compliant (WCAG AA contrast ratios)
+  static const Color _primaryNavy = Color(0xFF0F172A);     // Slate-900: high contrast
+  static const Color _accentGold = Color(0xFFB45309);      // Amber-700: AA on white
+  static const Color _surfaceColor = Color(0xFFF8FAFC);    // Slate-50
+  static const Color _onDutyGreen = Color(0xFF059669);     // Emerald-600
+  static const Color _dayShiftColor = Color(0xFFD97706);   // Amber-600
+  static const Color _nightShiftColor = Color(0xFF4338CA); // Indigo-700
+  static const Color _splitShiftColor = Color(0xFF7C3AED); // Violet-600
 
   @override
   Widget build(BuildContext context) {
     final workingShiftGroup = ShiftGroup.getWorkingShiftGroup(_selectedDate);
 
-    // Modern color scheme based on shift group
+    // HCI-compliant shift group colors — high contrast, consistent semantics
     final isAShift = workingShiftGroup == ShiftGroup.a;
     final gradientColors = isAShift
-        ? [const Color(0xFFD4AF37), const Color(0xFFF4D03F)] // Gold gradient
-        : [const Color(0xFF1E3A5F), const Color(0xFF2E5077)]; // Navy gradient
+        ? [const Color(0xFF0369A1), const Color(0xFF0284C7)] // Sky-700→600
+        : [const Color(0xFF0F172A), const Color(0xFF1E293B)]; // Slate-900→800
     final shadowColor = isAShift
-        ? const Color(0xFFD4AF37).withOpacity(0.3)
-        : const Color(0xFF1E3A5F).withOpacity(0.3);
+        ? const Color(0xFF0369A1).withOpacity(0.25)
+        : const Color(0xFF0F172A).withOpacity(0.25);
     final badgeColor =
-        isAShift ? const Color(0xFFD4AF37) : const Color(0xFF1E3A5F);
+        isAShift ? const Color(0xFF0369A1) : const Color(0xFF0F172A);
 
     return Scaffold(
       backgroundColor: _surfaceColor,
@@ -54,7 +58,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: const Icon(Icons.shield, size: 22),
             ),
             const SizedBox(width: 12),
-            const Text('Staffing Dashboard'),
+            const Text('Admin Dashboard'),
           ],
         ),
       ),
@@ -252,7 +256,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   'Day Shift',
                   Shift.day,
                   Icons.wb_sunny_rounded,
-                  const Color(0xFFF59E0B), // Modern amber
+                  _dayShiftColor,
                   badgeColor,
                 ),
                 const SizedBox(height: 16),
@@ -265,7 +269,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   'Night Shift',
                   Shift.night,
                   Icons.nightlight_round,
-                  const Color(0xFF4F46E5), // Modern indigo
+                  _nightShiftColor,
                   badgeColor,
                 ),
                 const SizedBox(height: 16),
@@ -474,7 +478,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final totalSplitEmployees =
         split1200Employees.length + split1400Employees.length;
 
-    const Color splitColor = Color(0xFF8B5CF6); // Modern purple
+    const Color splitColor = _splitShiftColor;
 
     return Container(
       decoration: BoxDecoration(
@@ -729,7 +733,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   /// Get color for supervisor based on rank
   Color _getSupervisorColor(Employee employee) {
     // Only LT can be supervisors now
-    return _accentGold; // Gold for lieutenants
+    return _accentGold; // Amber-700 for lieutenants (AA on white)
   }
 
   /// Build supervisor text widget with appropriate styling
@@ -749,12 +753,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildEmployeeCard(ScheduleEntry entry, Color badgeColor,
       {bool showShiftType = false}) {
     return Container(
-      constraints: const BoxConstraints(minWidth: 180),
-      padding: const EdgeInsets.all(14),
+      constraints: const BoxConstraints(minWidth: 190),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -764,8 +775,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 36,
-                height: 36,
+                width: 38,
+                height: 38,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [badgeColor, badgeColor.withOpacity(0.8)],
@@ -780,7 +791,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 10,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ),
@@ -789,17 +801,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Flexible(
                 child: Text(
                   '${entry.employee.rank} ${entry.employee.lastName}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
                     color: _primaryNavy,
+                    letterSpacing: -0.2,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -813,6 +826,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
+              const SizedBox(width: 10),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: _onDutyGreen.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: _onDutyGreen,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'On-Duty',
+                      style: TextStyle(
+                        color: _onDutyGreen,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
           if (showShiftType) ...[
@@ -820,13 +863,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFF8B5CF6).withOpacity(0.1),
+                color: _splitShiftColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
                 entry.shift,
                 style: const TextStyle(
-                  color: Color(0xFF8B5CF6),
+                  color: _splitShiftColor,
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                 ),

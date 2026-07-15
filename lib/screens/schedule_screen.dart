@@ -15,10 +15,11 @@ class ScheduleScreen extends StatefulWidget {
 class _ScheduleScreenState extends State<ScheduleScreen> {
   DateTime _selectedDate = DateTime.now();
 
-  // Modern color palette
-  static const Color _primaryNavy = Color(0xFF1E3A5F);
-  static const Color _surfaceColor = Color(0xFFF8FAFC);
-  static const Color _accentGold = Color(0xFFD4AF37);
+  // HCI-compliant color palette
+  static const Color _primaryNavy = Color(0xFF0F172A);     // Slate-900
+  static const Color _surfaceColor = Color(0xFFF8FAFC);    // Slate-50
+  static const Color _accentGold = Color(0xFFB45309);      // Amber-700
+  static const Color _onDutyGreen = Color(0xFF059669);     // Emerald-600
 
   @override
   Widget build(BuildContext context) {
@@ -338,12 +339,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   Color _getShiftColor(String shift) {
     switch (shift) {
       case Shift.day:
-        return const Color(0xFFF59E0B);  // Amber
+        return const Color(0xFFD97706);  // Amber-600
       case Shift.night:
-        return const Color(0xFF4F46E5);  // Indigo
+        return const Color(0xFF4338CA);  // Indigo-700
       case Shift.split1200:
       case Shift.split1400:
-        return const Color(0xFF8B5CF6);  // Purple
+        return const Color(0xFF7C3AED);  // Violet-600
       default:
         return _primaryNavy;
     }
@@ -398,7 +399,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   ? [Colors.grey.shade400, Colors.grey.shade500]
                   : isTemporary
                       ? [const Color(0xFF4F46E5), const Color(0xFF7C3AED)]
-                      : [const Color(0xFF10B981), const Color(0xFF059669)],
+                      : [_onDutyGreen, const Color(0xFF047857)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -483,16 +484,30 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                 decoration: BoxDecoration(
                   color: isTemporary 
                       ? const Color(0xFF4F46E5).withOpacity(0.1) 
-                      : const Color(0xFF10B981).withOpacity(0.1),
+                      : _onDutyGreen.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(
-                  isTemporary ? 'Fill-in' : 'On Duty',
-                  style: TextStyle(
-                    color: isTemporary ? const Color(0xFF4F46E5) : const Color(0xFF059669),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: isTemporary ? const Color(0xFF4F46E5) : _onDutyGreen,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      isTemporary ? 'Fill-in' : 'On-Duty',
+                      style: TextStyle(
+                        color: isTemporary ? const Color(0xFF4F46E5) : _onDutyGreen,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             if (isSupervisor) ...[

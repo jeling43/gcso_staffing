@@ -29,7 +29,7 @@ class GCSOStaffingApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF1E3A5F), // Deep navy blue
+          seedColor: const Color(0xFF0F172A), // Slate-900
             brightness: Brightness.light,
           ),
           useMaterial3: true,
@@ -37,7 +37,7 @@ class GCSOStaffingApp extends StatelessWidget {
             centerTitle: false,
             elevation: 0,
             scrolledUnderElevation: 2,
-            backgroundColor: const Color(0xFF1E3A5F),
+            backgroundColor: const Color(0xFF0F172A),
             foregroundColor: Colors.white,
             titleTextStyle: const TextStyle(
               fontSize: 20,
@@ -78,12 +78,12 @@ class GCSOStaffingApp extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF1E3A5F), width: 2),
+              borderSide: const BorderSide(color: Color(0xFF0F172A), width: 2),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           ),
           navigationRailTheme: NavigationRailThemeData(
-            backgroundColor: const Color(0xFF1E3A5F),
+            backgroundColor: const Color(0xFF0F172A),
             selectedIconTheme: const IconThemeData(color: Colors.white, size: 26),
             unselectedIconTheme: IconThemeData(color: Colors.white.withOpacity(0.7), size: 24),
             selectedLabelTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
@@ -93,11 +93,11 @@ class GCSOStaffingApp extends StatelessWidget {
           navigationBarTheme: NavigationBarThemeData(
             backgroundColor: Colors.white,
             elevation: 8,
-            indicatorColor: const Color(0xFF1E3A5F).withOpacity(0.15),
+            indicatorColor: const Color(0xFF0F172A).withOpacity(0.15),
             labelTextStyle: WidgetStateProperty.resolveWith((states) {
               if (states.contains(WidgetState.selected)) {
                 return const TextStyle(
-                  color: Color(0xFF1E3A5F),
+                  color: Color(0xFF0F172A),
                   fontWeight: FontWeight.w600,
                   fontSize: 12,
                 );
@@ -201,12 +201,12 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                     NavigationRailDestination(
                       icon: Icon(Icons.dashboard_outlined),
                       selectedIcon: Icon(Icons.dashboard),
-                      label: Text('Dashboard'),
+                      label: Text('Admin'),
                     ),
                     NavigationRailDestination(
                       icon: Icon(Icons.badge_outlined),
                       selectedIcon: Icon(Icons.badge),
-                      label: Text('Badges'),
+                      label: Text('On-Duty'),
                     ),
                     NavigationRailDestination(
                       icon: Icon(Icons.people_outlined),
@@ -266,12 +266,12 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                 NavigationDestination(
                   icon: Icon(Icons.dashboard_outlined),
                   selectedIcon: Icon(Icons.dashboard),
-                  label: 'Dashboard',
+                  label: 'Admin',
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.badge_outlined),
                   selectedIcon: Icon(Icons.badge),
-                  label: 'Badges',
+                  label: 'On-Duty',
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.people_outlined),
