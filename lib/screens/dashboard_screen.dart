@@ -478,7 +478,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final totalSplitEmployees =
         split1200Employees.length + split1400Employees.length;
 
-    const Color splitColor = _splitShiftColor;
+    final Color splitColor = _splitShiftColor;
 
     return Container(
       decoration: BoxDecoration(
@@ -801,7 +801,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Flexible(
                 child: Text(
                   '${entry.employee.rank} ${entry.employee.lastName}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
                     color: _primaryNavy,
