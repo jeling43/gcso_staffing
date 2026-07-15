@@ -17,21 +17,22 @@ class ScheduleProvider extends ChangeNotifier {
     // Determine which shift group is working today based on swing schedule
     final workingShiftGroup = ShiftGroup.getWorkingShiftGroup(today);
     
-    // Assign shifts based on employee's shiftType and shiftGroup
+    // Only create schedule entries for employees in the working shift group.
+    // Employees not assigned to today's shift are simply not scheduled —
+    // they should not appear as "Absent".
     for (final employee in employees) {
       if (employee.division != null && employee.shiftGroup != null && employee.shiftType != null) {
-        // Only add schedule entry if this employee's shift group is working today
-        final isWorking = employee.shiftGroup == workingShiftGroup;
-        
-        _scheduleEntries.add(ScheduleEntry(
-          id: 'sched_${employee.id}_${today.toIso8601String()}',
-          employee: employee,
-          division: employee.division!,
-          date: today,
-          shift: employee.shiftType!,
-          isOnDuty: isWorking,
-          isTemporary: false,
-        ));
+        if (employee.shiftGroup == workingShiftGroup) {
+          _scheduleEntries.add(ScheduleEntry(
+            id: 'sched_${employee.id}_${today.toIso8601String()}',
+            employee: employee,
+            division: employee.division!,
+            date: today,
+            shift: employee.shiftType!,
+            isOnDuty: true,
+            isTemporary: false,
+          ));
+        }
       }
     }
   }

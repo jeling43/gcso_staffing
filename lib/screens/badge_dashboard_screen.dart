@@ -42,7 +42,7 @@ class _BadgeDashboardScreenState extends State<BadgeDashboardScreen> {
           children: [
             Icon(Icons.badge_outlined, size: 20),
             SizedBox(width: 8),
-            Text('Badge Dashboard'),
+            Text('On-Duty Board'),
           ],
         ),
       ),
@@ -277,7 +277,7 @@ class _BadgeDashboardScreenState extends State<BadgeDashboardScreen> {
               Icon(icon, size: 18, color: color),
               const SizedBox(width: 8),
               Text(
-                '${matching.length} assigned',
+                '${matching.length} on-duty',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
