@@ -150,8 +150,8 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   int _selectedIndex = 0;
 
   static const List<Widget> _screens = [
-    DashboardScreen(),
-    ProtectedScreen(child: BadgeDashboardScreen()),
+    BadgeDashboardScreen(),
+    ProtectedScreen(child: DashboardScreen()),
     ProtectedScreen(child: EmployeeScreen()),
   ];
 
@@ -216,14 +216,14 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                   ),
                   destinations: const [
                     NavigationRailDestination(
-                      icon: Icon(Icons.dashboard_outlined),
-                      selectedIcon: Icon(Icons.dashboard),
-                      label: Text('Staffing Overview'),
-                    ),
-                    NavigationRailDestination(
                       icon: Icon(Icons.badge_outlined),
                       selectedIcon: Icon(Icons.badge),
                       label: Text('On-Duty Dashboard'),
+                    ),
+                    NavigationRailDestination(
+                      icon: Icon(Icons.dashboard_outlined),
+                      selectedIcon: Icon(Icons.dashboard),
+                      label: Text('Staffing Overview'),
                     ),
                     NavigationRailDestination(
                       icon: Icon(Icons.people_outlined),
@@ -276,14 +276,14 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
               },
               destinations: const [
                 NavigationDestination(
-                  icon: Icon(Icons.dashboard_outlined),
-                  selectedIcon: Icon(Icons.dashboard),
-                  label: 'Overview',
-                ),
-                NavigationDestination(
                   icon: Icon(Icons.badge_outlined),
                   selectedIcon: Icon(Icons.badge),
                   label: 'On-Duty',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.dashboard_outlined),
+                  selectedIcon: Icon(Icons.dashboard),
+                  label: 'Staffing',
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.people_outlined),
