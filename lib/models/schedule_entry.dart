@@ -7,9 +7,10 @@ class ScheduleEntry {
   final Employee employee;
   final Division division;
   final DateTime date;
-  final String shift; // "A-Days", "A-Split", "A-Night", "B-Days", "B-Split", "B-Night"
+  final String shift; // "Day", "Night", "Split-1200", or "Split-1400"
   final bool isOnDuty;
-  final bool isTemporary; // Identifies fill-in employees manually added to shifts
+  final bool
+      isTemporary; // Identifies fill-in employees manually added to shifts
 
   ScheduleEntry({
     required this.id,

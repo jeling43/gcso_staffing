@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'models/models.dart';
 import 'providers/providers.dart';
 import 'screens/screens.dart';
 
@@ -20,8 +19,13 @@ class GCSOStaffingApp extends StatelessWidget {
         ChangeNotifierProxyProvider<EmployeeProvider, ScheduleProvider>(
           create: (context) =>
               ScheduleProvider(context.read<EmployeeProvider>().employees),
-          update: (context, employeeProvider, previous) =>
-              previous ?? ScheduleProvider(employeeProvider.employees),
+          update: (context, employeeProvider, previous) {
+            if (previous == null) {
+              return ScheduleProvider(employeeProvider.employees);
+            }
+            previous.updateEmployees(employeeProvider.employees);
+            return previous;
+          },
         ),
       ],
       child: MaterialApp(
@@ -29,7 +33,7 @@ class GCSOStaffingApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF0F172A), // Slate-900
+            seedColor: const Color(0xFF0F172A), // Slate-900
             brightness: Brightness.light,
           ),
           useMaterial3: true,
@@ -40,6 +44,7 @@ class GCSOStaffingApp extends StatelessWidget {
             backgroundColor: const Color(0xFF0F172A),
             foregroundColor: Colors.white,
             titleTextStyle: const TextStyle(
+              color: Colors.white,
               fontSize: 20,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
@@ -80,14 +85,19 @@ class GCSOStaffingApp extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: Color(0xFF0F172A), width: 2),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           ),
           navigationRailTheme: NavigationRailThemeData(
             backgroundColor: const Color(0xFF0F172A),
-            selectedIconTheme: const IconThemeData(color: Colors.white, size: 26),
-            unselectedIconTheme: IconThemeData(color: Colors.white.withOpacity(0.7), size: 24),
-            selectedLabelTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-            unselectedLabelTextStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+            selectedIconTheme:
+                const IconThemeData(color: Colors.white, size: 26),
+            unselectedIconTheme:
+                IconThemeData(color: Colors.white.withOpacity(0.7), size: 24),
+            selectedLabelTextStyle: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.w600),
+            unselectedLabelTextStyle:
+                TextStyle(color: Colors.white.withOpacity(0.7)),
             indicatorColor: Colors.white.withOpacity(0.2),
           ),
           navigationBarTheme: NavigationBarThemeData(
@@ -135,7 +145,6 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     DashboardScreen(),
     BadgeDashboardScreen(),
     EmployeeScreen(),
-    ScheduleScreen(),
   ];
 
   @override
@@ -201,22 +210,17 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                     NavigationRailDestination(
                       icon: Icon(Icons.dashboard_outlined),
                       selectedIcon: Icon(Icons.dashboard),
-                      label: Text('Admin'),
+                      label: Text('Staffing Overview'),
                     ),
                     NavigationRailDestination(
                       icon: Icon(Icons.badge_outlined),
                       selectedIcon: Icon(Icons.badge),
-                      label: Text('On-Duty'),
+                      label: Text('On-Duty Dashboard'),
                     ),
                     NavigationRailDestination(
                       icon: Icon(Icons.people_outlined),
                       selectedIcon: Icon(Icons.people),
                       label: Text('Employees'),
-                    ),
-                    NavigationRailDestination(
-                      icon: Icon(Icons.calendar_today_outlined),
-                      selectedIcon: Icon(Icons.calendar_today),
-                      label: Text('Schedule'),
                     ),
                   ],
                 ),
@@ -266,7 +270,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                 NavigationDestination(
                   icon: Icon(Icons.dashboard_outlined),
                   selectedIcon: Icon(Icons.dashboard),
-                  label: 'Admin',
+                  label: 'Overview',
                 ),
                 NavigationDestination(
                   icon: Icon(Icons.badge_outlined),
@@ -277,11 +281,6 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                   icon: Icon(Icons.people_outlined),
                   selectedIcon: Icon(Icons.people),
                   label: 'Employees',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.calendar_today_outlined),
-                  selectedIcon: Icon(Icons.calendar_today),
-                  label: 'Schedule',
                 ),
               ],
             ),

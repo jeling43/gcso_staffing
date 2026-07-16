@@ -14,18 +14,13 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   DateTime _selectedDate = DateTime.now();
-  // Track selected lieutenants for each shift
-  final Map<String, Employee?> _selectedLieutenants = {
-    Shift.day: null,
-    Shift.night: null,
-  };
-
   // Design tokens — HCI-compliant (WCAG AA contrast ratios)
-  static const Color _primaryNavy = Color(0xFF0F172A);     // Slate-900: high contrast
-  static const Color _accentGold = Color(0xFFB45309);      // Amber-700: AA on white
-  static const Color _surfaceColor = Color(0xFFF8FAFC);    // Slate-50
-  static const Color _onDutyGreen = Color(0xFF059669);     // Emerald-600
-  static const Color _dayShiftColor = Color(0xFFD97706);   // Amber-600
+  static const Color _primaryNavy =
+      Color(0xFF0F172A); // Slate-900: high contrast
+  static const Color _accentGold = Color(0xFFB45309); // Amber-700: AA on white
+  static const Color _surfaceColor = Color(0xFFF8FAFC); // Slate-50
+  static const Color _onDutyGreen = Color(0xFF059669); // Emerald-600
+  static const Color _dayShiftColor = Color(0xFFD97706); // Amber-600
   static const Color _nightShiftColor = Color(0xFF4338CA); // Indigo-700
   static const Color _splitShiftColor = Color(0xFF7C3AED); // Violet-600
 
@@ -37,12 +32,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final isAShift = workingShiftGroup == ShiftGroup.a;
     final gradientColors = isAShift
         ? [const Color(0xFF0369A1), const Color(0xFF0284C7)] // Sky-700→600
-        : [const Color(0xFF0F172A), const Color(0xFF1E293B)]; // Slate-900→800
+        : [const Color(0xFF14532D), const Color(0xFF166534)]; // Green-900→800
     final shadowColor = isAShift
         ? const Color(0xFF0369A1).withOpacity(0.25)
-        : const Color(0xFF0F172A).withOpacity(0.25);
+        : const Color(0xFF14532D).withOpacity(0.25);
     final badgeColor =
-        isAShift ? const Color(0xFF0369A1) : const Color(0xFF0F172A);
+        isAShift ? const Color(0xFF0369A1) : const Color(0xFF14532D);
 
     return Scaffold(
       backgroundColor: _surfaceColor,
@@ -58,12 +53,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: const Icon(Icons.shield, size: 22),
             ),
             const SizedBox(width: 12),
-            const Text('Admin Dashboard'),
+            const Text(
+              'Staffing Overview',
+              style: TextStyle(color: Colors.white),
+            ),
           ],
         ),
       ),
       body: Consumer2<ScheduleProvider, EmployeeProvider>(
         builder: (context, scheduleProvider, employeeProvider, _) {
+          final scheduleEntries =
+              scheduleProvider.getScheduleForDate(_selectedDate);
+          final onDutyCount =
+              scheduleEntries.where((entry) => entry.isOnDuty).length;
+          final absentCount =
+              scheduleEntries.where((entry) => !entry.isOnDuty).length;
+          final fillInCount = scheduleEntries
+              .where((entry) => entry.isOnDuty && entry.isTemporary)
+              .length;
+          final dayCount = scheduleEntries
+              .where((entry) => entry.isOnDuty && entry.shift == Shift.day)
+              .length;
+          final nightCount = scheduleEntries
+              .where((entry) => entry.isOnDuty && entry.shift == Shift.night)
+              .length;
+          final splitCount = scheduleEntries
+              .where((entry) =>
+                  entry.isOnDuty &&
+                  (entry.shift == Shift.split1200 ||
+                      entry.shift == Shift.split1400))
+              .length;
+
           return SingleChildScrollView(
             padding: const EdgeInsets.all(24.0),
             child: Column(
@@ -187,10 +207,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           color: Colors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: Icon(
-                          isAShift
-                              ? Icons.wb_sunny_rounded
-                              : Icons.nightlight_round,
+                        child: const Icon(
+                          Icons.groups_rounded,
                           color: Colors.white,
                           size: 32,
                         ),
@@ -222,7 +240,51 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 20),
+
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    _buildSummaryCard(
+                      label: 'On duty',
+                      value: '$onDutyCount',
+                      icon: Icons.check_circle_rounded,
+                      color: _onDutyGreen,
+                    ),
+                    _buildSummaryCard(
+                      label: 'Day shift',
+                      value: '$dayCount',
+                      icon: Icons.wb_sunny_rounded,
+                      color: _dayShiftColor,
+                    ),
+                    _buildSummaryCard(
+                      label: 'Night shift',
+                      value: '$nightCount',
+                      icon: Icons.nightlight_round,
+                      color: _nightShiftColor,
+                    ),
+                    _buildSummaryCard(
+                      label: 'Split shifts',
+                      value: '$splitCount',
+                      icon: Icons.schedule_rounded,
+                      color: _splitShiftColor,
+                    ),
+                    _buildSummaryCard(
+                      label: 'Absent',
+                      value: '$absentCount',
+                      icon: Icons.person_off_rounded,
+                      color: const Color(0xFFDC2626),
+                    ),
+                    _buildSummaryCard(
+                      label: 'Fill-ins',
+                      value: '$fillInCount',
+                      icon: Icons.person_add_alt_1_rounded,
+                      color: const Color(0xFF4F46E5),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 28),
 
                 // Staff Breakdown by Shift Type - Modern Header
                 Row(
@@ -261,6 +323,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 const SizedBox(height: 16),
 
+                // Split Shifts (Combined)
+                _buildSplitShiftsSection(
+                  context,
+                  scheduleProvider,
+                  employeeProvider,
+                  badgeColor,
+                ),
+                const SizedBox(height: 16),
+
                 // Night Shift
                 _buildShiftTypeSection(
                   context,
@@ -272,18 +343,66 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   _nightShiftColor,
                   badgeColor,
                 ),
-                const SizedBox(height: 16),
-
-                // Split Shifts (Combined)
-                _buildSplitShiftsSection(
-                  context,
-                  scheduleProvider,
-                  badgeColor,
-                ),
               ],
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildSummaryCard({
+    required String label,
+    required String value,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Container(
+      width: 156,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withOpacity(0.18)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  style: const TextStyle(
+                    color: _primaryNavy,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    height: 1,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  label,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: _primaryNavy.withOpacity(0.65),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -328,9 +447,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Color badgeColor,
   ) {
     final scheduleEntries = scheduleProvider.getScheduleForDate(_selectedDate);
-    final shiftEmployees = scheduleEntries
-        .where((e) => e.shift == shiftType && e.isOnDuty)
-        .toList();
+    final shiftEmployees =
+        scheduleEntries.where((e) => e.shift == shiftType).toList();
+    final onDutyCount = shiftEmployees.where((e) => e.isOnDuty).length;
 
     // Get ALL supervisors (LT only) from employee provider, not just those on this shift
     final supervisors = employeeProvider.employees
@@ -391,6 +510,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                       ),
                     ),
+                    TextButton.icon(
+                      onPressed: () => _showAddFillInDialog(
+                        context,
+                        shiftType,
+                        scheduleProvider,
+                        employeeProvider,
+                      ),
+                      icon:
+                          const Icon(Icons.person_add_alt_1_rounded, size: 18),
+                      label: const Text('Add fill-in'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 8),
@@ -404,7 +538,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           Icon(Icons.people_rounded, color: color, size: 18),
                           const SizedBox(width: 6),
                           Text(
-                            '${shiftEmployees.length}',
+                            '$onDutyCount',
                             style: TextStyle(
                               color: color,
                               fontSize: 16,
@@ -422,6 +556,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     context,
                     shiftType,
                     supervisors,
+                    employeeProvider,
                   ),
                 ],
               ],
@@ -454,7 +589,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     spacing: 12,
                     runSpacing: 12,
                     children: shiftEmployees.map((entry) {
-                      return _buildEmployeeCard(entry, badgeColor);
+                      return _buildEmployeeCard(
+                        context,
+                        entry,
+                        badgeColor,
+                        scheduleProvider,
+                      );
                     }).toList(),
                   ),
           ),
@@ -466,17 +606,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _buildSplitShiftsSection(
     BuildContext context,
     ScheduleProvider scheduleProvider,
+    EmployeeProvider employeeProvider,
     Color badgeColor,
   ) {
     final scheduleEntries = scheduleProvider.getScheduleForDate(_selectedDate);
-    final split1200Employees = scheduleEntries
-        .where((e) => e.shift == Shift.split1200 && e.isOnDuty)
-        .toList();
-    final split1400Employees = scheduleEntries
-        .where((e) => e.shift == Shift.split1400 && e.isOnDuty)
-        .toList();
-    final totalSplitEmployees =
-        split1200Employees.length + split1400Employees.length;
+    final split1200Employees =
+        scheduleEntries.where((e) => e.shift == Shift.split1200).toList();
+    final split1400Employees =
+        scheduleEntries.where((e) => e.shift == Shift.split1400).toList();
+    final totalSplitEmployees = [...split1200Employees, ...split1400Employees]
+        .where((entry) => entry.isOnDuty)
+        .length;
 
     final Color splitColor = _splitShiftColor;
 
@@ -529,6 +669,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                 ),
+                PopupMenuButton<String>(
+                  tooltip: 'Add split-shift fill-in',
+                  icon: const Icon(Icons.person_add_alt_1_rounded,
+                      color: Colors.white),
+                  onSelected: (shift) => _showAddFillInDialog(
+                    context,
+                    shift,
+                    scheduleProvider,
+                    employeeProvider,
+                  ),
+                  itemBuilder: (context) => const [
+                    PopupMenuItem(
+                      value: Shift.split1200,
+                      child: Text('Add to Split 1200'),
+                    ),
+                    PopupMenuItem(
+                      value: Shift.split1400,
+                      child: Text('Add to Split 1400'),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 8),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -612,8 +774,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       spacing: 12,
                       runSpacing: 12,
                       children: split1200Employees.map((entry) {
-                        return _buildEmployeeCard(entry, badgeColor,
-                            showShiftType: true);
+                        return _buildEmployeeCard(
+                          context,
+                          entry,
+                          badgeColor,
+                          scheduleProvider,
+                          showShiftType: true,
+                        );
                       }).toList(),
                     ),
                     const SizedBox(height: 20),
@@ -648,8 +815,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       spacing: 12,
                       runSpacing: 12,
                       children: split1400Employees.map((entry) {
-                        return _buildEmployeeCard(entry, badgeColor,
-                            showShiftType: true);
+                        return _buildEmployeeCard(
+                          context,
+                          entry,
+                          badgeColor,
+                          scheduleProvider,
+                          showShiftType: true,
+                        );
                       }).toList(),
                     ),
                   ],
@@ -666,8 +838,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     BuildContext context,
     String shiftType,
     List<Employee> supervisors,
+    EmployeeProvider employeeProvider,
   ) {
-    final selectedLieutenant = _selectedLieutenants[shiftType];
+    final selectedLieutenant =
+        employeeProvider.selectedSupervisorForShift(_selectedDate, shiftType);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -675,7 +849,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         color: Colors.white.withOpacity(0.95),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Row(
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 10,
+        runSpacing: 8,
         children: [
           Container(
             padding: const EdgeInsets.all(6),
@@ -686,7 +864,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: Icon(Icons.supervisor_account_rounded,
                 size: 18, color: _accentGold),
           ),
-          const SizedBox(width: 10),
           const Text(
             'Supervisor:',
             style: TextStyle(
@@ -695,8 +872,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               color: Color(0xFF374151),
             ),
           ),
-          const SizedBox(width: 10),
-          Expanded(
+          SizedBox(
+            width: 260,
             child: DropdownButton<Employee>(
               value: selectedLieutenant,
               hint: Text(
@@ -714,9 +891,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 );
               }).toList(),
               onChanged: (Employee? newValue) {
-                setState(() {
-                  _selectedLieutenants[shiftType] = newValue;
-                });
+                employeeProvider.selectSupervisorForShift(
+                  _selectedDate,
+                  shiftType,
+                  newValue,
+                );
               },
               selectedItemBuilder: (BuildContext context) {
                 return supervisors.map((employee) {
@@ -739,24 +918,184 @@ class _DashboardScreenState extends State<DashboardScreen> {
   /// Build supervisor text widget with appropriate styling
   Widget _buildSupervisorText(Employee employee) {
     final textColor = _getSupervisorColor(employee);
-    return Text(
-      '${employee.rank} ${employee.lastName}',
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        color: textColor,
-        fontWeight: FontWeight.w600,
-        fontSize: 13,
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+        '${employee.rank} ${employee.lastName}',
+        style: TextStyle(
+          color: textColor,
+          fontWeight: FontWeight.w600,
+          fontSize: 13,
+        ),
       ),
     );
   }
 
-  Widget _buildEmployeeCard(ScheduleEntry entry, Color badgeColor,
-      {bool showShiftType = false}) {
+  void _showAddFillInDialog(
+    BuildContext context,
+    String shiftType,
+    ScheduleProvider scheduleProvider,
+    EmployeeProvider employeeProvider,
+  ) {
+    final scheduledIds = scheduleProvider
+        .getScheduleForDate(_selectedDate)
+        .map((entry) => entry.employee.id)
+        .toSet();
+    final eligibleEmployees = employeeProvider.employees
+        .where((employee) =>
+            employee.division == Division.patrol &&
+            !scheduledIds.contains(employee.id))
+        .toList();
+    Employee? selectedEmployee;
+
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text('Add fill-in to $shiftType shift'),
+          content: SizedBox(
+            width: 420,
+            child: DropdownButtonFormField<Employee>(
+              initialValue: selectedEmployee,
+              decoration: const InputDecoration(labelText: 'Employee'),
+              isExpanded: true,
+              items: eligibleEmployees
+                  .map(
+                    (employee) => DropdownMenuItem(
+                      value: employee,
+                      child: Text(
+                        '${employee.rank} ${employee.lastName} — #${employee.badgeNumber}',
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (employee) =>
+                  setDialogState(() => selectedEmployee = employee),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: selectedEmployee == null
+                  ? null
+                  : () {
+                      if (!scheduleProvider.canAddToSplit(
+                        shiftType,
+                        _selectedDate,
+                        Division.patrol,
+                      )) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'That split shift already has an on-duty employee.',
+                            ),
+                          ),
+                        );
+                        return;
+                      }
+
+                      final employee = selectedEmployee!;
+                      scheduleProvider.addScheduleEntry(
+                        ScheduleEntry(
+                          id: 'fillin_${employee.id}_${DateTime.now().microsecondsSinceEpoch}',
+                          employee: employee,
+                          division: Division.patrol,
+                          date: DateTime(
+                            _selectedDate.year,
+                            _selectedDate.month,
+                            _selectedDate.day,
+                          ),
+                          shift: shiftType,
+                          isTemporary: true,
+                        ),
+                      );
+                      Navigator.pop(dialogContext);
+                    },
+              child: const Text('Add fill-in'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showChangeShiftDialog(
+    BuildContext context,
+    ScheduleEntry entry,
+    ScheduleProvider scheduleProvider,
+  ) {
+    String selectedShift = entry.shift;
+
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text('Change shift for #${entry.employee.badgeNumber}'),
+          content: DropdownButtonFormField<String>(
+            initialValue: selectedShift,
+            decoration: const InputDecoration(labelText: 'Daily shift'),
+            items: const [
+              DropdownMenuItem(value: Shift.day, child: Text('Day')),
+              DropdownMenuItem(
+                  value: Shift.split1200, child: Text('Split 1200')),
+              DropdownMenuItem(
+                  value: Shift.split1400, child: Text('Split 1400')),
+              DropdownMenuItem(value: Shift.night, child: Text('Night')),
+            ],
+            onChanged: (value) {
+              if (value != null) {
+                setDialogState(() => selectedShift = value);
+              }
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                scheduleProvider.updateScheduleEntry(
+                  entry.copyWith(shift: selectedShift),
+                );
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmployeeCard(
+    BuildContext context,
+    ScheduleEntry entry,
+    Color badgeColor,
+    ScheduleProvider scheduleProvider, {
+    bool showShiftType = false,
+  }) {
+    final isAbsent = !entry.isOnDuty;
+    final statusColor = isAbsent
+        ? const Color(0xFFDC2626)
+        : entry.isTemporary
+            ? const Color(0xFF4F46E5)
+            : _onDutyGreen;
+    final statusLabel = isAbsent
+        ? 'Absent'
+        : entry.isTemporary
+            ? 'Fill-in'
+            : 'On-Duty';
+
     return Container(
       constraints: const BoxConstraints(minWidth: 190),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isAbsent ? const Color(0xFFFEF2F2) : Colors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
@@ -804,11 +1143,48 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
-                    color: _primaryNavy,
+                    color: isAbsent ? Colors.grey.shade600 : _primaryNavy,
                     letterSpacing: -0.2,
+                    decoration: isAbsent ? TextDecoration.lineThrough : null,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
+              ),
+              PopupMenuButton<String>(
+                tooltip: 'Schedule actions',
+                icon: const Icon(Icons.more_vert_rounded, size: 20),
+                onSelected: (action) {
+                  if (action == 'absent') {
+                    scheduleProvider.markEmployeeAbsent(entry.id, true);
+                  } else if (action == 'present') {
+                    scheduleProvider.markEmployeeAbsent(entry.id, false);
+                  } else if (action == 'remove') {
+                    scheduleProvider.removeScheduleEntry(entry.id);
+                  } else if (action == 'shift') {
+                    _showChangeShiftDialog(context, entry, scheduleProvider);
+                  }
+                },
+                itemBuilder: (context) => [
+                  if (entry.isTemporary)
+                    const PopupMenuItem(
+                      value: 'remove',
+                      child: Text('Remove fill-in'),
+                    )
+                  else if (isAbsent)
+                    const PopupMenuItem(
+                      value: 'present',
+                      child: Text('Mark present'),
+                    )
+                  else
+                    const PopupMenuItem(
+                      value: 'absent',
+                      child: Text('Mark absent'),
+                    ),
+                  const PopupMenuItem(
+                    value: 'shift',
+                    child: Text('Change daily shift'),
+                  ),
+                ],
               ),
             ],
           ),
@@ -830,7 +1206,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: _onDutyGreen.withOpacity(0.1),
+                  color: statusColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Row(
@@ -840,15 +1216,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       width: 6,
                       height: 6,
                       decoration: BoxDecoration(
-                        color: _onDutyGreen,
+                        color: statusColor,
                         shape: BoxShape.circle,
                       ),
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'On-Duty',
+                      statusLabel,
                       style: TextStyle(
-                        color: _onDutyGreen,
+                        color: statusColor,
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                       ),

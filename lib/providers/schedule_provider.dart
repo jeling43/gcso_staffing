@@ -4,41 +4,81 @@ import '../models/models.dart';
 /// Provider for managing schedule entries
 class ScheduleProvider extends ChangeNotifier {
   final List<ScheduleEntry> _scheduleEntries = [];
+  final Set<String> _generatedDateKeys = {};
+  Set<String>? _absentEntryIds;
+  List<Employee> _employees;
 
-  List<ScheduleEntry> get scheduleEntries => List.unmodifiable(_scheduleEntries);
+  Set<String> get _absences => _absentEntryIds ??= <String>{};
 
-  ScheduleProvider(List<Employee> employees) {
-    _initializeSampleSchedule(employees);
+  List<ScheduleEntry> get scheduleEntries =>
+      List.unmodifiable(_effectiveEntries());
+
+  ScheduleProvider(List<Employee> employees)
+      : _employees = List<Employee>.of(employees) {
+    _ensureScheduleForDate(DateTime.now());
   }
 
-  void _initializeSampleSchedule(List<Employee> employees) {
-    final today = DateTime.now();
-    
-    // Determine which shift group is working today based on swing schedule
-    final workingShiftGroup = ShiftGroup.getWorkingShiftGroup(today);
-    
-    // Only create schedule entries for employees in the working shift group.
-    // Employees not assigned to today's shift are simply not scheduled —
-    // they should not appear as "Absent".
-    for (final employee in employees) {
-      if (employee.division != null && employee.shiftGroup != null && employee.shiftType != null) {
-        if (employee.shiftGroup == workingShiftGroup) {
-          _scheduleEntries.add(ScheduleEntry(
-            id: 'sched_${employee.id}_${today.toIso8601String()}',
-            employee: employee,
-            division: employee.division!,
-            date: today,
-            shift: employee.shiftType!,
-            isOnDuty: true,
-            isTemporary: false,
-          ));
-        }
-      }
+  String _dateKey(DateTime date) {
+    return '${date.year.toString().padLeft(4, '0')}-'
+        '${date.month.toString().padLeft(2, '0')}-'
+        '${date.day.toString().padLeft(2, '0')}';
+  }
+
+  DateTime _dateOnly(DateTime date) =>
+      DateTime(date.year, date.month, date.day);
+
+  void updateEmployees(List<Employee> employees) {
+    _employees = List<Employee>.of(employees);
+  }
+
+  void _ensureScheduleForDate(DateTime date) {
+    final dateKey = _dateKey(date);
+    if (_generatedDateKeys.contains(dateKey)) {
+      return;
     }
+
+    final normalizedDate = _dateOnly(date);
+    final workingShiftGroup = ShiftGroup.getWorkingShiftGroup(normalizedDate);
+    final existingEmployeeIds = _scheduleEntries
+        .where((entry) => _dateKey(entry.date) == dateKey)
+        .map((entry) => entry.employee.id)
+        .toSet();
+
+    for (final employee in _employees) {
+      if (employee.division == null ||
+          employee.shiftGroup != workingShiftGroup ||
+          employee.shiftType == null ||
+          existingEmployeeIds.contains(employee.id)) {
+        continue;
+      }
+
+      _scheduleEntries.add(
+        ScheduleEntry(
+          id: 'sched_${employee.id}_$dateKey',
+          employee: employee,
+          division: employee.division!,
+          date: normalizedDate,
+          shift: employee.shiftType!,
+          isOnDuty: true,
+          isTemporary: false,
+        ),
+      );
+    }
+
+    _generatedDateKeys.add(dateKey);
+  }
+
+  List<ScheduleEntry> _effectiveEntries() {
+    return _scheduleEntries.map((entry) {
+      return _absences.contains(entry.id)
+          ? entry.copyWith(isOnDuty: false)
+          : entry;
+    }).toList();
   }
 
   List<ScheduleEntry> getScheduleForDate(DateTime date) {
-    return _scheduleEntries
+    _ensureScheduleForDate(date);
+    return _effectiveEntries()
         .where((entry) =>
             entry.date.year == date.year &&
             entry.date.month == date.month &&
@@ -46,8 +86,12 @@ class ScheduleProvider extends ChangeNotifier {
         .toList();
   }
 
-  List<ScheduleEntry> getScheduleByDivision(Division division, {DateTime? date}) {
-    var entries = _scheduleEntries.where((e) => e.division == division);
+  List<ScheduleEntry> getScheduleByDivision(Division division,
+      {DateTime? date}) {
+    if (date != null) {
+      _ensureScheduleForDate(date);
+    }
+    var entries = _effectiveEntries().where((e) => e.division == division);
     if (date != null) {
       entries = entries.where((entry) =>
           entry.date.year == date.year &&
@@ -59,7 +103,8 @@ class ScheduleProvider extends ChangeNotifier {
 
   List<ScheduleEntry> getCurrentlyOnDuty(Division division) {
     final today = DateTime.now();
-    return _scheduleEntries
+    _ensureScheduleForDate(today);
+    return _effectiveEntries()
         .where((entry) =>
             entry.division == division &&
             entry.isOnDuty &&
@@ -70,7 +115,10 @@ class ScheduleProvider extends ChangeNotifier {
   }
 
   List<ScheduleEntry> getScheduleByShift(String shift, {DateTime? date}) {
-    var entries = _scheduleEntries.where((e) => e.shift == shift);
+    if (date != null) {
+      _ensureScheduleForDate(date);
+    }
+    var entries = _effectiveEntries().where((e) => e.shift == shift);
     if (date != null) {
       entries = entries.where((entry) =>
           entry.date.year == date.year &&
@@ -82,7 +130,8 @@ class ScheduleProvider extends ChangeNotifier {
 
   List<ScheduleEntry> getCurrentlyOnDutyByShift(String shift) {
     final today = DateTime.now();
-    return _scheduleEntries
+    _ensureScheduleForDate(today);
+    return _effectiveEntries()
         .where((entry) =>
             entry.shift == shift &&
             entry.isOnDuty &&
@@ -100,13 +149,15 @@ class ScheduleProvider extends ChangeNotifier {
   void updateScheduleEntry(ScheduleEntry entry) {
     final index = _scheduleEntries.indexWhere((e) => e.id == entry.id);
     if (index != -1) {
-      _scheduleEntries[index] = entry;
+      _scheduleEntries[index] =
+          _absences.contains(entry.id) ? entry.copyWith(isOnDuty: true) : entry;
       notifyListeners();
     }
   }
 
   void removeScheduleEntry(String id) {
     _scheduleEntries.removeWhere((e) => e.id == id);
+    _absences.remove(id);
     notifyListeners();
   }
 
@@ -114,8 +165,11 @@ class ScheduleProvider extends ChangeNotifier {
   void toggleOnDutyStatus(String id) {
     final index = _scheduleEntries.indexWhere((e) => e.id == id);
     if (index != -1) {
-      final entry = _scheduleEntries[index];
-      _scheduleEntries[index] = entry.copyWith(isOnDuty: !entry.isOnDuty);
+      if (_absences.contains(id)) {
+        _absences.remove(id);
+      } else {
+        _absences.add(id);
+      }
       notifyListeners();
     }
   }
@@ -125,8 +179,11 @@ class ScheduleProvider extends ChangeNotifier {
   void markEmployeeAbsent(String scheduleEntryId, bool isAbsent) {
     final index = _scheduleEntries.indexWhere((e) => e.id == scheduleEntryId);
     if (index != -1) {
-      final entry = _scheduleEntries[index];
-      _scheduleEntries[index] = entry.copyWith(isOnDuty: !isAbsent);
+      if (isAbsent) {
+        _absences.add(scheduleEntryId);
+      } else {
+        _absences.remove(scheduleEntryId);
+      }
       notifyListeners();
     }
   }
@@ -138,9 +195,10 @@ class ScheduleProvider extends ChangeNotifier {
     if (shift != Shift.split1200 && shift != Shift.split1400) {
       return true;
     }
-    
+
     // For split shifts, check if there's already one person assigned
-    final existingCount = _scheduleEntries
+    _ensureScheduleForDate(date);
+    final existingCount = _effectiveEntries()
         .where((entry) =>
             entry.shift == shift &&
             entry.division == division &&
@@ -149,7 +207,7 @@ class ScheduleProvider extends ChangeNotifier {
             entry.date.month == date.month &&
             entry.date.day == date.day)
         .length;
-    
+
     return existingCount < 1;
   }
 }

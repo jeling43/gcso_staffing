@@ -159,15 +159,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 FloatingActionButton.extended(
-                  onPressed: () => _showGenerateSchedulesDialog(context),
-                  label: const Text('Generate Schedules'),
-                  icon: const Icon(Icons.auto_awesome_rounded),
-                  heroTag: 'generate',
-                  backgroundColor: _accentGold,
-                  foregroundColor: Colors.white,
-                ),
-                const SizedBox(height: 12),
-                FloatingActionButton.extended(
                   onPressed: () => _showAddScheduleDialog(context),
                   label: const Text('Add Schedule'),
                   icon: const Icon(Icons.add_rounded),

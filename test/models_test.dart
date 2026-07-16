@@ -7,7 +7,7 @@ void main() {
     test('has correct display names', () {
       expect(Division.patrol.displayName, equals('Patrol'));
     });
-    
+
     test('only has patrol division', () {
       expect(Division.values.length, equals(1));
       expect(Division.values.first, equals(Division.patrol));
@@ -195,19 +195,14 @@ void main() {
         shiftGroup: ShiftGroup.b,
       );
 
-      final shifts = Shift.validShifts;
-      
-      // Should have 8 shifts (4 for group A, 4 for group B)
-      expect(shifts.length, equals(8));
-      expect(shifts.contains(Shift.aDays), isTrue);
-      expect(shifts.contains(Shift.aSplit1200), isTrue);
-      expect(shifts.contains(Shift.aSplit1400), isTrue);
-      expect(shifts.contains(Shift.aNight), isTrue);
-      expect(shifts.contains(Shift.bDays), isTrue);
-      expect(shifts.contains(Shift.bSplit1200), isTrue);
-      expect(shifts.contains(Shift.bSplit1400), isTrue);
-      expect(shifts.contains(Shift.bNight), isTrue);
-      
+      final shifts = Shift.validTypes;
+
+      expect(shifts.length, equals(4));
+      expect(shifts.contains(Shift.day), isTrue);
+      expect(shifts.contains(Shift.split1200), isTrue);
+      expect(shifts.contains(Shift.split1400), isTrue);
+      expect(shifts.contains(Shift.night), isTrue);
+
       // Test creating schedule entries with the base shift types
       final dayEntry = ScheduleEntry(
         id: 'sched_day',
@@ -217,7 +212,7 @@ void main() {
         shift: Shift.day,
       );
       expect(dayEntry.shift, equals(Shift.day));
-      
+
       final split1200Entry = ScheduleEntry(
         id: 'sched_split1200',
         employee: employee,
@@ -226,7 +221,7 @@ void main() {
         shift: Shift.split1200,
       );
       expect(split1200Entry.shift, equals(Shift.split1200));
-      
+
       final split1400Entry = ScheduleEntry(
         id: 'sched_split1400',
         employee: employee,
@@ -236,102 +231,120 @@ void main() {
       );
       expect(split1400Entry.shift, equals(Shift.split1400));
     });
-    
+
     test('getDisplayName returns user-friendly names', () {
-      expect(Shift.getDisplayName(Shift.aDays), equals('Days Shift (A) - 06:00-18:00'));
-      expect(Shift.getDisplayName(Shift.aSplit1200), equals('Split Shift 1200 (A) - 12:00-24:00'));
-      expect(Shift.getDisplayName(Shift.aSplit1400), equals('Split Shift 1400 (A) - 14:00-02:00'));
-      expect(Shift.getDisplayName(Shift.aNight), equals('Night Shift (A) - 18:00-06:00'));
-      expect(Shift.getDisplayName(Shift.bDays), equals('Days Shift (B) - 06:00-18:00'));
-      expect(Shift.getDisplayName(Shift.bSplit1200), equals('Split Shift 1200 (B) - 12:00-24:00'));
-      expect(Shift.getDisplayName(Shift.bSplit1400), equals('Split Shift 1400 (B) - 14:00-02:00'));
-      expect(Shift.getDisplayName(Shift.bNight), equals('Night Shift (B) - 18:00-06:00'));
-      
-      // Test fallback for base shift types
-      expect(Shift.getDisplayName(Shift.day), equals('Days Shift - 06:00-18:00'));
-      expect(Shift.getDisplayName(Shift.night), equals('Night Shift - 18:00-06:00'));
-      expect(Shift.getDisplayName(Shift.split1200), equals('Split Shift 1200 - 12:00-24:00'));
-      expect(Shift.getDisplayName(Shift.split1400), equals('Split Shift 1400 - 14:00-02:00'));
+      expect(
+          Shift.getDisplayName(Shift.day), equals('Days Shift - 06:00-18:00'));
+      expect(Shift.getDisplayName(Shift.night),
+          equals('Night Shift - 18:00-06:00'));
+      expect(Shift.getDisplayName(Shift.split1200),
+          equals('Split Shift 1200 - 12:00-24:00'));
+      expect(Shift.getDisplayName(Shift.split1400),
+          equals('Split Shift 1400 - 14:00-02:00'));
     });
-    
+
     test('swing schedule calculates correctly', () {
       // A shift starts Jan 5, 2026 (Monday)
       final aStart = DateTime(2026, 1, 5);
-      
+
       // Day 0 (Jan 5) - A working
       expect(ShiftGroup.getWorkingShiftGroup(aStart), equals(ShiftGroup.a));
-      
+
       // Day 1 (Jan 6) - A working
-      expect(ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 1))), equals(ShiftGroup.a));
-      
+      expect(
+          ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 1))),
+          equals(ShiftGroup.a));
+
       // Day 2 (Jan 7) - B working
-      expect(ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 2))), equals(ShiftGroup.b));
-      
+      expect(
+          ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 2))),
+          equals(ShiftGroup.b));
+
       // Day 3 (Jan 8) - B working
-      expect(ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 3))), equals(ShiftGroup.b));
-      
+      expect(
+          ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 3))),
+          equals(ShiftGroup.b));
+
       // Day 4 (Jan 9) - A working
-      expect(ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 4))), equals(ShiftGroup.a));
-      
+      expect(
+          ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 4))),
+          equals(ShiftGroup.a));
+
       // Day 5 (Jan 10) - A working
-      expect(ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 5))), equals(ShiftGroup.a));
-      
+      expect(
+          ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 5))),
+          equals(ShiftGroup.a));
+
       // Day 6 (Jan 11) - A working
-      expect(ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 6))), equals(ShiftGroup.a));
-      
+      expect(
+          ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 6))),
+          equals(ShiftGroup.a));
+
       // Day 7 (Jan 12) - B working
-      expect(ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 7))), equals(ShiftGroup.b));
-      
+      expect(
+          ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 7))),
+          equals(ShiftGroup.b));
+
       // Day 8 (Jan 13) - B working
-      expect(ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 8))), equals(ShiftGroup.b));
-      
+      expect(
+          ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 8))),
+          equals(ShiftGroup.b));
+
       // Day 9 (Jan 14) - B working
-      expect(ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 9))), equals(ShiftGroup.b));
-      
+      expect(
+          ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 9))),
+          equals(ShiftGroup.b));
+
       // Day 10 (Jan 15) - A working (start of new cycle)
-      expect(ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 10))), equals(ShiftGroup.a));
+      expect(
+          ShiftGroup.getWorkingShiftGroup(aStart.add(const Duration(days: 10))),
+          equals(ShiftGroup.a));
     });
   });
 
   group('EmployeeProvider', () {
     test('initializes with 41 patrol employees', () {
       final provider = EmployeeProvider();
-      
+
       expect(provider.employees.length, equals(41));
       expect(provider.currentUser, isNotNull);
     });
-    
+
     test('all sample employees are in patrol division', () {
       final provider = EmployeeProvider();
-      
+
       for (final employee in provider.employees) {
         expect(employee.division, equals(Division.patrol));
       }
     });
-    
+
     test('employees with shift groups have valid values', () {
       final provider = EmployeeProvider();
-      
+
       for (final employee in provider.employees) {
         if (employee.shiftGroup != null) {
           expect(ShiftGroup.validGroups.contains(employee.shiftGroup), isTrue);
         }
       }
     });
-    
+
     test('shift groups are distributed correctly', () {
       final provider = EmployeeProvider();
-      
-      final bEmployees = provider.employees.where((e) => e.shiftGroup == ShiftGroup.b).toList();
-      final aEmployees = provider.employees.where((e) => e.shiftGroup == ShiftGroup.a).toList();
-      
+
+      final bEmployees = provider.employees
+          .where((e) => e.shiftGroup == ShiftGroup.b)
+          .toList();
+      final aEmployees = provider.employees
+          .where((e) => e.shiftGroup == ShiftGroup.a)
+          .toList();
+
       expect(bEmployees.length, equals(13)); // Added 1 LT to B group
       expect(aEmployees.length, equals(28)); // Added 1 LT to A group
     });
 
     test('all sample employees have ranks', () {
       final provider = EmployeeProvider();
-      
+
       for (final employee in provider.employees) {
         expect(employee.rank, isNotEmpty);
         expect(Rank.validRanks.contains(employee.rank), isTrue);
@@ -340,9 +353,9 @@ void main() {
 
     test('can filter employees by division', () {
       final provider = EmployeeProvider();
-      
+
       final patrolEmployees = provider.getEmployeesByDivision(Division.patrol);
-      
+
       expect(patrolEmployees.length, equals(39));
       for (final employee in patrolEmployees) {
         expect(employee.division, equals(Division.patrol));
@@ -351,13 +364,14 @@ void main() {
 
     test('all employees have unique IDs and badge numbers', () {
       final provider = EmployeeProvider();
-      
+
       final ids = provider.employees.map((e) => e.id).toList();
-      final badgeNumbers = provider.employees.map((e) => e.badgeNumber).toList();
-      
+      final badgeNumbers =
+          provider.employees.map((e) => e.badgeNumber).toList();
+
       // Check for unique IDs
       expect(ids.toSet().length, equals(41));
-      
+
       // Check for unique badge numbers
       expect(badgeNumbers.toSet().length, equals(41));
     });
@@ -365,13 +379,14 @@ void main() {
     test('assignToDivision updates employee division', () {
       final provider = EmployeeProvider();
       final employee = provider.employees.first;
-      
+
       // Already in patrol, just verify
       expect(employee.division, equals(Division.patrol));
-      
+
       provider.assignToDivision(employee.id, Division.patrol);
-      
-      final updatedEmployee = provider.employees.firstWhere((e) => e.id == employee.id);
+
+      final updatedEmployee =
+          provider.employees.firstWhere((e) => e.id == employee.id);
       expect(updatedEmployee.division, equals(Division.patrol));
     });
   });
@@ -381,59 +396,78 @@ void main() {
       final employeeProvider = EmployeeProvider();
       final scheduleProvider = ScheduleProvider(employeeProvider.employees);
       final today = DateTime.now();
-      
+
       // Non-split shifts should always return true
-      expect(scheduleProvider.canAddToSplit(Shift.day, today, Division.patrol), isTrue);
-      expect(scheduleProvider.canAddToSplit(Shift.night, today, Division.patrol), isTrue);
+      expect(scheduleProvider.canAddToSplit(Shift.day, today, Division.patrol),
+          isTrue);
+      expect(
+          scheduleProvider.canAddToSplit(Shift.night, today, Division.patrol),
+          isTrue);
     });
-    
+
     test('canAddToSplit enforces 1-person limit for split shifts', () {
       final employeeProvider = EmployeeProvider();
       final scheduleProvider = ScheduleProvider(employeeProvider.employees);
       final today = DateTime.now();
-      
+
       // Get current on-duty split shift staff
-      final split1200Staff = scheduleProvider.getCurrentlyOnDutyByShift(Shift.split1200);
-      final split1400Staff = scheduleProvider.getCurrentlyOnDutyByShift(Shift.split1400);
-      
+      final split1200Staff =
+          scheduleProvider.getCurrentlyOnDutyByShift(Shift.split1200);
+      final split1400Staff =
+          scheduleProvider.getCurrentlyOnDutyByShift(Shift.split1400);
+
       // If no one is on split1200, should be able to add
       if (split1200Staff.isEmpty) {
-        expect(scheduleProvider.canAddToSplit(Shift.split1200, today, Division.patrol), isTrue);
+        expect(
+            scheduleProvider.canAddToSplit(
+                Shift.split1200, today, Division.patrol),
+            isTrue);
       } else {
         // If someone is already on split1200, should not be able to add
-        expect(scheduleProvider.canAddToSplit(Shift.split1200, today, Division.patrol), isFalse);
+        expect(
+            scheduleProvider.canAddToSplit(
+                Shift.split1200, today, Division.patrol),
+            isFalse);
       }
-      
+
       // Same for split1400
       if (split1400Staff.isEmpty) {
-        expect(scheduleProvider.canAddToSplit(Shift.split1400, today, Division.patrol), isTrue);
+        expect(
+            scheduleProvider.canAddToSplit(
+                Shift.split1400, today, Division.patrol),
+            isTrue);
       } else {
-        expect(scheduleProvider.canAddToSplit(Shift.split1400, today, Division.patrol), isFalse);
+        expect(
+            scheduleProvider.canAddToSplit(
+                Shift.split1400, today, Division.patrol),
+            isFalse);
       }
     });
 
     test('markEmployeeAbsent marks employee as absent', () {
       final employeeProvider = EmployeeProvider();
       final scheduleProvider = ScheduleProvider(employeeProvider.employees);
-      
+
       // Get any schedule entry
       final entries = scheduleProvider.scheduleEntries;
       if (entries.isNotEmpty) {
         final entry = entries.first;
         final entryId = entry.id;
-        
+
         // Mark as absent
         scheduleProvider.markEmployeeAbsent(entryId, true);
-        
+
         // Verify the employee is marked as not on duty
-        final updatedEntry = scheduleProvider.scheduleEntries.firstWhere((e) => e.id == entryId);
+        final updatedEntry =
+            scheduleProvider.scheduleEntries.firstWhere((e) => e.id == entryId);
         expect(updatedEntry.isOnDuty, isFalse);
-        
+
         // Mark as present
         scheduleProvider.markEmployeeAbsent(entryId, false);
-        
+
         // Verify the employee is marked as on duty
-        final presentEntry = scheduleProvider.scheduleEntries.firstWhere((e) => e.id == entryId);
+        final presentEntry =
+            scheduleProvider.scheduleEntries.firstWhere((e) => e.id == entryId);
         expect(presentEntry.isOnDuty, isTrue);
       }
     });
@@ -442,10 +476,10 @@ void main() {
       final employeeProvider = EmployeeProvider();
       final scheduleProvider = ScheduleProvider(employeeProvider.employees);
       final today = DateTime.now();
-      
+
       final employee = employeeProvider.employees.first;
       final initialCount = scheduleProvider.scheduleEntries.length;
-      
+
       // Add a temporary employee
       scheduleProvider.addScheduleEntry(ScheduleEntry(
         id: 'fillin_test',
@@ -456,13 +490,14 @@ void main() {
         isOnDuty: true,
         isTemporary: true,
       ));
-      
+
       expect(scheduleProvider.scheduleEntries.length, equals(initialCount + 1));
-      
+
       // Find the added entry
-      final addedEntry = scheduleProvider.scheduleEntries.firstWhere((e) => e.id == 'fillin_test');
+      final addedEntry = scheduleProvider.scheduleEntries
+          .firstWhere((e) => e.id == 'fillin_test');
       expect(addedEntry.isTemporary, isTrue);
-      
+
       // Clean up
       scheduleProvider.removeScheduleEntry('fillin_test');
       expect(scheduleProvider.scheduleEntries.length, equals(initialCount));
