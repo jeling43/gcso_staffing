@@ -83,8 +83,17 @@ class ShiftGroup {
   /// - Days 10-11 (Mon-Tue): B works 2 days
   /// - Days 12-13 (Wed-Thu): A works 2 days
   static String getWorkingShiftGroup(DateTime date) {
-    final daysSinceStart = date.difference(cycleStartDate).inDays;
-    final cycleDay = daysSinceStart % 14;
+    // Compare UTC calendar dates so daylight-saving transitions cannot turn a
+    // calendar day into 23 or 25 hours and shift the rotation by one day.
+    final normalizedDate = DateTime.utc(date.year, date.month, date.day);
+    final normalizedCycleStart = DateTime.utc(
+      cycleStartDate.year,
+      cycleStartDate.month,
+      cycleStartDate.day,
+    );
+    final daysSinceStart =
+        normalizedDate.difference(normalizedCycleStart).inDays;
+    final cycleDay = ((daysSinceStart % 14) + 14) % 14;
 
     // B Shift working days:  0-2 (weekend), 5-6 (weekdays), 10-11 (weekdays)
     // A Shift working days: 3-4 (weekdays), 7-9 (weekend), 12-13 (weekdays)
@@ -131,6 +140,41 @@ class Employee {
   }) : assert(Rank.validRanks.contains(rank), 'Invalid rank: $rank');
 
   String get fullName => '$firstName $lastName';
+
+  /// Standard command-order comparison used anywhere employees are displayed.
+  static int compareByRankThenBadge(Employee first, Employee second) {
+    final rankComparison =
+        _rankPriority(first.rank).compareTo(_rankPriority(second.rank));
+    if (rankComparison != 0) {
+      return rankComparison;
+    }
+
+    final firstBadge = int.tryParse(first.badgeNumber);
+    final secondBadge = int.tryParse(second.badgeNumber);
+    if (firstBadge != null && secondBadge != null) {
+      return firstBadge.compareTo(secondBadge);
+    }
+    return first.badgeNumber.compareTo(second.badgeNumber);
+  }
+
+  static int _rankPriority(String rank) {
+    switch (rank) {
+      case Rank.captain:
+        return 0;
+      case Rank.lieutenant:
+        return 1;
+      case Rank.sergeantFirstClass:
+        return 2;
+      case Rank.sergeant:
+        return 3;
+      case Rank.corporal:
+        return 4;
+      case Rank.deputy:
+        return 5;
+      default:
+        return 6;
+    }
+  }
 
   /// Get the full shift assignment (e.g., "B Shift - Nights")
   String get shiftAssignment {

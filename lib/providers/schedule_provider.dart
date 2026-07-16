@@ -29,6 +29,44 @@ class ScheduleProvider extends ChangeNotifier {
 
   void updateEmployees(List<Employee> employees) {
     _employees = List<Employee>.of(employees);
+    final employeesById = {
+      for (final employee in _employees) employee.id: employee
+    };
+
+    _scheduleEntries.removeWhere((entry) {
+      if (entry.isTemporary) {
+        return false;
+      }
+      final currentEmployee = employeesById[entry.employee.id];
+      return currentEmployee == null ||
+          currentEmployee.shiftGroup !=
+              ShiftGroup.getWorkingShiftGroup(entry.date);
+    });
+
+    // Revisit generated dates so newly eligible employees are added from the
+    // current hard-coded roster. Date-specific temporary overrides remain.
+    _generatedDateKeys.clear();
+  }
+
+  /// Pre-generate an inclusive date range when needed by an administrative
+  /// workflow. Normal date navigation generates individual dates on demand.
+  int generateScheduleRange(DateTime startDate, DateTime endDate) {
+    final start = _dateOnly(startDate);
+    final end = _dateOnly(endDate);
+    if (end.isBefore(start)) {
+      return 0;
+    }
+
+    final entriesBefore = _scheduleEntries.length;
+    for (var date = start;
+        !date.isAfter(end);
+        date = date.add(const Duration(days: 1))) {
+      _ensureScheduleForDate(date);
+    }
+
+    final entriesCreated = _scheduleEntries.length - entriesBefore;
+    notifyListeners();
+    return entriesCreated;
   }
 
   void _ensureScheduleForDate(DateTime date) {
@@ -69,11 +107,39 @@ class ScheduleProvider extends ChangeNotifier {
   }
 
   List<ScheduleEntry> _effectiveEntries() {
-    return _scheduleEntries.map((entry) {
-      return _absences.contains(entry.id)
-          ? entry.copyWith(isOnDuty: false)
-          : entry;
-    }).toList();
+    final employeesById = {
+      for (final employee in _employees) employee.id: employee
+    };
+    final entries = <ScheduleEntry>[];
+
+    for (final entry in _scheduleEntries) {
+      final currentEmployee = employeesById[entry.employee.id];
+      if (!entry.isTemporary &&
+          (currentEmployee == null ||
+              currentEmployee.shiftGroup !=
+                  ShiftGroup.getWorkingShiftGroup(entry.date))) {
+        continue;
+      }
+
+      var effectiveEntry = currentEmployee == null
+          ? entry
+          : entry.copyWith(
+              employee: currentEmployee,
+              division: currentEmployee.division ?? entry.division,
+            );
+      if (_absences.contains(entry.id)) {
+        effectiveEntry = effectiveEntry.copyWith(isOnDuty: false);
+      }
+      entries.add(effectiveEntry);
+    }
+
+    entries.sort(
+      (first, second) => Employee.compareByRankThenBadge(
+        first.employee,
+        second.employee,
+      ),
+    );
+    return entries;
   }
 
   List<ScheduleEntry> getScheduleForDate(DateTime date) {

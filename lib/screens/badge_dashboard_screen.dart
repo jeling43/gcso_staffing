@@ -352,9 +352,12 @@ class _BadgeDashboardScreenState extends State<BadgeDashboardScreen> {
         .where((entry) => entry.shift == shiftType && entry.isOnDuty)
         .toList();
 
-    // Sort by badge number for predictable ordering
     matching.sort(
-        (a, b) => a.employee.badgeNumber.compareTo(b.employee.badgeNumber));
+      (first, second) => Employee.compareByRankThenBadge(
+        first.employee,
+        second.employee,
+      ),
+    );
 
     return Container(
       padding: const EdgeInsets.all(16),

@@ -8,19 +8,8 @@ class EmployeeProvider extends ChangeNotifier {
 
   List<Employee> get employees {
     final sortedEmployees = List<Employee>.of(_employees)
-      ..sort(_compareEmployeesById);
+      ..sort(Employee.compareByRankThenBadge);
     return List.unmodifiable(sortedEmployees);
-  }
-
-  static int _compareEmployeesById(Employee first, Employee second) {
-    final firstId = int.tryParse(first.id);
-    final secondId = int.tryParse(second.id);
-
-    if (firstId != null && secondId != null) {
-      return firstId.compareTo(secondId);
-    }
-
-    return first.id.compareTo(second.id);
   }
 
   // Everyone can modify schedule - no user authentication
@@ -71,6 +60,19 @@ class EmployeeProvider extends ChangeNotifier {
         firstName: 'C.L.',
         lastName: 'PHILLIPS (FTO/ UAV PILOT)',
         badgeNumber: '014',
+        rank: Rank.lieutenant,
+        isSupervisor: true,
+        division: Division.patrol,
+        //shiftGroup: ShiftGroup.a,
+        //shiftType: Shift.day,
+        employmentStatus: EmploymentStatus.fullTime,
+      ),
+
+      Employee(
+        id: '017',
+        firstName: 'R.C.',
+        lastName: 'GARCIA',
+        badgeNumber: '017',
         rank: Rank.lieutenant,
         isSupervisor: true,
         division: Division.patrol,
@@ -210,18 +212,7 @@ class EmployeeProvider extends ChangeNotifier {
           shiftGroup: ShiftGroup.a,
           shiftType: Shift.night,
           employmentStatus: EmploymentStatus.fullTime),
-      Employee(
-        id: '122',
-        firstName: 'R.C.',
-        lastName: 'GARCIA',
-        badgeNumber: '122',
-        rank: Rank.sergeantFirstClass,
-        isSupervisor: false,
-        division: Division.patrol,
-        shiftGroup: ShiftGroup.a,
-        shiftType: Shift.night,
-        employmentStatus: EmploymentStatus.fullTime,
-      ),
+
       Employee(
         id: '123',
         firstName: 'C.A.',
@@ -237,25 +228,13 @@ class EmployeeProvider extends ChangeNotifier {
       Employee(
         id: '126',
         firstName: 'A.S.',
-        lastName: 'Carnes',
+        lastName: 'CARNES',
         badgeNumber: '126',
         rank: Rank.deputy,
         isSupervisor: false,
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
         shiftType: Shift.night,
-        employmentStatus: EmploymentStatus.fullTime,
-      ),
-      Employee(
-        id: '129',
-        firstName: 'E.L.',
-        lastName: 'KIRBY',
-        badgeNumber: '129',
-        rank: Rank.sergeantFirstClass,
-        isSupervisor: false,
-        division: Division.patrol,
-        shiftGroup: ShiftGroup.a,
-        shiftType: Shift.day,
         employmentStatus: EmploymentStatus.fullTime,
       ),
       Employee(
@@ -366,18 +345,7 @@ class EmployeeProvider extends ChangeNotifier {
         shiftType: null,
         employmentStatus: EmploymentStatus.partTime,
       ),
-      Employee(
-        id: '150',
-        firstName: 'M.D.',
-        lastName: 'GALLMAN',
-        badgeNumber: '150',
-        rank: Rank.deputy,
-        isSupervisor: false,
-        division: Division.patrol,
-        shiftGroup: ShiftGroup.b,
-        shiftType: Shift.night,
-        employmentStatus: EmploymentStatus.fullTime,
-      ),
+
       Employee(
         id: '153',
         firstName: 'J.T.',
@@ -564,11 +532,11 @@ class EmployeeProvider extends ChangeNotifier {
         firstName: 'M.D.',
         lastName: 'RALSTON',
         badgeNumber: '954',
-        rank: Rank.deputy,
+        rank: Rank.sergeantFirstClass,
         isSupervisor: false,
         division: Division.patrol,
         shiftGroup: ShiftGroup.a,
-        shiftType: Shift.night,
+        shiftType: Shift.day,
         employmentStatus: EmploymentStatus.fullTime,
       ),
     ]);

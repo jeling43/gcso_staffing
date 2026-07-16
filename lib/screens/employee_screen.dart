@@ -474,7 +474,8 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
     final unassigned = employees
         .where((employee) =>
             employee.shiftGroup == null || employee.shiftType == null)
-        .toList();
+        .toList()
+      ..sort(Employee.compareByRankThenBadge);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -508,7 +509,8 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
   ) {
     final groupEmployees = employees
         .where((employee) => employee.shiftGroup == shiftGroup)
-        .toList();
+        .toList()
+      ..sort(Employee.compareByRankThenBadge);
     const shiftTypes = [
       Shift.day,
       Shift.split1200,
