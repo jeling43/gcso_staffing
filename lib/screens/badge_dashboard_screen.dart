@@ -45,6 +45,14 @@ class _BadgeDashboardScreenState extends State<BadgeDashboardScreen> {
             Text('On-Duty Dashboard'),
           ],
         ),
+        actions: [
+          IconButton(
+            tooltip: 'Sign out',
+            onPressed: context.read<AuthProvider>().signOut,
+            icon: const Icon(Icons.logout_rounded),
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: Consumer2<ScheduleProvider, EmployeeProvider>(
         builder: (context, scheduleProvider, employeeProvider, _) {

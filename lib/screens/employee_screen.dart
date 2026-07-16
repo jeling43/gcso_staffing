@@ -52,6 +52,14 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
             const Text('Employee Directory'),
           ],
         ),
+        actions: [
+          IconButton(
+            tooltip: 'Sign out',
+            onPressed: context.read<AuthProvider>().signOut,
+            icon: const Icon(Icons.logout_rounded),
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: Consumer<EmployeeProvider>(
         builder: (context, employeeProvider, _) {

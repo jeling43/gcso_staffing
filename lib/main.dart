@@ -1,9 +1,16 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'firebase_options.dart';
 import 'providers/providers.dart';
 import 'screens/screens.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(const GCSOStaffingApp());
 }
 
@@ -15,6 +22,7 @@ class GCSOStaffingApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => EmployeeProvider()),
         ChangeNotifierProxyProvider<EmployeeProvider, ScheduleProvider>(
           create: (context) =>
@@ -143,8 +151,8 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
 
   static const List<Widget> _screens = [
     DashboardScreen(),
-    BadgeDashboardScreen(),
-    EmployeeScreen(),
+    ProtectedScreen(child: BadgeDashboardScreen()),
+    ProtectedScreen(child: EmployeeScreen()),
   ];
 
   @override

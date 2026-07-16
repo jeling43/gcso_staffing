@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../models/models.dart';
 import '../providers/providers.dart';
+import 'admin_login_screen.dart';
 
 /// Dashboard screen showing staffing overview by shift
 class DashboardScreen extends StatefulWidget {
@@ -59,6 +60,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ],
         ),
+        actions: [
+          Consumer<AuthProvider>(
+            builder: (context, authProvider, _) {
+              if (authProvider.isAuthenticated) {
+                return IconButton(
+                  tooltip: 'Sign out',
+                  onPressed: authProvider.signOut,
+                  icon: const Icon(Icons.logout_rounded),
+                );
+              }
+              return TextButton.icon(
+                onPressed: () => _openAdminLogin(context),
+                icon: const Icon(Icons.lock_outline, color: Colors.white),
+                label: const Text(
+                  'Admin sign in',
+                  style: TextStyle(color: Colors.white),
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: Consumer2<ScheduleProvider, EmployeeProvider>(
         builder: (context, scheduleProvider, employeeProvider, _) {
@@ -446,6 +469,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Color color,
     Color badgeColor,
   ) {
+    final canEdit = context.watch<AuthProvider>().isAuthenticated;
     final scheduleEntries = scheduleProvider.getScheduleForDate(_selectedDate);
     final shiftEmployees =
         scheduleEntries.where((e) => e.shift == shiftType).toList();
@@ -511,15 +535,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ),
                     TextButton.icon(
-                      onPressed: () => _showAddFillInDialog(
-                        context,
-                        shiftType,
-                        scheduleProvider,
-                        employeeProvider,
+                      onPressed: canEdit
+                          ? () => _showAddFillInDialog(
+                                context,
+                                shiftType,
+                                scheduleProvider,
+                                employeeProvider,
+                              )
+                          : () => _openAdminLogin(context),
+                      icon: Icon(
+                        canEdit
+                            ? Icons.person_add_alt_1_rounded
+                            : Icons.lock_outline,
+                        size: 18,
                       ),
-                      icon:
-                          const Icon(Icons.person_add_alt_1_rounded, size: 18),
-                      label: const Text('Add fill-in'),
+                      label: Text(canEdit ? 'Add fill-in' : 'Sign in to edit'),
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.white,
                       ),
@@ -609,6 +639,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     EmployeeProvider employeeProvider,
     Color badgeColor,
   ) {
+    final canEdit = context.watch<AuthProvider>().isAuthenticated;
     final scheduleEntries = scheduleProvider.getScheduleForDate(_selectedDate);
     final split1200Employees =
         scheduleEntries.where((e) => e.shift == Shift.split1200).toList();
@@ -669,27 +700,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                 ),
-                PopupMenuButton<String>(
-                  tooltip: 'Add split-shift fill-in',
-                  icon: const Icon(Icons.person_add_alt_1_rounded,
-                      color: Colors.white),
-                  onSelected: (shift) => _showAddFillInDialog(
-                    context,
-                    shift,
-                    scheduleProvider,
-                    employeeProvider,
+                if (canEdit)
+                  PopupMenuButton<String>(
+                    tooltip: 'Add split-shift fill-in',
+                    icon: const Icon(Icons.person_add_alt_1_rounded,
+                        color: Colors.white),
+                    onSelected: (shift) => _showAddFillInDialog(
+                      context,
+                      shift,
+                      scheduleProvider,
+                      employeeProvider,
+                    ),
+                    itemBuilder: (context) => const [
+                      PopupMenuItem(
+                        value: Shift.split1200,
+                        child: Text('Add to Split 1200'),
+                      ),
+                      PopupMenuItem(
+                        value: Shift.split1400,
+                        child: Text('Add to Split 1400'),
+                      ),
+                    ],
+                  )
+                else
+                  IconButton(
+                    tooltip: 'Sign in to edit',
+                    onPressed: () => _openAdminLogin(context),
+                    icon: const Icon(Icons.lock_outline, color: Colors.white),
                   ),
-                  itemBuilder: (context) => const [
-                    PopupMenuItem(
-                      value: Shift.split1200,
-                      child: Text('Add to Split 1200'),
-                    ),
-                    PopupMenuItem(
-                      value: Shift.split1400,
-                      child: Text('Add to Split 1400'),
-                    ),
-                  ],
-                ),
                 const SizedBox(width: 8),
                 Container(
                   padding:
@@ -840,6 +878,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     List<Employee> supervisors,
     EmployeeProvider employeeProvider,
   ) {
+    final canEdit = context.watch<AuthProvider>().isAuthenticated;
     final selectedLieutenant =
         employeeProvider.selectedSupervisorForShift(_selectedDate, shiftType);
 
@@ -890,13 +929,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   child: _buildSupervisorText(employee),
                 );
               }).toList(),
-              onChanged: (Employee? newValue) {
-                employeeProvider.selectSupervisorForShift(
-                  _selectedDate,
-                  shiftType,
-                  newValue,
-                );
-              },
+              onChanged: canEdit
+                  ? (Employee? newValue) {
+                      employeeProvider.selectSupervisorForShift(
+                        _selectedDate,
+                        shiftType,
+                        newValue,
+                      );
+                    }
+                  : null,
               selectedItemBuilder: (BuildContext context) {
                 return supervisors.map((employee) {
                   return _buildSupervisorText(employee);
@@ -1079,6 +1120,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ScheduleProvider scheduleProvider, {
     bool showShiftType = false,
   }) {
+    final canEdit = context.watch<AuthProvider>().isAuthenticated;
     final isAbsent = !entry.isOnDuty;
     final statusColor = isAbsent
         ? const Color(0xFFDC2626)
@@ -1150,42 +1192,49 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              PopupMenuButton<String>(
-                tooltip: 'Schedule actions',
-                icon: const Icon(Icons.more_vert_rounded, size: 20),
-                onSelected: (action) {
-                  if (action == 'absent') {
-                    scheduleProvider.markEmployeeAbsent(entry.id, true);
-                  } else if (action == 'present') {
-                    scheduleProvider.markEmployeeAbsent(entry.id, false);
-                  } else if (action == 'remove') {
-                    scheduleProvider.removeScheduleEntry(entry.id);
-                  } else if (action == 'shift') {
-                    _showChangeShiftDialog(context, entry, scheduleProvider);
-                  }
-                },
-                itemBuilder: (context) => [
-                  if (entry.isTemporary)
+              if (canEdit)
+                PopupMenuButton<String>(
+                  tooltip: 'Schedule actions',
+                  icon: const Icon(Icons.more_vert_rounded, size: 20),
+                  onSelected: (action) {
+                    if (action == 'absent') {
+                      scheduleProvider.markEmployeeAbsent(entry.id, true);
+                    } else if (action == 'present') {
+                      scheduleProvider.markEmployeeAbsent(entry.id, false);
+                    } else if (action == 'remove') {
+                      scheduleProvider.removeScheduleEntry(entry.id);
+                    } else if (action == 'shift') {
+                      _showChangeShiftDialog(context, entry, scheduleProvider);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    if (entry.isTemporary)
+                      const PopupMenuItem(
+                        value: 'remove',
+                        child: Text('Remove fill-in'),
+                      )
+                    else if (isAbsent)
+                      const PopupMenuItem(
+                        value: 'present',
+                        child: Text('Mark present'),
+                      )
+                    else
+                      const PopupMenuItem(
+                        value: 'absent',
+                        child: Text('Mark absent'),
+                      ),
                     const PopupMenuItem(
-                      value: 'remove',
-                      child: Text('Remove fill-in'),
-                    )
-                  else if (isAbsent)
-                    const PopupMenuItem(
-                      value: 'present',
-                      child: Text('Mark present'),
-                    )
-                  else
-                    const PopupMenuItem(
-                      value: 'absent',
-                      child: Text('Mark absent'),
+                      value: 'shift',
+                      child: Text('Change daily shift'),
                     ),
-                  const PopupMenuItem(
-                    value: 'shift',
-                    child: Text('Change daily shift'),
-                  ),
-                ],
-              ),
+                  ],
+                )
+              else
+                IconButton(
+                  tooltip: 'Sign in to edit',
+                  onPressed: () => _openAdminLogin(context),
+                  icon: const Icon(Icons.lock_outline, size: 19),
+                ),
             ],
           ),
           const SizedBox(height: 10),
@@ -1253,6 +1302,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ],
         ],
+      ),
+    );
+  }
+
+  void _openAdminLogin(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => const AdminLoginScreen(),
       ),
     );
   }
